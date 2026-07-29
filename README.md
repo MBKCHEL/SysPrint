@@ -37,7 +37,7 @@ mint <img width="1920" height="1080" alt="image" src="https://github.com/user-at
 
 1. **Clone the repository:**
    ```
-   git clone [https://github.com/MBKCHEL/SysPrint.git](https://github.com/MBKCHEL/SysPrint.git)
+   git clone https://github.com/MBKCHEL/SysPrint.git
    cd SysPrint
    ```
     Build the release binary:
