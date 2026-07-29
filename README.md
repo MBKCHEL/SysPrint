@@ -35,26 +35,26 @@ mint <img width="1920" height="1080" alt="image" src="https://github.com/user-at
 
 ### Linux
 
-1. **Clone the repository:**
-   ```
-   git clone https://github.com/MBKCHEL/SysPrint.git
-   cd SysPrint
-   ```
-    Build the release binary:
-   ```
-    cargo build --release
-   ```
-    Install globally (optional):
-    Move the binary to /usr/local/bin to run sysprint from anywhere in your terminal:
-    
-    ```
-    sudo cp target/release/sysprint /usr/local/bin/
-    ```
-    Auto-run on Terminal Startup (optional):
-    To display system info every time you open a terminal, add sysprint to your shell config file (~/.bashrc or ~/.zshrc):
-    
-    ```
-    echo "sysprint" >> ~/.bashrc
-    ```
+#### Option 1: Fast Install (Precompiled Binary)
+Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/releases/tag/1.0.0) and install to download folder:
+```bash
+chmod +x ~/Downloads/sysprint-linux
+sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
+```
+*(Replace `Downloads` with `Загрузки` if needed).*
+
+#### Option 2: Build from Source
+```bash
+git clone https://github.com/MBKCHEL/SysPrint.git
+cd SysPrint
+cargo build --release
+sudo cp target/release/sysprint /usr/local/bin/
+```
+
+#### Auto-run on Terminal Startup (Optional)
+```bash
+echo "sysprint" >> ~/.bashrc
+```
+
 ### Windows
-Download last release on GitHub, and run his!
+Download the `.exe` from the Releases page and run it.
