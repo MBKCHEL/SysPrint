@@ -9,5 +9,31 @@ A fast, lightweight, and customizable system information fetch tool written in R
 
 ## Installation
 
-### Download last release on GitHub, and run his! 
+### Linux
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/MBKCHEL/SysPrint.git](https://github.com/MBKCHEL/SysPrint.git)
+   cd SysPrint
+   ```
+
+2. Build the release binary:
+   ```
+   cargo build --release
+   ```
+3. Install globally (optional):
+Move the binary to /usr/local/bin to run sysprint from anywhere in your terminal:
+Bash
+
+sudo cp target/release/sysprint /usr/local/bin/
+
+4. Auto-run on Terminal Startup (optional):
+   To display system info every time you open a terminal, add sysprint to your shell config file (~/.bashrc or ~/.zshrc):
+```
+echo "sysprint" >> ~/.bashrc
+```
+
+### Windows
+### Download last release on GitHub, and run his!
+
 
