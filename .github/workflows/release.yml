@@ -1,11 +1,11 @@
 name: Build and Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
+  
   build:
     name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
