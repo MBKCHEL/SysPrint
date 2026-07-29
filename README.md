@@ -13,10 +13,8 @@ A fast, lightweight, and customizable system information fetch tool written in R
 
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/MBKCHEL/SysPrint.git]
-   (https://github.com/MBKCHEL/SysPrint.git)
+   git clone [https://github.com/MBKCHEL/SysPrint.git](https://github.com/MBKCHEL/SysPrint.git)
    cd SysPrint
-   ```
 
 2. Build the release binary:
    ```
