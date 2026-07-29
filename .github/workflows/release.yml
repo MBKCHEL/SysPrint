@@ -15,12 +15,19 @@ jobs:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             artifact_name: sysprint-linux
+            binary_name: sysprint
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact_name: sysprint-windows.exe
+            artifact_name: sysprint-windows
+            binary_name: sysprint.exe
           - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: sysprint-macos-arm64
+            binary_name: sysprint
+          - os: macos-13
             target: x86_64-apple-darwin
-            artifact_name: sysprint-macos
+            artifact_name: sysprint-macos-intel
+            binary_name: sysprint
 
     steps:
       - name: Checkout code
@@ -34,13 +41,25 @@ jobs:
       - name: Build binary
         run: cargo build --release --target ${{ matrix.target }}
 
+      - name: Rename binary before upload
+        shell: bash
+        run: |
+          cd target/${{ matrix.target }}/release/
+          if [ "${{ matrix.binary_name }}" = "sysprint.exe" ]; then
+            mv sysprint.exe sysprint-windows.exe
+          else
+            mv sysprint ${{ matrix.artifact_name }}
+          fi
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            target/${{ matrix.target }}/release/sysprint
-            target/${{ matrix.target }}/release/sysprint.exe
+            target/${{ matrix.target }}/release/sysprint-linux
+            target/${{ matrix.target }}/release/sysprint-windows.exe
+            target/${{ matrix.target }}/release/sysprint-macos-arm64
+            target/${{ matrix.target }}/release/sysprint-macos-intel
 
   release:
     needs: build
@@ -50,13 +69,12 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          files: |
-            sysprint-linux/sysprint
-            sysprint-windows.exe/sysprint.exe
-            sysprint-macos/sysprint
+          files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
