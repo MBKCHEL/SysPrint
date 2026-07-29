@@ -41,6 +41,7 @@ Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/release
 chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
 ```
+and write *sysprint*
 *Или Если у вас русский интерфейс:*
 ```bash
 chmod +x ~/Загрузки/sysprint-linux
