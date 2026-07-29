@@ -22,11 +22,7 @@ jobs:
             binary_name: sysprint.exe
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact_name: sysprint-macos-arm64
-            binary_name: sysprint
-          - os: macos-13
-            target: x86_64-apple-darwin
-            artifact_name: sysprint-macos-intel
+            artifact_name: sysprint-macos
             binary_name: sysprint
 
     steps:
@@ -58,8 +54,7 @@ jobs:
           path: |
             target/${{ matrix.target }}/release/sysprint-linux
             target/${{ matrix.target }}/release/sysprint-windows.exe
-            target/${{ matrix.target }}/release/sysprint-macos-arm64
-            target/${{ matrix.target }}/release/sysprint-macos-intel
+            target/${{ matrix.target }}/release/sysprint-macos
 
   release:
     needs: build
