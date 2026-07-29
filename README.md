@@ -22,9 +22,9 @@ A fast, lightweight, and customizable system information fetch tool written in R
    ```
 3. Install globally (optional):
 Move the binary to /usr/local/bin to run sysprint from anywhere in your terminal:
-Bash
-
+```
 sudo cp target/release/sysprint /usr/local/bin/
+```
 
 4. Auto-run on Terminal Startup (optional):
    To display system info every time you open a terminal, add sysprint to your shell config file (~/.bashrc or ~/.zshrc):
