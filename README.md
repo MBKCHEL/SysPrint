@@ -8,8 +8,8 @@ A fast, lightweight, and customizable system information fetch tool written in R
 
 Windows <img width="972" height="494" alt="изображение" src="https://github.com/user-attachments/assets/b266bc19-46ad-45bc-b08b-61df368fc4f8" />
 Debian <img width="1005" height="570" alt="изображение" src="https://github.com/user-attachments/assets/95c5627f-4b99-4a92-9fbd-28b8b025d149" />
-Also available Arch, mint, ubuntu, macOS, gentoo, fedora, kali. And next soon!!!!
-If you distro not have in SysPrint in Logo will standart logo GNU/Linux - tax
+> 🐧 **Supported Logos:** Arch, Debian, Linux Mint, Ubuntu, macOS, Gentoo, Fedora, Kali, and Windows. More coming soon!  
+> *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
 
