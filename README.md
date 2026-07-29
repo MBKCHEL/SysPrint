@@ -2,6 +2,13 @@
 
 A fast, lightweight, and customizable system information fetch tool written in Rust. Inspired by `neofetch` and `fastfetch`.
 
+## 💡 Usage Note
+
+> **Note for Windows & Terminal Users:**  
+> After displaying the system information, `SysPrint` waits for you to press **`Enter`** before exiting. 
+> * **If you run it from terminal (CMD / PowerShell / Bash):** Just press `Enter` to return to your command line.
+> * **If you run it by double-clicking the `.exe` on Windows:** Press `Enter` when you are done reading your stats so the window closes.
+
 ## Features
 - 🚀 Blazing fast performance thanks to Rust
 - 🎨 Beautiful ASCII art logos and colored CLI output
