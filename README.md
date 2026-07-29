@@ -41,7 +41,11 @@ Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/release
 chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
 ```
-*(Replace `Downloads` with `Загрузки` if needed).*
+*Или Если у вас русский интерфейс:*
+```bash
+chmod +x ~/Загрузки/sysprint-linux
+sudo mv ~/Загрузки/sysprint-linux /usr/local/bin/sysprint
+```
 
 #### Option 2: Build from Source
 ```bash
