@@ -25,7 +25,7 @@ Debian <img width="1005" height="570" alt="изображение" src="https://
 ## Features
 - 🚀 Blazing fast performance thanks to Rust
 - 🎨 Beautiful ASCII art logos and colored CLI output
-- 💻 Displays CPU, RAM, OS, Kernel, and Hostname info using the `sysinfo` crate
+- 💻 Displays CPU, RAM, OS, Kernel, info using the `sysinfo` crate
 
 ---
 
@@ -54,5 +54,5 @@ Debian <img width="1005" height="570" alt="изображение" src="https://
     ```
     echo "sysprint" >> ~/.bashrc
     ```
-Windows
+### Windows
 Download last release on GitHub, and run his!
