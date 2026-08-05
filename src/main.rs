@@ -1,11 +1,10 @@
 mod logos;
+use colored::*;
 use std::env;
 use std::fs;
-use std::process::Command;
 use std::io::stdin;
-use sysinfo::{System, Components, Disks};
-use colored::*;
-
+use std::process::Command;
+use sysinfo::{Components, Disks, System};
 
 fn get_gpu_info() -> Vec<String> {
     let mut gpu_lines = Vec::new();
@@ -14,7 +13,7 @@ fn get_gpu_info() -> Vec<String> {
     let nvidia_output = Command::new("nvidia-smi")
         .args([
             "--query-gpu=gpu_name,memory.total,memory.used,temperature.gpu",
-            "--format=csv,noheader,nounits"
+            "--format=csv,noheader,nounits",
         ])
         .output();
 
@@ -29,7 +28,12 @@ fn get_gpu_info() -> Vec<String> {
                 let temp = parts[3];
 
                 gpu_lines.push(format!("{}: {}", "GPU".bold(), name));
-                gpu_lines.push(format!("{}: {:.2} GB / {:.2} GB", "VRAM".bold(), mem_used, mem_total));
+                gpu_lines.push(format!(
+                    "{}: {:.2} GB / {:.2} GB",
+                    "VRAM".bold(),
+                    mem_used,
+                    mem_total
+                ));
                 gpu_lines.push(format!("{}: {}°C", "GPU Temp".bold(), temp));
 
                 return gpu_lines;
@@ -43,7 +47,10 @@ fn get_gpu_info() -> Vec<String> {
     #[cfg(windows)]
     {
         let output = Command::new("powershell")
-            .args(["-Command", "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name"])
+            .args([
+                "-Command",
+                "Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name",
+            ])
             .output();
 
         if let Ok(out) = output {
@@ -66,7 +73,12 @@ fn get_gpu_info() -> Vec<String> {
             if let Some(line) = text.lines().next() {
                 if let Some(pos) = line.find(':') {
                     let raw_name = line[pos + 1..].trim();
-                    name = raw_name.split(':').last().unwrap_or(raw_name).trim().to_string();
+                    name = raw_name
+                        .split(':')
+                        .last()
+                        .unwrap_or(raw_name)
+                        .trim()
+                        .to_string();
                 }
             }
         }
@@ -79,7 +91,6 @@ fn get_gpu_info() -> Vec<String> {
     gpu_lines.push(format!("{}: {}", "GPU".bold(), name));
     gpu_lines
 }
-
 
 fn main() {
     // For fucking Windows CMD
@@ -95,10 +106,21 @@ fn main() {
 
     // --- SYSTEM INFO ---
     info.push(format!("{}", "--- System INFO ---".bold().cyan()));
-    info.push(format!("{}: {}", "OS".bold(), System::name().unwrap_or_default()));
-    info.push(format!("{}: {}", "OS Version".bold(), System::os_version().unwrap_or_default()));
-    info.push(format!("{}: {}", "Host".bold(), System::host_name().unwrap_or_default()));
-
+    info.push(format!(
+        "{}: {}",
+        "OS".bold(),
+        System::name().unwrap_or_default()
+    ));
+    info.push(format!(
+        "{}: {}",
+        "OS Version".bold(),
+        System::os_version().unwrap_or_default()
+    ));
+    info.push(format!(
+        "{}: {}",
+        "Host".bold(),
+        System::host_name().unwrap_or_default()
+    ));
 
     // --- CPU INFO ---
     info.push(format!("{}", "--- CPU INFO ---".bold().cyan()));
@@ -121,7 +143,11 @@ fn main() {
     let components = Components::new_with_refreshed_list();
     let cpu_temp = components.iter().find_map(|comp| {
         let label = comp.label().to_lowercase();
-        if label.contains("cpu") || label.contains("core") || label.contains("package") || label.contains("k10temp") {
+        if label.contains("cpu")
+            || label.contains("core")
+            || label.contains("package")
+            || label.contains("k10temp")
+        {
             comp.temperature()
         } else {
             None
@@ -133,15 +159,23 @@ fn main() {
     }
 
     // Processor Cores & Threads
-    info.push(format!("{}: {}", "Cores".bold(), System::physical_core_count().unwrap_or(0)));
+    info.push(format!(
+        "{}: {}",
+        "Cores".bold(),
+        System::physical_core_count().unwrap_or(0)
+    ));
     info.push(format!("{}: {}", "Threads".bold(), cpus.len()));
-
 
     // --- MEMORY INFO ---
     info.push(format!("{}", "--- Memory INFO ---".bold().cyan()));
     let total_ram = sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_ram = sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
-    info.push(format!("{}: {:.2} GB / {:.2} GB", "RAM".bold(), used_ram, total_ram));
+    info.push(format!(
+        "{}: {:.2} GB / {:.2} GB",
+        "RAM".bold(),
+        used_ram,
+        total_ram
+    ));
 
     // --- DISKS INFO ---
     info.push(format!("{}", "--- Disks INFO ---".bold().cyan()));
@@ -186,12 +220,10 @@ fn main() {
     };
     info.push(format!("{}: {}", "Battery".bold(), battery));
 
-
     // TODO: Render logic with ASCII Logo goes here
     // GPU info
     info.push(format!("{}", "--- GPU INFO ---".bold().cyan()));
     info.extend(get_gpu_info());
-
 
     // --- Render logic with ASCII Logo ---
     let (logo, logo_padding) = logos::get_logo();
@@ -202,12 +234,11 @@ fn main() {
         if i < logo.len() {
             let logo_line = &logo[i];
 
-
             print!("{}", logo_line);
 
-
-            let raw_len = strip_ansi_escapes::strip_str(&logo_line.to_string()).chars().count();
-
+            let raw_len = strip_ansi_escapes::strip_str(&logo_line.to_string())
+                .chars()
+                .count();
 
             let pad = if logo_padding > raw_len {
                 logo_padding - raw_len + 3
@@ -219,10 +250,14 @@ fn main() {
             print!("{}", " ".repeat(logo_padding + 3));
         }
 
-
         let info_line = info.get(i).unwrap_or(&String::new()).clone();
         println!("{}", info_line);
     }
 
-    stdin().read_line(&mut String::new()).expect("Did not enter a correct string");
+    #[cfg(windows)]
+    {
+        use std::io::stdin;
+        let mut dummy = String::new();
+        let _ = stdin().read_line(&mut dummy);
+    }
 }
