@@ -12,7 +12,7 @@ Mint <img width="1920" height="1080" alt="image" src="https://github.com/user-at
 Arch <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/6e2f2dca-0ad7-44f6-b38a-7db60c859760" />
 
 
-> 🐧 **Supported Logos:** Arch, Debian, Linux Mint, Ubuntu, macOS, Gentoo, Fedora, Kali, and Windows. More coming soon!  
+> 🐧 **Supported Logos:** Arch, Debian, Linux Mint, Ubuntu, macOS, Gentoo, Fedora, Kali, Manjaro, void Linux, NixOS, and Windows. More coming soon!  
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
