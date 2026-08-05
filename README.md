@@ -69,3 +69,20 @@ echo "sysprint" >> ~/.bashrc
 
 ### Windows
 Download the `.exe` from the Releases page and run it.
+
+## Uninstallation
+## Linux
+1. Remove binary:
+   ```
+   sudo rm /usr/local/bin/sysprint
+   ```
+2. Remove from terminal auto-run (if added):
+   ```
+   sed -i '/sysprint/d' ~/.bashrc
+   ```
+   (If using zsh, replace ~/.bashrc with ~/.zshrc)
+
+## Windows 
+1. Delete the downloaded sysprint.exe file.
+2. If added to startup, press Win + R, type shell:startup, and delete the sysprint shortcut.
+    
