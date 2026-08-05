@@ -229,7 +229,6 @@ fn main() {
     fn get_logo() -> (Vec<ColoredString>, usize) {
         // Give Name OS
         let os_name = System::name().unwrap_or_default().to_lowercase();
-
         if os_name.contains("arch") {
             //Arch (I Use Arch BTW)
             let logo = vec![
@@ -255,6 +254,11 @@ fn main() {
                 "     .+++++++..                      .+++++++.    ".blue().bold(),
                 "    ++++.                                  ++++   ".blue().bold(),
                 "  .+                                          .*. ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
             ];
             (logo, 16) // возвращаем лого и ширину отступа (16 пробелов)
 
@@ -283,6 +287,10 @@ fn main() {
                 "                      ########## .--------                ".yellow().bold(),
                 "                                  --------                ".yellow().bold(),
                 "                                   -----.                 ".yellow().bold(),
+                "                                                          ".blue().bold(),
+                "                                                          ".blue().bold(),
+                "                                                          ".blue().bold(),
+                "                                                          ".blue().bold(),
             ];
             (logo, 16)
         } else if os_name.contains("windows") {
@@ -372,6 +380,9 @@ fn main() {
                 "             =========================            ".green().bold(),
                 "                ===================               ".green().bold(),
                 "                       .===.                      ".green().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
             ];
             (logo, 19)
         } else if os_name.contains("gentoo") {
@@ -437,7 +448,10 @@ fn main() {
                 "           %%%                                    ".red().bold(),
                 "             %%%                                  ".red().bold(),
                 "               %%%                                ".red().bold(),
-                "                  %%%%                            ".red().bold()
+                "                  %%%%                            ".red().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
+                "                                                  ".blue().bold(),
             ];
             (logo, 19)
 
@@ -613,6 +627,9 @@ fn main() {
                 "      .##############################.                  ".blue().bold(),
                 "       :#########################..                     ".blue().bold(),
                 "         . ..................                           ".blue().bold(),
+                "                                                        ".blue().bold(),
+                "                                                        ".blue().bold(),
+                "                                                        ".blue().bold(),
                 "                                                        ".blue().bold(),
                 "                                                        ".blue().bold(),
                 "                                                        ".blue().bold(),
