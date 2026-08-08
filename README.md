@@ -15,6 +15,29 @@ Arch <img width="1280" height="719" alt="изображение" src="https://gi
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
+## Configuration
+
+`SysPrint` generates and reads a configuration file `.sysinfo.toml` automatically on the first launch.
+
+### Default Config Paths
+
+* **Linux:** `~/.config/.sysinfo.toml`
+* **Windows:** `%APPDATA%\.sysinfo.toml` *(usually `C:\Users\<Username>\AppData\Roaming\.sysinfo.toml`)*
+
+### Example `.sysinfo.toml`
+
+```toml
+# SysPrint configuration
+show-system-info = true
+show-cpu-info = true
+show-memory-info = true
+show-disks-info = true
+show-other-info = true
+show-gpu-info = true
+```
+# When a CLI flag contradicts the config, `config-stronger = true` makes the config win
+config-stronger = false
+
 
 ## Features
 - 🚀 Blazing fast performance thanks to Rust
