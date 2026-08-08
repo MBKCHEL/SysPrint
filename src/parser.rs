@@ -1,53 +1,33 @@
 //! Argument parsing.
-use clap::{ArgAction, Parser};
+use clap::Parser;
 
 #[derive(Parser)]
 pub struct Arguments {
-    /// Hide System section (shown by default)
-    #[arg(
-        long = "hide-system",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_system_info: bool,
+    /// Write a default configuration file to the user config directory and exit
+    #[arg(long)]
+    pub generate_config: bool,
 
-    /// Hide CPU section (shown by default)
-    #[arg(
-        long = "hide-cpu",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_cpu_info: bool,
+    /// Hide System section
+    #[arg(long = "hide-system")]
+    pub hide_system: bool,
 
-    /// Hide Memory section (shown by default)
-    #[arg(
-        long = "hide-memory",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_memory_info: bool,
+    /// Hide CPU section
+    #[arg(long = "hide-cpu")]
+    pub hide_cpu: bool,
 
-    /// Hide Disks section (shown by default)
-    #[arg(
-        long = "hide-disks",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_disks_info: bool,
+    /// Hide Memory section
+    #[arg(long = "hide-memory")]
+    pub hide_memory: bool,
 
-    /// Hide Other section (shown by default)
-    #[arg(
-        long = "hide-other",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_other_info: bool,
+    /// Hide Disks section
+    #[arg(long = "hide-disks")]
+    pub hide_disks: bool,
 
-    /// Hide GPU section (shown by default)
-    #[arg(
-        long = "hide-gpu",
-        action = ArgAction::SetFalse,
-        default_value_t = true
-    )]
-    pub show_gpu_info: bool,
+    /// Hide Other section
+    #[arg(long = "hide-other")]
+    pub hide_other: bool,
+
+    /// Hide GPU section
+    #[arg(long = "hide-gpu")]
+    pub hide_gpu: bool,
 }
