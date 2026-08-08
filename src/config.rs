@@ -49,7 +49,11 @@ pub fn load() -> Result<Option<Config>, String> {
     let path = config_path();
     let contents = match fs::read_to_string(&path) {
         Ok(contents) => contents,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
+            // if don`t have config
+            let _ = generate();
+            return Ok(Some(Config::default()));
+        }
         Err(e) => return Err(format!("failed to read {}: {e}", path.display())),
     };
 
