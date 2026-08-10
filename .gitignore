@@ -1,2 +1,4 @@
 /target
 sysprint-bin/
+*.SRCINFO
+PKGBUILD
