@@ -13,16 +13,28 @@ const MINT_LOGO: &str = include_str!("../assets/mint.txt");
 const NIXOS_LOGO: &str = include_str!("../assets/nixos.txt");
 const VOID_LOGO: &str = include_str!("../assets/void.txt");
 const WINDOWS_LOGO: &str = include_str!("../assets/windows.txt");
+const NET_BSD_LOGO: &str = include_str!("../assets/netbsd.txt");
+const OPEN_BSD_LOGO: &str = include_str!("../assets/openbsd.txt");
+const FREE_BSD_LOGO: &str = include_str!("../assets/freebsd.txt");
 const DEFAULT_LOGO: &str = include_str!("../assets/tux.txt");
 
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-
+    
     let (raw_logo, color_func, padding): (&str, fn(&str) -> ColoredString, usize) = if os_name.contains("arch") {
         (ARCH_LOGO, |s| s.blue().bold(), 16)
     }
     else if os_name.contains("manjaro") {
         (MANJARO_LOGO, |s| s.green().bold(), 16)
+    }
+    else if os_name.contains("openbsd") {
+        (OPEN_BSD_LOGO, |s| s.yellow().bold(), 16)
+    }
+    else if os_name.contains("freebsd") {
+        (FREE_BSD_LOGO, |s| s.red().bold(), 16)
+    }
+    else if os_name.contains("netbsd") {
+        (NET_BSD_LOGO, |s| s.yellow().bold(), 1)
     }
     else if os_name.contains("mint") {
         (MINT_LOGO, |s| s.green().bold(), 16)

@@ -164,20 +164,57 @@ impl SystemInfo {
                 .unwrap_or_else(|_| "Unknown".to_string());
             lines.push(format!("{}: {}", "DE/WM".bold(), desktop));
 
-            // Battery status (checks /sys/class/power_supply/BAT0 or BAT1)
-            let battery = match (
-                fs::read_to_string("/sys/class/power_supply/BAT0/capacity"),
-                fs::read_to_string("/sys/class/power_supply/BAT0/status"),
-            ) {
-                (Ok(cap), Ok(stat)) => format!("{}% [{}]", cap.trim(), stat.trim()),
-                _ => match (
+            let mut battery = "N/A (Desktop)".to_string();
+
+
+            #[cfg(target_os = "linux")]
+            {
+                if let (Ok(cap), Ok(stat)) = (
+                    fs::read_to_string("/sys/class/power_supply/BAT0/capacity"),
+                    fs::read_to_string("/sys/class/power_supply/BAT0/status"),
+                ) {
+                    battery = format!("{}% [{}]", cap.trim(), stat.trim());
+                } else if let (Ok(cap), Ok(stat)) = (
                     fs::read_to_string("/sys/class/power_supply/BAT1/capacity"),
                     fs::read_to_string("/sys/class/power_supply/BAT1/status"),
                 ) {
-                    (Ok(cap), Ok(stat)) => format!("{}% [{}]", cap.trim(), stat.trim()),
-                    _ => "N/A (Desktop)".to_string(),
-                },
-            };
+                    battery = format!("{}% [{}]", cap.trim(), stat.trim());
+                }
+            }
+
+            // BSD
+            #[cfg(any(target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+            {
+                let output = Command::new("sysctl")
+                    .arg("-n")
+                    .arg("hw.acpi.battery.life")
+                    .output();
+
+                if let Ok(out) = output {
+                    let cap = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    if !cap.is_empty() {
+                        battery = format!("{}%", cap);
+                    }
+                }
+            }
+
+            #[cfg(windows)]
+            {
+                let output = Command::new("wmic")
+                    .args(["path", "Win32_Battery", "get", "EstimatedChargeRemaining"])
+                    .output();
+
+                if let Ok(out) = output {
+                    let text = String::from_utf8_lossy(&out.stdout);
+                    if let Some(cap) = text.lines().nth(1) {
+                        let trimmed = cap.trim();
+                        if !trimmed.is_empty() {
+                            battery = format!("{}%", trimmed);
+                        }
+                    }
+                }
+            }
+
             lines.push(format!("{}: {}", "Battery".bold(), battery));
         }
 
@@ -204,7 +241,7 @@ impl SystemInfo {
 pub fn get_gpu_info() -> Vec<String> {
     let mut gpu_lines = Vec::new();
 
-    // Temp And Vram
+
     let nvidia_output = Command::new("nvidia-smi")
         .args([
             "--query-gpu=gpu_name,memory.total,memory.used,temperature.gpu",
@@ -236,7 +273,7 @@ pub fn get_gpu_info() -> Vec<String> {
         }
     }
 
-    // If not nvidia we give name.
+
     let mut name = String::new();
 
     #[cfg(windows)]
@@ -274,6 +311,26 @@ pub fn get_gpu_info() -> Vec<String> {
                         .unwrap_or(raw_name)
                         .trim()
                         .to_string();
+                }
+            }
+        }
+    }
+
+    #[cfg(any(target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+    {
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg("pciconf -lv | grep -B 4 -i 'class=0x03'")
+            .output();
+
+        if let Ok(out) = output {
+            let text = String::from_utf8_lossy(&out.stdout);
+            for line in text.lines() {
+                if line.trim().starts_with("device") {
+                    if let Some(pos) = line.find("='") {
+                        name = line[pos + 2..].trim_matches('\'').to_string();
+                        break;
+                    }
                 }
             }
         }

@@ -1,0 +1,17 @@
+pkgbase = sysprint-git
+	pkgdesc = A lightweight system information fetch tool written in Rust
+	pkgver = 2.5.0.r1.g8ae39d0
+	pkgrel = 1
+	url = https://github.com/MBKCHEL/SysPrint
+	arch = x86_64
+	license = MIT
+	makedepends = cargo
+	makedepends = git
+	depends = gcc-libs
+	provides = sysprint
+	conflicts = sysprint
+	conflicts = sysprint-bin
+	source = git+https://github.com/MBKCHEL/SysPrint.git
+	sha256sums = SKIP
+
+pkgname = sysprint-git
