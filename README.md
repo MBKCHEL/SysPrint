@@ -11,7 +11,7 @@ Debian <img width="1005" height="570" alt="изображение" src="https://
 Mint <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f748baf5-4be8-4286-b759-280d0ad794e5" />
 Arch <img width="1280" height="719" alt="изображение" src="https://github.com/user-attachments/assets/29320bfc-1e16-44af-adb0-9524537f49b3" />
 
-> 🐧 **Supported Logos:** Arch, Debian, Linux Mint, Ubuntu, macOS, Gentoo, Fedora, Kali, Manjaro, void Linux, NixOS, and Windows. More coming soon!  
+> 🐧 **Supported Logos:** Arch, Debian, Linux Mint, Ubuntu, macOS, Gentoo, Fedora, Kali, Manjaro, void Linux, NixOS, OpenBSD, FreeBSD, NetBSD, and Windows. More coming soon!  
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
