@@ -2,6 +2,7 @@
 use crate::logos;
 use crate::sysinfo::SystemInfo;
 
+
 /// Renders the collected system info next to the OS ASCII logo.
 pub fn render(info: &SystemInfo) {
     let lines = info.all_lines();
