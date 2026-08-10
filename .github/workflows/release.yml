@@ -5,7 +5,6 @@ on:
     types: [published]
 
 jobs:
-  
   build:
     name: Build for ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
@@ -51,13 +50,33 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
-          path: |
-            target/${{ matrix.target }}/release/sysprint-linux
-            target/${{ matrix.target }}/release/sysprint-windows.exe
-            target/${{ matrix.target }}/release/sysprint-macos
+          path: target/${{ matrix.target }}/release/${{ matrix.artifact_name }}*
+
+  build-freebsd:
+    name: Build for FreeBSD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build inside FreeBSD VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y rust git
+          run: |
+            cargo build --release
+            mv target/release/sysprint target/release/sysprint-freebsd
+
+      - name: Upload FreeBSD artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sysprint-freebsd
+          path: target/release/sysprint-freebsd
 
   release:
-    needs: build
+    needs: [build, build-freebsd]
     runs-on: ubuntu-latest
     permissions:
       contents: write
