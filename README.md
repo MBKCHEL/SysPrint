@@ -51,7 +51,7 @@ config-stronger = false
 ### Linux
 
 #### Option 1: Fast Install (Precompiled Binary)
-Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/releases/tag/1.0.0) and install to download folder:
+Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/releases/tag/2.5.0) and install to download folder:
 ```bash
 chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
