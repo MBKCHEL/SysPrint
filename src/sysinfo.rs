@@ -81,7 +81,7 @@ impl SystemInfo {
             if let Some(cpu) = cpus.first() {
                 lines.push(format!("{}: {}", "CPU".bold(), cpu.brand().trim()));
                 let freq_ghz = cpu.frequency() as f64 / 1000.0;
-                lines.push(format!("{}: {:.2} GHz", "Freq".bold(), freq_ghz));
+                lines.push(format!("{}: {:.2} GHz", "GHz".bold(), freq_ghz));
             } else {
                 lines.push("CPU: Unknown".to_string());
             }
