@@ -15,13 +15,9 @@ Arch <img width="1280" height="719" alt="изображение" src="https://gi
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
-## Configuration
+### Config
 
-`SysPrint` generates and reads a configuration file `.sysinfo.toml` automatically on the first launch.
-
-### Default Config Paths
-
-* **Linux:** `~/.config/.sysinfo.toml`
+* **Linux / BSD:** `~/.config/.sysinfo.toml`
 * **Windows:** `%APPDATA%\.sysinfo.toml` *(usually `C:\Users\<Username>\AppData\Roaming\.sysinfo.toml`)*
 
 ### Example `.sysinfo.toml`
@@ -34,9 +30,10 @@ show-memory-info = true
 show-disks-info = true
 show-other-info = true
 show-gpu-info = true
-```
+
 # When a CLI flag contradicts the config, `config-stronger = true` makes the config win
 config-stronger = false
+
 
 
 ## Features
@@ -79,12 +76,23 @@ sudo cp target/release/sysprint /usr/local/bin/
 ```bash
 echo "sysprint" >> ~/.bashrc
 ```
+### FreeBSD / OpenBSD / NetBSD
+Option 1: Fast Install (Precompiled Binary)
+Download the sysprint-freebsd binary from the Releases page
+```
+chmod +x ~/Downloads/sysprint-freebsd
+sudo mv ~/Downloads/sysprint-freebsd /usr/local/bin/sysprint
+```
+To run:
+```
+sysprint
+```
 
 ### Windows
 Download the `.exe` from the Releases page and run it.
 
 ## Uninstallation
-## Linux
+## Linux & BSD(FreeBSD, OpenBSD, NetBSD)
 1. Remove binary:
    ```
    sudo rm /usr/local/bin/sysprint
@@ -94,6 +102,7 @@ Download the `.exe` from the Releases page and run it.
    sed -i '/sysprint/d' ~/.bashrc
    ```
    (If using zsh, replace ~/.bashrc with ~/.zshrc)
+
 
 ## Windows 
 1. Delete the downloaded sysprint.exe file.
