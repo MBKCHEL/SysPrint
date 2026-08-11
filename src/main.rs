@@ -6,7 +6,11 @@ mod sysinfo;
 
 use clap::Parser;
 use parser::Arguments;
-use sysinfo::{DisplayOptions, SystemInfo};
+
+use crate::sysinfo::combine::DisplayOptions;
+
+use crate::sysinfo::combine::SystemInfo;
+
 
 fn main() {
     let args = Arguments::parse();

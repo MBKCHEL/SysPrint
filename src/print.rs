@@ -1,6 +1,6 @@
 //! Display system information.
 use crate::logos;
-use crate::sysinfo::SystemInfo;
+use crate::sysinfo::combine::SystemInfo;
 
 
 /// Renders the collected system info next to the OS ASCII logo.
