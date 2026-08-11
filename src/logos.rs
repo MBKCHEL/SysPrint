@@ -16,16 +16,23 @@ const WINDOWS_LOGO: &str = include_str!("../assets/windows.txt");
 const NET_BSD_LOGO: &str = include_str!("../assets/netbsd.txt");
 const OPEN_BSD_LOGO: &str = include_str!("../assets/openbsd.txt");
 const FREE_BSD_LOGO: &str = include_str!("../assets/freebsd.txt");
+const ANDROID_LOGO: &str = include_str!("../assets/android.txt");
+const CACHYOS_LOGO: &str = include_str!("../assets/cachyos.txt");
 const DEFAULT_LOGO: &str = include_str!("../assets/tux.txt");
 
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-    
     let (raw_logo, color_func, padding): (&str, fn(&str) -> ColoredString, usize) = if os_name.contains("arch") {
         (ARCH_LOGO, |s| s.blue().bold(), 16)
     }
+    else if os_name.contains("cachyos") {
+        (CACHYOS_LOGO, |s| s.green().bold(), 16)
+    }
     else if os_name.contains("manjaro") {
         (MANJARO_LOGO, |s| s.green().bold(), 16)
+    }
+    else if os_name.contains("android") {
+        (ANDROID_LOGO, |s| s.green().bold(), 16)
     }
     else if os_name.contains("openbsd") {
         (OPEN_BSD_LOGO, |s| s.yellow().bold(), 16)
