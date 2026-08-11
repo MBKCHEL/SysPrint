@@ -75,8 +75,36 @@ jobs:
           name: sysprint-freebsd
           path: target/release/sysprint-freebsd
 
+  build-android:
+    name: Build for Android (aarch64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - name: Install Cross
+        uses: taiki-e/install-action@cross
+
+      - name: Build Android binary
+        run: cross build --release --target aarch64-linux-android
+
+      - name: Rename binary
+        run: |
+          mv target/aarch64-linux-android/release/sysprint target/aarch64-linux-android/release/sysprint-android-aarch64
+
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sysprint-android-aarch64
+          path: target/aarch64-linux-android/release/sysprint-android-aarch64
+
   release:
-    needs: [build, build-freebsd]
+    needs: [build, build-freebsd, build-android]
     runs-on: ubuntu-latest
     permissions:
       contents: write
