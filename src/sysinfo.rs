@@ -166,7 +166,7 @@ impl SystemInfo {
 
             let mut battery = "N/A (Desktop)".to_string();
 
-
+            // Linux battery
             #[cfg(target_os = "linux")]
             {
                 if let (Ok(cap), Ok(stat)) = (
@@ -182,8 +182,8 @@ impl SystemInfo {
                 }
             }
 
-            // BSD
-            #[cfg(any(target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+            // FreeBSD battery
+            #[cfg(target_os = "freebsd")]
             {
                 let output = Command::new("sysctl")
                     .arg("-n")
@@ -197,7 +197,40 @@ impl SystemInfo {
                     }
                 }
             }
+            // OpenBSD battery
+            #[cfg(target_os = "openbsd")]
+            {
+                // apm -l
+                let output = Command::new("apm").arg("-l").output();
 
+                if let Ok(out) = output {
+                    let cap = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                    // 255 в apm означает "батарея не найдена / ПК от сети"
+                    if !cap.is_empty() && cap != "255" {
+                        battery = format!("{}%", cap);
+                    }
+                }
+            }
+            // NetBSD battery
+            #[cfg(target_os = "netbsd")]
+            {
+                //envstat
+                let output = Command::new("envstat").args(["-s", "bat0:charge"]).output();
+
+                if let Ok(out) = output {
+                    let text = String::from_utf8_lossy(&out.stdout);
+                    if let Some(line) = text.lines().find(|l| l.contains("%")) {
+                        if let Some(val) = line.split('(').next() {
+                            let cleaned = val.replace("charge:", "").replace("%", "");
+                            let trimmed = cleaned.trim();
+                            if !trimmed.is_empty() {
+                                battery = format!("{}%", trimmed);
+                            }
+                        }
+                    }
+                }
+            }
+            // Windows battery
             #[cfg(windows)]
             {
                 let output = Command::new("wmic")
@@ -276,6 +309,7 @@ pub fn get_gpu_info() -> Vec<String> {
 
     let mut name = String::new();
 
+    // Windows GPU
     #[cfg(windows)]
     {
         let output = Command::new("powershell")
@@ -293,6 +327,7 @@ pub fn get_gpu_info() -> Vec<String> {
         }
     }
 
+    // Linux GPU
     #[cfg(target_os = "linux")]
     {
         let output = Command::new("sh")
@@ -316,7 +351,8 @@ pub fn get_gpu_info() -> Vec<String> {
         }
     }
 
-    #[cfg(any(target_os = "freebsd", target_os = "openbsd", target_os = "netbsd"))]
+    // FreeBSD GPU
+    #[cfg(target_os = "freebsd")]
     {
         let output = Command::new("sh")
             .arg("-c")
@@ -331,6 +367,46 @@ pub fn get_gpu_info() -> Vec<String> {
                         name = line[pos + 2..].trim_matches('\'').to_string();
                         break;
                     }
+                }
+            }
+        }
+    }
+
+    // OpenBSD GPU
+    #[cfg(target_os = "openbsd")]
+    {
+        //pcidump
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg("pcidump -v | grep -i 'vga'")
+            .output();
+
+        if let Ok(out) = output {
+            let text = String::from_utf8_lossy(&out.stdout);
+            if let Some(line) = text.lines().next() {
+                if let Some(pos) = line.rfind(':') {
+                    name = line[pos + 1..].trim().to_string();
+                } else {
+                    name = line.trim().to_string();
+                }
+            }
+        }
+    }
+
+    // NetBSD GPU
+    #[cfg(target_os = "netbsd")]
+    {
+        // pcictl
+        let output = Command::new("sh")
+            .arg("-c")
+            .arg("pcictl pci0 list | grep -i 'display'")
+            .output();
+
+        if let Ok(out) = output {
+            let text = String::from_utf8_lossy(&out.stdout);
+            if let Some(line) = text.lines().next() {
+                if let Some(pos) = line.find(':') {
+                    name = line[pos + 1..].trim().to_string();
                 }
             }
         }
