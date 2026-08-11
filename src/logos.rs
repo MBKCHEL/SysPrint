@@ -22,61 +22,28 @@ const DEFAULT_LOGO: &str = include_str!("../assets/tux.txt");
 
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-    let (raw_logo, color_func, padding): (&str, fn(&str) -> ColoredString, usize) = if os_name.contains("arch") {
-        (ARCH_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("cachyos") {
-        (CACHYOS_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("manjaro") {
-        (MANJARO_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("android") {
-        (ANDROID_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("openbsd") {
-        (OPEN_BSD_LOGO, |s| s.yellow().bold(), 16)
-    }
-    else if os_name.contains("freebsd") {
-        (FREE_BSD_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("netbsd") {
-        (NET_BSD_LOGO, |s| s.yellow().bold(), 1)
-    }
-    else if os_name.contains("mint") {
-        (MINT_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("nixos") {
-        (NIXOS_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("void") {
-        (VOID_LOGO, |s| s.cyan().bold(), 16)
-    }
-    else if os_name.contains("windows") {
-        (WINDOWS_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("ubuntu") {
-        (UBUNTU_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("fedora") {
-        (FEDORA_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("gentoo") {
-        (GENTOO_LOGO, |s| s.white().bold(), 16)
-    }
-    else if os_name.contains("debian") {
-        (DEBIAN_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("darwin") | os_name.contains("mac") | os_name.contains("macos") {
-        (APPLE_LOGO, |s| s.white().bold(), 16)
-    }
-    else if os_name.contains("kali") {
-        (KALI_LOGO, |s| s.white().bold(), 16)
-    }
-    else {
-        (DEFAULT_LOGO, |s| s.white(), 10)
+    let (raw_logo, color_func, _): (&str, fn(&str) -> ColoredString, usize) = match os_name {
+        s if s.contains("arch") => (ARCH_LOGO, |s| s.blue().bold(), 16),
+        s if s.contains("cachyos") => (CACHYOS_LOGO, |s| s.green().bold(), 16),
+        s if s.contains("manjaro") => (MANJARO_LOGO, |s| s.green().bold(), 16),
+        s if s.contains("android") => (ANDROID_LOGO, |s| s.green().bold(), 16),
+        s if s.contains("openbsd") => (OPEN_BSD_LOGO, |s| s.yellow().bold(), 16),
+        s if s.contains("freebsd") => (FREE_BSD_LOGO, |s| s.red().bold(), 16),
+        s if s.contains("netbsd") => (NET_BSD_LOGO, |s| s.yellow().bold(), 1),
+        s if s.contains("mint") => (MINT_LOGO, |s| s.green().bold(), 16),
+        s if s.contains("nixos") => (NIXOS_LOGO, |s| s.blue().bold(), 16),
+        s if s.contains("void") => (VOID_LOGO, |s| s.cyan().bold(), 16),
+        s if s.contains("windows") => (WINDOWS_LOGO, |s| s.blue().bold(), 16),
+        s if s.contains("ubuntu") => (UBUNTU_LOGO, |s| s.red().bold(), 16),
+        s if s.contains("fedora") => (FEDORA_LOGO, |s| s.blue().bold(), 16),
+        s if s.contains("gentoo") => (GENTOO_LOGO, |s| s.white().bold(), 16),
+        s if s.contains("debian") => (DEBIAN_LOGO, |s| s.red().bold(), 16),
+        s if s.contains("darwin") || s.contains("mac") || s.contains("macos") => {
+            (APPLE_LOGO, |s| s.white().bold(), 16)
+        }
+        s if s.contains("kali") => (KALI_LOGO, |s| s.white().bold(), 16),
+        _ => (DEFAULT_LOGO, |s| s.white(), 10),
     };
-
 
     let max_width = raw_logo.lines().map(|l| l.len()).max().unwrap_or(0);
 
