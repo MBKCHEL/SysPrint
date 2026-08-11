@@ -1,6 +1,7 @@
 use colored::Colorize;
 use std::env;
 use std::fs;
+use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
 
 pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
