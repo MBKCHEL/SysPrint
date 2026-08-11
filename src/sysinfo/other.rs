@@ -30,7 +30,7 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
 
         // Linux battery
         #[cfg(target_os = "linux")]
-        {
+        {use std::process::Command;
 
 
             if let (Ok(cap), Ok(stat)) = (
@@ -97,6 +97,7 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
         // Windows battery
         #[cfg(windows)]
         {
+            use std::process::Command;
             let output = Command::new("wmic")
                 .args(["path", "Win32_Battery", "get", "EstimatedChargeRemaining"])
                 .output();

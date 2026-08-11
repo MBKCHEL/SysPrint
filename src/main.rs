@@ -6,13 +6,17 @@ mod sysinfo;
 
 use clap::Parser;
 use parser::Arguments;
-
+use colored::*;
 use crate::sysinfo::combine::DisplayOptions;
 
 use crate::sysinfo::combine::SystemInfo;
 
 
 fn main() {
+    // For fucking Windows CMD
+    #[cfg(windows)]
+    let _ = colored::control::set_virtual_terminal(true);
+
     let args = Arguments::parse();
 
     if args.generate_config {
