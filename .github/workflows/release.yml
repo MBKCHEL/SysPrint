@@ -89,14 +89,14 @@ jobs:
 
       - name: Setup Android NDK
         uses: nttld/setup-ndk@v1
-        id: setup-ndk
         with:
           ndk-version: r26b
 
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk
+
       - name: Build Android binary
-        env:
-          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android29-clang
-        run: cargo build --release --target aarch64-linux-android
+        run: cargo ndk -t aarch64-linux-android -p 29 -- build --release
 
       - name: Rename binary
         run: |
