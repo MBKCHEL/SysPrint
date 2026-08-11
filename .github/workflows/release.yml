@@ -75,6 +75,7 @@ jobs:
         with:
           name: sysprint-freebsd
           path: target/release/sysprint-freebsd
+
   release:
     needs: [build, build-freebsd]
     runs-on: ubuntu-latest
@@ -89,6 +90,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
           files: artifacts/**/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
