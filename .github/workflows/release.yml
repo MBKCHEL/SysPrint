@@ -87,11 +87,16 @@ jobs:
         with:
           targets: aarch64-linux-android
 
-      - name: Install Cross
-        uses: taiki-e/install-action@cross
+      - name: Setup Android NDK
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r26b
 
       - name: Build Android binary
-        run: cross build --release --target aarch64-linux-android
+        env:
+          CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER: ${{ steps.setup-ndk.outputs.ndk-path }}/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android29-clang
+        run: cargo build --release --target aarch64-linux-android
 
       - name: Rename binary
         run: |
