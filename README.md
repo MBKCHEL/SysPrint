@@ -4,8 +4,9 @@ A fast, lightweight, and customizable system information fetch tool written in R
 
 ---
 ## Contributors
-@dev-er1 - https://github.com/dev-er1
-@MBKCHEL (owner) - https://github.com/MBKCHEL
+
+* [@dev-er1](https://github.com/dev-er1)
+* [@MBKCHEL](https://github.com/MBKCHEL) (Owner)
 ---
 ## 🖼️ Preview & Screenshots
 
