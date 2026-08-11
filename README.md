@@ -3,7 +3,10 @@
 A fast, lightweight, and customizable system information fetch tool written in Rust. Inspired by `neofetch` and `fastfetch`.
 
 ---
-
+## Contributors
+@dev-er1
+@MBKCHEL
+---
 ## 🖼️ Preview & Screenshots
 
 Windows <img width="972" height="494" alt="изображение" src="https://github.com/user-attachments/assets/b266bc19-46ad-45bc-b08b-61df368fc4f8" />
