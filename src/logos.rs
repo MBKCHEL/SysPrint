@@ -1,94 +1,41 @@
 use sysinfo::System;
 use colored::*;
 
-const ARCH_LOGO: &str = include_str!("../assets/arch.txt");
-const UBUNTU_LOGO: &str = include_str!("../assets/ubuntu.txt");
-const APPLE_LOGO: &str = include_str!("../assets/apple.txt");
-const DEBIAN_LOGO: &str = include_str!("../assets/debian.txt");
-const FEDORA_LOGO: &str = include_str!("../assets/fedora.txt");
-const GENTOO_LOGO: &str = include_str!("../assets/gentoo.txt");
-const KALI_LOGO: &str = include_str!("../assets/kali.txt");
-const MANJARO_LOGO: &str = include_str!("../assets/manjaro.txt");
-const MINT_LOGO: &str = include_str!("../assets/mint.txt");
-const NIXOS_LOGO: &str = include_str!("../assets/nixos.txt");
-const VOID_LOGO: &str = include_str!("../assets/void.txt");
-const WINDOWS_LOGO: &str = include_str!("../assets/windows.txt");
-const NET_BSD_LOGO: &str = include_str!("../assets/netbsd.txt");
-const OPEN_BSD_LOGO: &str = include_str!("../assets/openbsd.txt");
-const FREE_BSD_LOGO: &str = include_str!("../assets/freebsd.txt");
-const ANDROID_LOGO: &str = include_str!("../assets/android.txt");
-const CACHYOS_LOGO: &str = include_str!("../assets/cachyos.txt");
-const DEFAULT_LOGO: &str = include_str!("../assets/tux.txt");
-
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-    let (raw_logo, color_func, padding): (&str, fn(&str) -> ColoredString, usize) = if os_name.contains("arch") {
-        (ARCH_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("cachyos") {
-        (CACHYOS_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("manjaro") {
-        (MANJARO_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("android") {
-        (ANDROID_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("openbsd") {
-        (OPEN_BSD_LOGO, |s| s.yellow().bold(), 16)
-    }
-    else if os_name.contains("freebsd") {
-        (FREE_BSD_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("netbsd") {
-        (NET_BSD_LOGO, |s| s.yellow().bold(), 1)
-    }
-    else if os_name.contains("mint") {
-        (MINT_LOGO, |s| s.green().bold(), 16)
-    }
-    else if os_name.contains("nixos") {
-        (NIXOS_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("void") {
-        (VOID_LOGO, |s| s.cyan().bold(), 16)
-    }
-    else if os_name.contains("windows") {
-        (WINDOWS_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("ubuntu") {
-        (UBUNTU_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("fedora") {
-        (FEDORA_LOGO, |s| s.blue().bold(), 16)
-    }
-    else if os_name.contains("gentoo") {
-        (GENTOO_LOGO, |s| s.white().bold(), 16)
-    }
-    else if os_name.contains("debian") {
-        (DEBIAN_LOGO, |s| s.red().bold(), 16)
-    }
-    else if os_name.contains("darwin") | os_name.contains("mac") | os_name.contains("macos") {
-        (APPLE_LOGO, |s| s.white().bold(), 16)
-    }
-    else if os_name.contains("kali") {
-        (KALI_LOGO, |s| s.white().bold(), 16)
-    }
-    else {
-        (DEFAULT_LOGO, |s| s.white(), 10)
+
+    let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = match os_name.as_str() {
+        s if s.contains("arch")    => (include_str!("../assets/arch.txt"), |s| s.blue().bold()),
+        s if s.contains("cachyos")  => (include_str!("../assets/cachyos.txt"), |s| s.green().bold()),
+        s if s.contains("manjaro")  => (include_str!("../assets/manjaro.txt"), |s| s.green().bold()),
+        s if s.contains("android")  => (include_str!("../assets/android.txt"), |s| s.green().bold()),
+        s if s.contains("openbsd")  => (include_str!("../assets/openbsd.txt"), |s| s.yellow().bold()),
+        s if s.contains("freebsd")  => (include_str!("../assets/freebsd.txt"), |s| s.red().bold()),
+        s if s.contains("netbsd")   => (include_str!("../assets/netbsd.txt"), |s| s.yellow().bold()),
+        s if s.contains("mint")     => (include_str!("../assets/mint.txt"), |s| s.green().bold()),
+        s if s.contains("nixos")    => (include_str!("../assets/nixos.txt"), |s| s.blue().bold()),
+        s if s.contains("void")     => (include_str!("../assets/void.txt"), |s| s.cyan().bold()),
+        s if s.contains("windows")  => (include_str!("../assets/windows.txt"), |s| s.blue().bold()),
+        s if s.contains("ubuntu")   => (include_str!("../assets/ubuntu.txt"), |s| s.red().bold()),
+        s if s.contains("fedora")   => (include_str!("../assets/fedora.txt"), |s| s.blue().bold()),
+        s if s.contains("gentoo")   => (include_str!("../assets/gentoo.txt"), |s| s.white().bold()),
+        s if s.contains("debian")   => (include_str!("../assets/debian.txt"), |s| s.red().bold()),
+        s if s.contains("kali")     => (include_str!("../assets/kali.txt"), |s| s.white().bold()),
+        s if s.contains("darwin") || s.contains("mac") => (include_str!("../assets/apple.txt"), |s| s.white().bold()),
+        _ => (include_str!("../assets/tux.txt"), |s| s.white()),
     };
 
+    
+    let max_width = raw_logo.lines().map(|l| l.chars().count()).max().unwrap_or(0);
 
-    let max_width = raw_logo.lines().map(|l| l.len()).max().unwrap_or(0);
-
-
-    let logo_lines: Vec<ColoredString> = raw_logo
+    let logo_lines = raw_logo
         .lines()
         .map(|line| {
-            let padded = format!("{:width$}", line, width = max_width);
-            color_func(&padded)
+            let char_count = line.chars().count();
+            let padding = " ".repeat(max_width.saturating_sub(char_count));
+            color_func(&format!("{line}{padding}"))
         })
         .collect();
-
 
     (logo_lines, max_width)
 }
