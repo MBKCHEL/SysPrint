@@ -3,6 +3,7 @@ name: Build and Release
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -76,9 +77,9 @@ jobs:
           path: target/release/sysprint-freebsd
 
   build-android:
-    name: Build for Android (aarch64)
-    runs-on: ubuntu-latest
-    steps:
+      name: Build for Android (aarch64)
+      runs-on: ubuntu-latest
+      steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -88,14 +89,19 @@ jobs:
           targets: aarch64-linux-android
 
       - name: Setup Android NDK
+        id: setup-ndk
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r26b
 
       - name: Install cargo-ndk
-        run: cargo install cargo-ndk
+        run: |
+          curl -Lws "\n" https://github.com | tar -xzf - -C ~/.cargo/bin
+          cargo binstall -y cargo-ndk
 
       - name: Build Android binary
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: cargo ndk -t aarch64-linux-android -p 29 -- build --release
 
       - name: Rename binary
