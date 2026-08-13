@@ -1,4 +1,4 @@
-//! Helper functions for retrieving system information.
+//
 use sysinfo::System;
 use crate::sysinfo::gpu::get_gpu_info;
 use crate::sysinfo::memory::memory_info;
