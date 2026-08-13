@@ -69,4 +69,13 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, sys: &System
         lines.push(format!("{}: {}", "Threads".bold(), cpus.len()));
     }
 
+    cpu_arch(lines);
+    // CPU Architecture
+    fn cpu_arch(lines: &mut Vec<String>) {
+        lines.push(format!(
+            "{}: {}",
+            "Architecture".bold(),
+            std::env::consts::ARCH,
+        ));
+    }
 }
