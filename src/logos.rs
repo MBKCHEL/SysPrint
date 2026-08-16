@@ -3,6 +3,7 @@ use colored::*;
 
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
+    let os_name = "artix".to_string();
 
     let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = match os_name.as_str() {
         s if s.contains("arch")    => (include_str!("../assets/arch.txt"), |s| s.blue().bold()),
@@ -21,6 +22,8 @@ pub fn get_logo() -> (Vec<ColoredString>, usize) {
         s if s.contains("gentoo")   => (include_str!("../assets/gentoo.txt"), |s| s.white().bold()),
         s if s.contains("debian")   => (include_str!("../assets/debian.txt"), |s| s.red().bold()),
         s if s.contains("kali")     => (include_str!("../assets/kali.txt"), |s| s.white().bold()),
+        s if s.contains("artix")     => (include_str!("../assets/artix.txt"), |s| s.blue().bold()),
+        s if s.contains("pop") || s.contains("popos") => (include_str!("../assets/popos.txt"), |s| s.blue().bold()),
         s if s.contains("darwin") || s.contains("mac") => (include_str!("../assets/apple.txt"), |s| s.white().bold()),
         _ => (include_str!("../assets/tux.txt"), |s| s.white()),
     };
