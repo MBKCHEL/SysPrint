@@ -3,7 +3,6 @@ use colored::*;
 
 pub fn get_logo() -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-    let os_name = "artix".to_string();
 
     let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = match os_name.as_str() {
         s if s.contains("arch")    => (include_str!("../assets/arch.txt"), |s| s.blue().bold()),
