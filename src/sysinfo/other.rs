@@ -1,5 +1,6 @@
 use colored::Colorize;
 use std::env;
+use chrono::Local;
 use std::fs;
 use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
@@ -21,6 +22,15 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
         lines.push(format!("{}: {}", "DE/WM".bold(), desktop));
     }
 
+    system_time(&mut lines);
+
+    fn system_time(lines: &mut Vec<String>){
+        let now = Local::now();
+        now.format("%H:%M").to_string();
+        lines.push(format!("{}: {}", "Locale Time".bold(), now.format("%H:%M").to_string()));
+    }
+
+
     // give link functions battery for variables lines
     battery(&mut lines);
 
@@ -30,7 +40,7 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
 
         // Linux battery
         #[cfg(target_os = "linux")]
-        {use std::process::Command;
+        {
 
 
             if let (Ok(cap), Ok(stat)) = (
