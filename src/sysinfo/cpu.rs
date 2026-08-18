@@ -1,13 +1,24 @@
 use colored::Colorize;
-use sysinfo::{Components, System};
+use std::thread;
+use sysinfo::{Components, System, MINIMUM_CPU_UPDATE_INTERVAL};
 use crate::sysinfo::combine::DisplayOptions;
 
 // --- CPU INFO ---
 pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, sys: &System){
 
         let mut sys = System::new_all();
-        sys.refresh_cpu_usage();
-        sys.refresh_cpu_usage();
+
+
+    sys.refresh_cpu_usage();
+
+
+    thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL);
+
+
+    sys.refresh_cpu_usage();
+
+
+
 
     opts.cpu;
     lines.push(format!("{}", "--- CPU INFO ---".bold().cyan()));
