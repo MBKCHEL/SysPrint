@@ -56,6 +56,8 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
             }
         }
 
+
+
         // FreeBSD battery
         #[cfg(target_os = "freebsd")]
         {
@@ -124,5 +126,7 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
         }
 
         lines.push(format!("{}: {}", "Battery".bold(), battery));
+
+
     }
 }

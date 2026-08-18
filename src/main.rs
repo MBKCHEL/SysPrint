@@ -44,6 +44,7 @@ fn main() {
         disks: decide(args.hide_disks, cfg.map(|c| c.show_disks_info), config_stronger),
         other: decide(args.hide_other, cfg.map(|c| c.show_other_info), config_stronger),
         gpu: decide(args.hide_gpu, cfg.map(|c| c.show_gpu_info), config_stronger),
+        mini_mode: decide(args.mini, cfg.map(|c| c.mini_mode), config_stronger),
     };
 
     let info = SystemInfo::collect(opts);

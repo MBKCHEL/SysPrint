@@ -23,6 +23,8 @@ pub struct Config {
     pub show_gpu_info: bool,
     #[serde(default)]
     pub config_stronger: bool,
+    #[serde(default)]
+    pub mini_mode: bool,
 }
 
 impl Default for Config {
@@ -35,6 +37,7 @@ impl Default for Config {
             show_other_info: true,
             show_gpu_info: true,
             config_stronger: false,
+            mini_mode: false,
         }
     }
 }

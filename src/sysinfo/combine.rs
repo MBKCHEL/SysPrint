@@ -16,6 +16,7 @@ pub struct DisplayOptions {
     pub disks: bool,
     pub other: bool,
     pub gpu: bool,
+    pub mini_mode: bool,
 }
 
 impl Default for DisplayOptions {
@@ -27,6 +28,7 @@ impl Default for DisplayOptions {
             disks: true,
             other: true,
             gpu: true,
+            mini_mode: false,
         }
     }
 }
@@ -39,6 +41,7 @@ pub struct SystemInfo {
     pub cpu: Vec<String>,
     pub other: Vec<String>,
     pub disk: Vec<String>,
+    pub mini_mode: bool,
 }
 
 impl SystemInfo {
@@ -98,7 +101,8 @@ impl SystemInfo {
             system,
             cpu,
             other,
-            disk
+            disk,
+            mini_mode: opts.mini_mode,
         }
     }
 

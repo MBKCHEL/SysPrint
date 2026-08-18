@@ -30,4 +30,8 @@ pub struct Arguments {
     /// Hide GPU section
     #[arg(long = "hide-gpu")]
     pub hide_gpu: bool,
+
+    // Mini mode
+    #[arg(short = 'm', long = "mini")]
+    pub mini: bool,
 }

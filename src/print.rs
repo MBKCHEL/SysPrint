@@ -7,7 +7,7 @@ use crate::sysinfo::combine::SystemInfo;
 pub fn render(info: &SystemInfo) {
     let lines = info.all_lines();
 
-    let (logo, logo_padding) = logos::get_logo();
+    let (logo, logo_padding) = logos::get_logo(info.mini_mode);
     let max_lines = std::cmp::max(logo.len(), lines.len());
 
     for i in 0..max_lines {
