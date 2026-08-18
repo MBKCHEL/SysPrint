@@ -17,6 +17,12 @@ pub fn get_gpu_info(opts: &DisplayOptions) -> Vec<String> {
         return gpu_lines;
     }
 
+    #[cfg(target_os = "macos")]
+    if let Some(mac_lines) = get_macos_gpu_info() {
+        gpu_lines.extend(mac_lines);
+        return gpu_lines;
+    }
+
     #[cfg(target_os = "linux")]
     if let Some(sysfs_lines) = get_linux_sysfs_gpu() {
         gpu_lines.extend(sysfs_lines);
@@ -81,6 +87,42 @@ fn get_nvidia_info() -> Option<Vec<String>> {
         format!("{}: {:.2} GB / {:.2} GB", "VRAM".bold(), mem_used, mem_total),
         format!("{}: {}°C", "GPU Temp".bold(), temp),
     ])
+}
+
+#[cfg(target_os = "macos")]
+fn get_macos_gpu_info() -> Option<Vec<String>> {
+    let output = Command::new("system_profiler")
+        .arg("SPDisplaysDataType")
+        .output()
+        .ok()?;
+
+    let text = String::from_utf8_lossy(&output.stdout);
+    let mut gpu_name = String::new();
+    let mut vram = String::new();
+
+    for line in text.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("Chipset Model:") {
+            if let Some(pos) = trimmed.find(':') {
+                gpu_name = trimmed[pos + 1..].trim().to_string();
+            }
+        } else if trimmed.starts_with("VRAM (Total):") || trimmed.starts_with("VRAM (Dynamic):") {
+            if let Some(pos) = trimmed.find(':') {
+                vram = trimmed[pos + 1..].trim().to_string();
+            }
+        }
+    }
+
+    if gpu_name.is_empty() {
+        return None;
+    }
+
+    let mut lines = vec![format!("{}: {}", "GPU".bold(), gpu_name)];
+    if !vram.is_empty() {
+        lines.push(format!("{}: {}", "VRAM".bold(), vram));
+    }
+
+    Some(lines)
 }
 
 #[cfg(target_os = "linux")]
@@ -261,6 +303,21 @@ fn get_netbsd_gpu_info() -> Option<Vec<String>> {
 }
 
 fn get_generic_gpu_name() -> String {
+    #[cfg(target_os = "macos")]
+    {
+        if let Ok(output) = Command::new("system_profiler").arg("SPDisplaysDataType").output() {
+            let text = String::from_utf8_lossy(&output.stdout);
+            for line in text.lines() {
+                let trimmed = line.trim();
+                if trimmed.starts_with("Chipset Model:") {
+                    if let Some(pos) = trimmed.find(':') {
+                        return trimmed[pos + 1..].trim().to_string();
+                    }
+                }
+            }
+        }
+    }
+
     #[cfg(target_os = "linux")]
     {
         if let Ok(output) = Command::new("sh").args(["-c", "lspci | grep -Ei 'vga|3d|display'"]).output() {
