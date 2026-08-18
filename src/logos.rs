@@ -1,9 +1,11 @@
+use std::net::ToSocketAddrs;
 use sysinfo::System;
 use colored::*;
 
 pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
 
+    let os_name = "gentoo".to_string();
     let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = if mini {
         // Mini
         match os_name.as_str() {
