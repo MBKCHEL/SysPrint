@@ -5,6 +5,10 @@ use crate::sysinfo::combine::DisplayOptions;
 // --- CPU INFO ---
 pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, sys: &System){
 
+        let mut sys = System::new_all();
+        sys.refresh_cpu_usage();
+        sys.refresh_cpu_usage();
+
     opts.cpu;
     lines.push(format!("{}", "--- CPU INFO ---".bold().cyan()));
 

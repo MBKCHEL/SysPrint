@@ -4,6 +4,7 @@ mod parser;
 mod print;
 mod sysinfo;
 
+use ::sysinfo::System;
 use clap::Parser;
 use parser::Arguments;
 use colored::*;
@@ -16,6 +17,10 @@ fn main() {
     // For fucking Windows CMD
     #[cfg(windows)]
     let _ = colored::control::set_virtual_terminal(true);
+    
+    let mut sys = System::new_all();
+    sys.refresh_cpu_usage();
+    sys.refresh_cpu_usage();
 
     let args = Arguments::parse();
 
