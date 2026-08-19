@@ -50,7 +50,7 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
     fn cpu_temperature(lines: &mut Vec<String>) {
 
         let components = Components::new_with_refreshed_list();
-        let mut cpu_temp = components.iter().find_map(|comp| {
+        let cpu_temp = components.iter().find_map(|comp| {
             let label = comp.label().to_lowercase();
             if label.contains("cpu")
                 || label.contains("core")
@@ -100,21 +100,41 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
 
 #[cfg(target_os = "windows")]
 fn get_windows_cpu_temp() -> Option<f32> {
+    let script_acpi = "(Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature -ErrorAction SilentlyContinue).CurrentTemperature";
+
+    if let Some(temp) = query_powershell_temp(script_acpi, true) {
+        return Some(temp);
+    }
+
+    let script_perf = "(Get-CimInstance -ClassName Win32_PerfFormattedData_Counters_ThermalZoneInformation -ErrorAction SilentlyContinue).HighPrecisionTemperature";
+
+    if let Some(temp) = query_powershell_temp(script_perf, false) {
+        return Some(temp);
+    }
+
+    None
+}
+
+#[cfg(target_os = "windows")]
+fn query_powershell_temp(command: &str, is_kelvin: bool) -> Option<f32> {
     let output = Command::new("powershell")
-        .args(&[
-            "-NoProfile",
-            "-Command",
-            "(Get-CimInstance -Namespace root/WMI -ClassName MSAcpi_ThermalZoneTemperature).CurrentTemperature",
-        ])
+        .args(&["-NoProfile", "-Command", command])
         .output()
         .ok()?;
 
     if output.status.success() {
         let stdout = String::from_utf8_lossy(&output.stdout);
-        if let Ok(raw_temp) = stdout.trim().parse::<f32>() {
-            let celsius = (raw_temp / 10.0) - 273.15;
-            if celsius > 0.0 && celsius < 120.0 {
-                return Some(celsius);
+        if let Some(first_line) = stdout.lines().next() {
+            if let Ok(raw_temp) = first_line.trim().parse::<f32>() {
+                let celsius = if is_kelvin {
+                    (raw_temp / 10.0) - 273.15
+                } else {
+                    (raw_temp - 2731.5) / 10.0
+                };
+
+                if celsius > 0.0 && celsius < 115.0 {
+                    return Some(celsius);
+                }
             }
         }
     }
