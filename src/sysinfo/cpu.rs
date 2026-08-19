@@ -1,28 +1,22 @@
 use colored::Colorize;
-use std::thread;
-use sysinfo::{Components, System, MINIMUM_CPU_UPDATE_INTERVAL};
+use sysinfo::{Components, System};
 use crate::sysinfo::combine::DisplayOptions;
 
-#[cfg(target_os = "windows")]
-use std::process::Command;
-
 // --- CPU INFO ---
-pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &System) {
+pub fn cpu_info(opts: &DisplayOptions, lines: &mut Vec<String>, sys: &System) {
+    if !opts.cpu {
+        return;
+    }
 
-    let mut sys = System::new_all();
-
-    sys.refresh_cpu_usage();
-
-    thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL);
-
-    sys.refresh_cpu_usage();
-
-    opts.cpu;
     lines.push(format!("{}", "--- CPU INFO ---".bold().cyan()));
 
-    ggz_and_name_cpu(&mut lines, &sys);
+    ggz_and_name_cpu(lines, sys);
+    cpu_usage(lines, sys);
+    cpu_temperature(lines);
+    cpu_cores_and_threads(lines, sys);
+    cpu_arch(lines);
+
     fn ggz_and_name_cpu(lines: &mut Vec<String>, sys: &System) {
-        // GHz and name CPU
         let cpus = sys.cpus();
         if let Some(cpu) = cpus.first() {
             lines.push(format!("{}: {}", "CPU name".bold(), cpu.brand().trim()));
@@ -33,10 +27,7 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
         }
     }
 
-    cpu_usage(&mut lines, &sys);
-
     fn cpu_usage(lines: &mut Vec<String>, sys: &System) {
-        // CPU Usage
         lines.push(format!(
             "{}: {:.1}%",
             "CPU Usage".bold(),
@@ -44,13 +35,9 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
         ));
     }
 
-    cpu_temperature(&mut lines);
-
-    // CPU Temperature
     fn cpu_temperature(lines: &mut Vec<String>) {
-
         let components = Components::new_with_refreshed_list();
-        let mut cpu_temp = components.iter().find_map(|comp| {
+        let cpu_temp = components.iter().find_map(|comp| {
             let label = comp.label().to_lowercase();
             if label.contains("cpu")
                 || label.contains("core")
@@ -63,16 +50,12 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
                 None
             }
         });
-        
 
         if let Some(temp) = cpu_temp {
             lines.push(format!("{}: {:.1}°C", "CPU Temp".bold(), temp));
         }
     }
 
-    cpu_cores_and_threads(&mut lines, &sys);
-
-    // cpu_cores_and_threads
     fn cpu_cores_and_threads(lines: &mut Vec<String>, sys: &System) {
         lines.push(format!(
             "{}: {}",
@@ -83,8 +66,6 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
         lines.push(format!("{}: {}", "Threads".bold(), cpus.len()));
     }
 
-    cpu_arch(lines);
-    // CPU Architecture
     fn cpu_arch(lines: &mut Vec<String>) {
         lines.push(format!(
             "{}: {}",
