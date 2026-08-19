@@ -23,11 +23,7 @@ fn main() {
 
     sys.refresh_cpu_usage();
 
-
-
-    use std::time::Instant;
-
-
+    
 
 
     sys.refresh_cpu_usage();
