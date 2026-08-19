@@ -65,7 +65,8 @@ jobs:
         with:
           usesh: true
           prepare: |
-            pkg install -y rust git
+            pkg update -f
+            pkg install -y rust
           run: |
             cargo build --release
             mv target/release/sysprint target/release/sysprint-freebsd
