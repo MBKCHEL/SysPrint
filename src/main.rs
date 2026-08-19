@@ -27,9 +27,7 @@ fn main() {
 
     use std::time::Instant;
 
-    let start = Instant::now();
-    // твой_модуль::get_info(&opts, &mut lines, &sys);
-    println!("Модуль XXX занял: {:?}", start.elapsed());
+
 
 
     sys.refresh_cpu_usage();
