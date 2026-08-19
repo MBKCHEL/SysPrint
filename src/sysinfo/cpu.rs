@@ -63,11 +63,7 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
                 None
             }
         });
-
-        #[cfg(target_os = "windows")]
-        if cpu_temp.is_none() {
-            cpu_temp = get_windows_cpu_temp();
-        }
+        
 
         if let Some(temp) = cpu_temp {
             lines.push(format!("{}: {:.1}°C", "CPU Temp".bold(), temp));
