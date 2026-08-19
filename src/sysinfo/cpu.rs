@@ -50,7 +50,7 @@ pub fn cpu_info(opts: &DisplayOptions, mut lines: &mut Vec<String>, _sys: &Syste
     fn cpu_temperature(lines: &mut Vec<String>) {
 
         let components = Components::new_with_refreshed_list();
-        let cpu_temp = components.iter().find_map(|comp| {
+        let mut cpu_temp = components.iter().find_map(|comp| {
             let label = comp.label().to_lowercase();
             if label.contains("cpu")
                 || label.contains("core")
