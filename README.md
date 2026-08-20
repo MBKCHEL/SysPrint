@@ -81,6 +81,7 @@ sudo cp target/release/sysprint /usr/local/bin/
 ```bash
 echo "sysprint" >> ~/.bashrc
 ```
+(If using zsh, replace ~/.bashrc with ~/.zshrc)
 ### FreeBSD / OpenBSD / NetBSD
 Option 1: Fast Install (Precompiled Binary)
 Download the sysprint-freebsd binary from the Releases page
