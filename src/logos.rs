@@ -4,7 +4,7 @@ use colored::*;
 
 pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
-
+    
     
     let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = if mini {
         // Mini
@@ -26,6 +26,7 @@ pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
             s if s.contains("debian")   => (include_str!("../assets/mini/debian.txt"), |s| s.red().bold()),
             s if s.contains("kali")     => (include_str!("../assets/mini/kali.txt"), |s| s.white().bold()),
             s if s.contains("artix")    => (include_str!("../assets/mini/artix.txt"), |s| s.blue().bold()),
+            s if s.contains("alpine")    => (include_str!("../assets/mini/alpine.txt"), |s| s.purple().bold()),
             s if s.contains("zorinos") || s.contains("zorin") => (include_str!("../assets/mini/zorin.txt"), |s| s.blue().bold()),
             s if s.contains("pop") || s.contains("popos")     => (include_str!("../assets/mini/popos.txt"), |s| s.blue().bold()),
             s if s.contains("darwin") || s.contains("mac")    => (include_str!("../assets/mini/apple.txt"), |s| s.white().bold()),
@@ -51,6 +52,7 @@ pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
             s if s.contains("debian")   => (include_str!("../assets/normal/debian.txt"), |s| s.red().bold()),
             s if s.contains("kali")     => (include_str!("../assets/normal/kali.txt"), |s| s.white().bold()),
             s if s.contains("artix")    => (include_str!("../assets/normal/artix.txt"), |s| s.blue().bold()),
+            s if s.contains("alpine")    => (include_str!("../assets/normal/alpine.txt"), |s| s.purple().bold()),
             s if s.contains("zorinos") || s.contains("zorin") => (include_str!("../assets/normal/zorin.txt"), |s| s.blue().bold()),
             s if s.contains("pop") || s.contains("popos")     => (include_str!("../assets/normal/popos.txt"), |s| s.blue().bold()),
             s if s.contains("darwin") || s.contains("mac")    => (include_str!("../assets/normal/apple.txt"), |s| s.white().bold()),
