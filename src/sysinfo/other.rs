@@ -22,7 +22,24 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
         lines.push(format!("{}: {}", "DE/WM".bold(), desktop));
     }
 
-    system_time(&mut lines);
+
+    fn get_shell(lines: &mut Vec<String>) {
+        let shell_name = if let Ok(shell_path) = env::var("SHELL") {
+            shell_path
+                .split('/')
+                .last()
+                .unwrap_or("Unknown")
+                .to_string()
+        } else {
+            env::var("ComSpec")
+                .map(|p| p.split('\\').last().unwrap_or("cmd.exe").to_string())
+                .unwrap_or_else(|_| "Unknown".to_string())
+        };
+
+        lines.push(format!("{}: {}", "Shell".bold(), shell_name));
+    }
+
+    get_shell(lines);
 
     fn system_time(lines: &mut Vec<String>){
         let now = Local::now();
@@ -129,4 +146,5 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
 
 
     }
+    system_time(&mut lines);
 }
