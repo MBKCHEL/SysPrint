@@ -23,18 +23,7 @@ fn main() {
 
     sys.refresh_cpu_usage();
 
-    let mut sys = System::new_all();
-
-
-    sys.refresh_cpu_usage();
-
-    #[cfg(target_os = "windows")]
-    {
-        thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL);
-        sys.refresh_cpu_usage();
-    }
-
-
+    thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL);
 
     sys.refresh_cpu_usage();
 
