@@ -28,11 +28,16 @@ pub fn cpu_info(opts: &DisplayOptions, lines: &mut Vec<String>, sys: &System) {
     }
 
     fn cpu_usage(lines: &mut Vec<String>, sys: &System) {
-        lines.push(format!(
-            "{}: {:.1}%",
-            "CPU Usage".bold(),
-            sys.global_cpu_usage()
-        ));
+        let usage = sys.global_cpu_usage();
+        if usage > 99.9 && cfg!(target_os = "windows") {
+            lines.push(format!("{}: N/A", "CPU Usage".bold()));
+        } else {
+            lines.push(format!(
+                "{}: {:.1}%",
+                "CPU Usage".bold(),
+                usage
+            ));
+        }
     }
 
     fn cpu_temperature(lines: &mut Vec<String>) {

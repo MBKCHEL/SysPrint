@@ -4,8 +4,6 @@ mod parser;
 mod print;
 mod sysinfo;
 
-use std::thread;
-use ::sysinfo::{System, MINIMUM_CPU_UPDATE_INTERVAL};
 use clap::Parser;
 use parser::Arguments;
 use colored::*;
@@ -19,13 +17,7 @@ fn main() {
     #[cfg(windows)]
     let _ = colored::control::set_virtual_terminal(true);
 
-    let mut sys = System::new_all();
 
-    sys.refresh_cpu_usage();
-
-    thread::sleep(MINIMUM_CPU_UPDATE_INTERVAL);
-
-    sys.refresh_cpu_usage();
 
     let args = Arguments::parse();
 
