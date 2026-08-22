@@ -59,7 +59,7 @@ chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
 ```
 To run:
-```
+``` bash
 sysprint
 ```
 
@@ -91,12 +91,12 @@ echo "sysprint" >> ~/.config/fish/config.fish
 ### FreeBSD / OpenBSD / NetBSD
 Option 1: Fast Install (Precompiled Binary)
 Download the sysprint-freebsd binary from the Releases page
-```
+``` bash
 chmod +x ~/Downloads/sysprint-freebsd
 sudo mv ~/Downloads/sysprint-freebsd /usr/local/bin/sysprint
 ```
 To run:
-```
+``` bash
 sysprint
 ```
 
