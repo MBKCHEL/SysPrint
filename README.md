@@ -106,16 +106,16 @@ Download the `.exe` from the Releases page and run it.
 ## Uninstallation
 ## Linux & BSD(FreeBSD, OpenBSD, NetBSD)
 1. Remove binary:
-   ```
+   ``` bash
    sudo rm /usr/local/bin/sysprint
    ```
 2. Remove from terminal auto-run (if added):
-   ```
+   ``` bash
    # Bash
    sed -i '/sysprint/d' ~/.bashrc
 
-    # Zsh
-    sed -i '/sysprint/d' ~/.zshrc
+   # Zsh
+   sed -i '/sysprint/d' ~/.zshrc
 
    # Fish
    fish -c "sed -i '/sysprint/d' ~/.config/fish/config.fish"
