@@ -1,5 +1,6 @@
 use colored::Colorize;
 use sysinfo::{System};
+use std::fmt::Write;
 use crate::sysinfo::combine::DisplayOptions;
 
 // Uptime functions
@@ -18,52 +19,54 @@ fn format_uptime(seconds: u64) -> String {
 }
 
 // --- SYSTEM INFO ---
-pub fn system_info(opts: &DisplayOptions, lines: &mut Vec<String>){
+pub fn system_info(opts: &DisplayOptions, buf: &mut String){
 
-    if opts.system {
-        lines.push(format!("{}", "--- System INFO ---".bold().cyan()));
+    if !opts.system {
+        return;
+    }
+
+    let _ = writeln!(buf, "{}", "--- System INFO ---".bold().cyan());
 
 
-        os_name(lines);
+        os_name(buf);
 
         // OS_name
-        fn os_name(lines: &mut Vec<String>){
+        fn os_name(buf: &mut String){
 
-            lines.push(format!(
+            let _ = writeln!(buf,
                 "{}: {}",
                 "OS".bold(),
                 System::name().unwrap_or_default()
-            ));
+            );
 
         }
 
-        os_version(lines);
+        os_version(buf);
 
         // OS_version
-        fn os_version(lines: &mut Vec<String>){
-            lines.push(format!(
+        fn os_version(buf: &mut String){
+            let _ = writeln!(buf,
                 "{}: {}",
                 "OS Version".bold(),
                 System::os_version().unwrap_or_default()
-            ));
+            );
         }
 
-        host(lines);
+        host(buf);
 
         // Host name
-        fn host(lines: &mut Vec<String>){
-            lines.push(format!(
+        fn host(buf: &mut String){
+            let _ = writeln!(buf,
                 "{}: {}",
                 "Host".bold(),
                 System::host_name().unwrap_or_default()
-            ));
+            );
         }
 
         //Uptime
-        lines.push(format!(
+         let _ = writeln!(buf,
             "{}: {}",
             "Uptime".bold(),
             format_uptime(System::uptime())
-        ));
+        );
     }
-}

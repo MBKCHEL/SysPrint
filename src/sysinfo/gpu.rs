@@ -1,80 +1,76 @@
 use colored::Colorize;
+use std::fmt::Write;
 use std::fs;
 use std::path::Path;
 use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
 
-pub fn get_gpu_info(opts: &DisplayOptions) -> Vec<String> {
-    let mut gpu_lines = Vec::new();
+pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String) {
     if !opts.gpu {
-        return gpu_lines;
+        return;
     }
 
-    gpu_lines.push(format!("{}", "--- GPU INFO ---".bold().cyan()));
+    let _ = writeln!(buf, "{}", "--- GPU INFO ---".bold().cyan());
 
-    if let Some(nvidia_lines) = get_nvidia_info() {
-        gpu_lines.extend(nvidia_lines);
-        return gpu_lines;
+    if get_nvidia_info(buf) {
+        return;
     }
 
     #[cfg(target_os = "macos")]
-    if let Some(mac_lines) = get_macos_gpu_info() {
-        gpu_lines.extend(mac_lines);
-        return gpu_lines;
+    if get_macos_gpu_info(buf) {
+        return;
     }
 
     #[cfg(target_os = "linux")]
-    if let Some(sysfs_lines) = get_linux_sysfs_gpu() {
-        gpu_lines.extend(sysfs_lines);
-        return gpu_lines;
+    if get_linux_sysfs_gpu(buf) {
+        return;
     }
 
     #[cfg(windows)]
-    if let Some(win_lines) = get_windows_gpu_info() {
-        gpu_lines.extend(win_lines);
-        return gpu_lines;
+    if get_windows_gpu_info(buf) {
+        return;
     }
 
     #[cfg(target_os = "freebsd")]
-    if let Some(bsd_lines) = get_freebsd_gpu_info() {
-        gpu_lines.extend(bsd_lines);
-        return gpu_lines;
+    if get_freebsd_gpu_info(buf) {
+        return;
     }
 
     #[cfg(target_os = "openbsd")]
-    if let Some(bsd_lines) = get_openbsd_gpu_info() {
-        gpu_lines.extend(bsd_lines);
-        return gpu_lines;
+    if get_openbsd_gpu_info(buf) {
+        return;
     }
 
     #[cfg(target_os = "netbsd")]
-    if let Some(bsd_lines) = get_netbsd_gpu_info() {
-        gpu_lines.extend(bsd_lines);
-        return gpu_lines;
+    if get_netbsd_gpu_info(buf) {
+        return;
     }
 
     let name = get_generic_gpu_name();
-    gpu_lines.push(format!("{}: {}", "GPU".bold(), name));
-    gpu_lines
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
 }
 
-fn get_nvidia_info() -> Option<Vec<String>> {
+fn get_nvidia_info(buf: &mut String) -> bool {
     let output = Command::new("nvidia-smi")
         .args([
             "--query-gpu=gpu_name,memory.total,memory.used,temperature.gpu",
             "--format=csv,noheader,nounits",
         ])
-        .output()
-        .ok()?;
+        .output();
+
+    let output = match output {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let stdout = String::from_utf8_lossy(&output.stdout).trim().to_string();
     if stdout.is_empty() {
-        return None;
+        return false;
     }
 
     let parts: Vec<&str> = stdout.split(',').map(|s| s.trim()).collect();
     if parts.len() < 4 {
-        return None;
+        return false;
     }
 
     let name = parts[0];
@@ -82,19 +78,19 @@ fn get_nvidia_info() -> Option<Vec<String>> {
     let mem_used: f64 = parts[2].parse().unwrap_or(0.0) / 1024.0;
     let temp = parts[3];
 
-    Some(vec![
-        format!("{}: {}", "GPU".bold(), name),
-        format!("{}: {:.2} GB / {:.2} GB", "VRAM".bold(), mem_used, mem_total),
-        format!("{}: {}°C", "GPU Temp".bold(), temp),
-    ])
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
+    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", "VRAM".bold(), mem_used, mem_total);
+    let _ = writeln!(buf, "{}: {}°C", "GPU Temp".bold(), temp);
+
+    true
 }
 
 #[cfg(target_os = "macos")]
-fn get_macos_gpu_info() -> Option<Vec<String>> {
-    let output = Command::new("system_profiler")
-        .arg("SPDisplaysDataType")
-        .output()
-        .ok()?;
+fn get_macos_gpu_info(buf: &mut String) -> bool {
+    let output = match Command::new("system_profiler").arg("SPDisplaysDataType").output() {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let text = String::from_utf8_lossy(&output.stdout);
     let mut gpu_name = String::new();
@@ -114,30 +110,31 @@ fn get_macos_gpu_info() -> Option<Vec<String>> {
     }
 
     if gpu_name.is_empty() {
-        return None;
+        return false;
     }
 
-    let mut lines = vec![format!("{}: {}", "GPU".bold(), gpu_name)];
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), gpu_name);
     if !vram.is_empty() {
-        lines.push(format!("{}: {}", "VRAM".bold(), vram));
+        let _ = writeln!(buf, "{}: {}", "VRAM".bold(), vram);
     }
 
-    Some(lines)
+    true
 }
 
 #[cfg(target_os = "linux")]
-fn get_linux_sysfs_gpu() -> Option<Vec<String>> {
+fn get_linux_sysfs_gpu(buf: &mut String) -> bool {
     let base_path = Path::new("/sys/class/drm/card0/device");
     if !base_path.exists() {
-        return None;
+        return false;
     }
 
-    let mut lines = Vec::new();
     let name = get_generic_gpu_name();
-    lines.push(format!("{}: {}", "GPU".bold(), name));
+    let mut found_any = false;
 
     let vram_used_path = base_path.join("mem_info_vram_used");
     let vram_total_path = base_path.join("mem_info_vram_total");
+
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
 
     if vram_used_path.exists() && vram_total_path.exists() {
         let used_bytes: f64 = fs::read_to_string(vram_used_path)
@@ -154,7 +151,8 @@ fn get_linux_sysfs_gpu() -> Option<Vec<String>> {
         if total_bytes > 0.0 {
             let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
             let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
-            lines.push(format!("{}: {:.2} GB / {:.2} GB", "VRAM".bold(), used_gb, total_gb));
+            let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", "VRAM".bold(), used_gb, total_gb);
+            found_any = true;
         }
     }
 
@@ -165,7 +163,8 @@ fn get_linux_sysfs_gpu() -> Option<Vec<String>> {
             if temp_path.exists() {
                 if let Ok(temp_raw) = fs::read_to_string(temp_path) {
                     if let Ok(temp_mc) = temp_raw.trim().parse::<f64>() {
-                        lines.push(format!("{}: {:.0}°C", "GPU Temp".bold(), temp_mc / 1000.0));
+                        let _ = writeln!(buf, "{}: {:.0}°C", "GPU Temp".bold(), temp_mc / 1000.0);
+                        found_any = true;
                         break;
                     }
                 }
@@ -173,24 +172,20 @@ fn get_linux_sysfs_gpu() -> Option<Vec<String>> {
         }
     }
 
-    if lines.len() > 1 {
-        Some(lines)
-    } else {
-        None
-    }
+    found_any
 }
 
 #[cfg(windows)]
-fn get_windows_gpu_info() -> Option<Vec<String>> {
+fn get_windows_gpu_info(buf: &mut String) -> bool {
     let script = "Get-CimInstance Win32_VideoController | Select-Object Name, AdapterRAM | ConvertTo-Json";
-    let output = Command::new("powershell")
-        .args(["-Command", script])
-        .output()
-        .ok()?;
+    let output = match Command::new("powershell").args(["-Command", script]).output() {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     if stdout.trim().is_empty() {
-        return None;
+        return false;
     }
 
     if let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) {
@@ -199,23 +194,22 @@ fn get_windows_gpu_info() -> Option<Vec<String>> {
         let vram_bytes = obj["AdapterRAM"].as_f64().unwrap_or(0.0);
         let vram_gb = vram_bytes / 1024.0 / 1024.0 / 1024.0;
 
-        let mut lines = vec![format!("{}: {}", "GPU".bold(), name)];
+        let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
         if vram_gb > 0.0 {
-            lines.push(format!("{}: {:.2} GB", "VRAM".bold(), vram_gb));
+            let _ = writeln!(buf, "{}: {:.2} GB", "VRAM".bold(), vram_gb);
         }
-        return Some(lines);
+        return true;
     }
 
-    None
+    false
 }
 
 #[cfg(target_os = "freebsd")]
-fn get_freebsd_gpu_info() -> Option<Vec<String>> {
-    let output = Command::new("sh")
-        .arg("-c")
-        .arg("pciconf -lv | grep -B 4 -i 'class=0x03'")
-        .output()
-        .ok()?;
+fn get_freebsd_gpu_info(buf: &mut String) -> bool {
+    let output = match Command::new("sh").arg("-c").arg("pciconf -lv | grep -B 4 -i 'class=0x03'").output() {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let text = String::from_utf8_lossy(&output.stdout);
     let mut name = String::new();
@@ -230,31 +224,33 @@ fn get_freebsd_gpu_info() -> Option<Vec<String>> {
     }
 
     if name.is_empty() {
-        return None;
+        return false;
     }
 
-    let mut lines = vec![format!("{}: {}", "GPU".bold(), name)];
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
 
     if let Ok(sysctl_out) = Command::new("sysctl").arg("-n").arg("dev.amdtemp.0.core0").output() {
         let temp_str = String::from_utf8_lossy(&sysctl_out.stdout).trim().to_string();
         if !temp_str.is_empty() {
-            lines.push(format!("{}: {}", "GPU Temp".bold(), temp_str));
+            let _ = writeln!(buf, "{}: {}", "GPU Temp".bold(), temp_str);
         }
     }
 
-    Some(lines)
+    true
 }
 
 #[cfg(target_os = "openbsd")]
-fn get_openbsd_gpu_info() -> Option<Vec<String>> {
-    let output = Command::new("sh")
-        .arg("-c")
-        .arg("pcidump -v | grep -i 'vga'")
-        .output()
-        .ok()?;
+fn get_openbsd_gpu_info(buf: &mut String) -> bool {
+    let output = match Command::new("sh").arg("-c").arg("pcidump -v | grep -i 'vga'").output() {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let text = String::from_utf8_lossy(&output.stdout);
-    let line = text.lines().next()?;
+    let line = match text.lines().next() {
+        Some(l) => l,
+        None => return false,
+    };
 
     let name = if let Some(pos) = line.rfind(':') {
         line[pos + 1..].trim().to_string()
@@ -263,43 +259,49 @@ fn get_openbsd_gpu_info() -> Option<Vec<String>> {
     };
 
     if name.is_empty() {
-        return None;
+        return false;
     }
 
-    Some(vec![format!("{}: {}", "GPU".bold(), name)])
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
+    true
 }
 
 #[cfg(target_os = "netbsd")]
-fn get_netbsd_gpu_info() -> Option<Vec<String>> {
-    let output = Command::new("sh")
-        .arg("-c")
-        .arg("pcictl pci0 list | grep -i 'display'")
-        .output()
-        .ok()?;
+fn get_netbsd_gpu_info(buf: &mut String) -> bool {
+    let output = match Command::new("sh").arg("-c").arg("pcictl pci0 list | grep -i 'display'").output() {
+        Ok(out) => out,
+        Err(_) => return false,
+    };
 
     let text = String::from_utf8_lossy(&output.stdout);
-    let line = text.lines().next()?;
+    let line = match text.lines().next() {
+        Some(l) => l,
+        None => return false,
+    };
 
-    let pos = line.find(':')?;
+    let pos = match line.find(':') {
+        Some(p) => p,
+        None => return false,
+    };
+
     let name = line[pos + 1..].trim().to_string();
-
     if name.is_empty() {
-        return None;
+        return false;
     }
 
-    let mut lines = vec![format!("{}: {}", "GPU".bold(), name)];
+    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
 
     if let Ok(env_out) = Command::new("envstat").args(["-s", "amdgpu:temperature"]).output() {
         let env_text = String::from_utf8_lossy(&env_out.stdout);
         if let Some(temp_line) = env_text.lines().find(|l| l.contains("degC")) {
             let parts: Vec<&str> = temp_line.split_whitespace().collect();
             if parts.len() >= 2 {
-                lines.push(format!("{}: {}°C", "GPU Temp".bold(), parts[1]));
+                let _ = writeln!(buf, "{}: {}°C", "GPU Temp".bold(), parts[1]);
             }
         }
     }
 
-    Some(lines)
+    true
 }
 
 fn get_generic_gpu_name() -> String {

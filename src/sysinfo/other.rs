@@ -1,29 +1,33 @@
 use colored::Colorize;
 use std::env;
 use chrono::Local;
+use std::fmt::Write;
 use std::fs;
 use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
 
-pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
+pub fn other_info(opts: &DisplayOptions, buf: &mut String) {
     // --- Other Info ---
-    opts.other;
-    lines.push(format!("{}", "--- Other Info ---".bold().cyan()));
+    if !opts.other {
+        return;
+    }
+
+    let _ = writeln!(buf,"{}", "--- Other Info ---".bold().cyan());
 
     // give link functions de_wm_check for variables lines
-    de_wm_check(&mut lines);
+    de_wm_check(buf);
 
     // Functions de_wm_check
-    fn de_wm_check(lines: &mut Vec<String>){
+    fn de_wm_check(buf: &mut String){
         // Desktop Environment / Window Manager
         let desktop = env::var("XDG_CURRENT_DESKTOP")
             .or_else(|_| env::var("DESKTOP_SESSION"))
             .unwrap_or_else(|_| "Unknown".to_string());
-        lines.push(format!("{}: {}", "DE/WM".bold(), desktop));
+        let _ = writeln!(buf,"{}: {}", "DE/WM".bold(), desktop);
     }
 
 
-    fn get_shell(lines: &mut Vec<String>) {
+    fn get_shell(buf: &mut String) {
         let shell_name = if let Ok(shell_path) = env::var("SHELL") {
             shell_path
                 .split('/')
@@ -36,23 +40,23 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
                 .unwrap_or_else(|_| "Unknown".to_string())
         };
 
-        lines.push(format!("{}: {}", "Shell".bold(), shell_name));
+        let _ = writeln!(buf,"{}: {}", "Shell".bold(), shell_name);
     }
 
-    get_shell(lines);
+    get_shell(buf);
 
-    fn system_time(lines: &mut Vec<String>){
+    fn system_time(buf: &mut String){
         let now = Local::now();
         now.format("%H:%M").to_string();
-        lines.push(format!("{}: {}", "Locale Time".bold(), now.format("%H:%M").to_string()));
+        let _ = writeln!(buf,"{}: {}", "Locale Time".bold(), now.format("%H:%M").to_string());
     }
 
 
     // give link functions battery for variables lines
-    battery(&mut lines);
+    battery(buf);
 
     // Functions battery
-    fn battery(lines: &mut Vec<String>){
+    fn battery(buf: &mut String){
         let mut battery = "N/A (Desktop)".to_string();
 
         // Linux battery
@@ -142,9 +146,9 @@ pub fn other_info(opts: &DisplayOptions, mut lines: &mut Vec<String>) {
             }
         }
 
-        lines.push(format!("{}: {}", "Battery".bold(), battery));
+        let _ = writeln!(buf,"{}: {}", "Battery".bold(), battery);
 
 
     }
-    system_time(&mut lines);
+    system_time(buf);
 }

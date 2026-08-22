@@ -6,8 +6,6 @@ use crate::sysinfo::cpu::cpu_info;
 use crate::sysinfo::other::other_info;
 use crate::sysinfo::disks::disk_info;
 
-
-/// Which sections of the report should be collected.
 #[derive(Clone, Copy)]
 pub struct DisplayOptions {
     pub system: bool,
@@ -34,87 +32,38 @@ impl Default for DisplayOptions {
 }
 
 pub struct SystemInfo {
-    pub lines: Vec<String>,
-    pub memory: Vec<String>,
-    pub gpu: Vec<String>,
-    pub system: Vec<String>,
-    pub cpu: Vec<String>,
-    pub other: Vec<String>,
-    pub disk: Vec<String>,
+    pub buffer: String,
     pub mini_mode: bool,
 }
 
 impl SystemInfo {
-    /// Collect all system information into a renderable form.
     pub fn collect(opts: DisplayOptions) -> Self {
         let _sys = System::new_all();
 
-        let lines: Vec<String> = Vec::new();
+        let mut buffer = String::with_capacity(2048);
 
-        let mut memory = Vec::new();
-
-        let mut other = Vec::new();
-
-        let mut system = Vec::new();
-
-        let mut cpu = Vec::new();
-
-        let mut disk = Vec::new();
-
-        // Memory info
-        if opts.memory {
-            memory_info(&opts, &mut memory, &_sys);
-        }
-
-        // System info
         if opts.system {
-            system_info(&opts,  &mut system);
+            system_info(&opts, &mut buffer);
         }
-
-        //CPU info
         if opts.cpu {
-            cpu_info(&opts,  &mut cpu, &_sys);
+            cpu_info(&opts, &mut buffer, &_sys);
         }
-
-        //Other info
+        if opts.gpu {
+            get_gpu_info(&opts, &mut buffer);
+        }
+        if opts.memory {
+            memory_info(&opts, &mut buffer, &_sys);
+        }
         if opts.other {
-            other_info(&opts,  &mut other);
+            other_info(&opts, &mut buffer);
         }
-
-        //Disk info
         if opts.disks {
-            disk_info(&opts,  &mut disk);
+            disk_info(&opts, &mut buffer);
         }
-
-        // GPU info
-        let gpu = if opts.gpu {
-            get_gpu_info(&opts)
-        } else {
-            Vec::new()
-        };
-
 
         Self {
-            lines,
-            memory,
-            gpu,
-            system,
-            cpu,
-            other,
-            disk,
+            buffer,
             mini_mode: opts.mini_mode,
         }
-    }
-
-
-    pub fn all_lines(&self) -> Vec<String> {
-        let mut all = self.lines.clone();
-        all.extend(self.system.clone());
-        all.extend(self.cpu.clone());
-        all.extend(self.gpu.clone());
-        all.extend(self.memory.clone());
-        all.extend(self.other.clone());
-        all.extend(self.disk.clone());
-        all
     }
 }
