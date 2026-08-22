@@ -59,7 +59,7 @@ chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
 ```
 To run:
-```
+``` bash
 sysprint
 ```
 
@@ -79,18 +79,24 @@ sudo cp target/release/sysprint /usr/local/bin/
 
 #### Auto-run on Terminal Startup (Optional)
 ```bash
+# For Bash
 echo "sysprint" >> ~/.bashrc
+
+# For Zsh
+echo "sysprint" >> ~/.zshrc
+
+# For Fish
+echo "sysprint" >> ~/.config/fish/config.fish
 ```
-(If using zsh, replace ~/.bashrc with ~/.zshrc)
 ### FreeBSD / OpenBSD / NetBSD
 Option 1: Fast Install (Precompiled Binary)
 Download the sysprint-freebsd binary from the Releases page
-```
+``` bash
 chmod +x ~/Downloads/sysprint-freebsd
 sudo mv ~/Downloads/sysprint-freebsd /usr/local/bin/sysprint
 ```
 To run:
-```
+``` bash
 sysprint
 ```
 
@@ -100,14 +106,20 @@ Download the `.exe` from the Releases page and run it.
 ## Uninstallation
 ## Linux & BSD(FreeBSD, OpenBSD, NetBSD)
 1. Remove binary:
-   ```
+   ``` bash
    sudo rm /usr/local/bin/sysprint
    ```
 2. Remove from terminal auto-run (if added):
-   ```
+   ``` bash
+   # Bash
    sed -i '/sysprint/d' ~/.bashrc
+
+   # Zsh
+   sed -i '/sysprint/d' ~/.zshrc
+
+   # Fish
+   fish -c "sed -i '/sysprint/d' ~/.config/fish/config.fish"
    ```
-   (If using zsh, replace ~/.bashrc with ~/.zshrc)
 
 
 ## Windows 
