@@ -1,8 +1,7 @@
-use std::net::ToSocketAddrs;
 use sysinfo::System;
 use colored::*;
 
-pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
+pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredString) {
     let os_name = System::name().unwrap_or_default().to_lowercase();
 
     
@@ -73,5 +72,5 @@ pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize) {
         })
         .collect();
 
-    (logo_lines, max_width)
+    (logo_lines, max_width, color_func)
 }

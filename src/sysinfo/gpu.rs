@@ -1,18 +1,18 @@
-use colored::Colorize;
+use colored::{ColoredString, Colorize};
 use std::fmt::Write;
 use std::fs;
 use std::path::Path;
 use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
 
-pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String) {
+pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
     if !opts.gpu {
         return;
     }
 
     let _ = writeln!(buf, "{}", "--- GPU INFO ---".bold().cyan());
 
-    if get_nvidia_info(buf) {
+    if get_nvidia_info(buf, c) {
         return;
     }
 
@@ -47,10 +47,10 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String) {
     }
 
     let name = get_generic_gpu_name();
-    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
 }
 
-fn get_nvidia_info(buf: &mut String) -> bool {
+fn get_nvidia_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
     let output = Command::new("nvidia-smi")
         .args([
             "--query-gpu=gpu_name,memory.total,memory.used,temperature.gpu",
@@ -78,9 +78,9 @@ fn get_nvidia_info(buf: &mut String) -> bool {
     let mem_used: f64 = parts[2].parse().unwrap_or(0.0) / 1024.0;
     let temp = parts[3];
 
-    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
-    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", "VRAM".bold(), mem_used, mem_total);
-    let _ = writeln!(buf, "{}: {}°C", "GPU Temp".bold(), temp);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), mem_used, mem_total);
+    let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
 
     true
 }

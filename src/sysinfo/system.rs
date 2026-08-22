@@ -1,6 +1,7 @@
-use colored::Colorize;
+use colored::{ColoredString};
 use sysinfo::{System};
 use std::fmt::Write;
+use colored::Colorize;
 use crate::sysinfo::combine::DisplayOptions;
 
 // Uptime functions
@@ -19,7 +20,7 @@ fn format_uptime(seconds: u64) -> String {
 }
 
 // --- SYSTEM INFO ---
-pub fn system_info(opts: &DisplayOptions, buf: &mut String){
+pub fn system_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
 
     if !opts.system {
         return;
@@ -28,45 +29,30 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String){
     let _ = writeln!(buf, "{}", "--- System INFO ---".bold().cyan());
 
 
-        os_name(buf);
+        os_name(buf, c);
 
         // OS_name
-        fn os_name(buf: &mut String){
-
-            let _ = writeln!(buf,
-                "{}: {}",
-                "OS".bold(),
-                System::name().unwrap_or_default()
-            );
+        fn os_name(buf: &mut String, c :fn(&str) -> ColoredString){
+            let _ = writeln!(buf, "{}: {}", c("OS"), System::name().unwrap_or_default());
 
         }
 
-        os_version(buf);
+        os_version(buf, c);
 
         // OS_version
-        fn os_version(buf: &mut String){
+        fn os_version(buf: &mut String, c :fn(&str) -> ColoredString){
             let _ = writeln!(buf,
-                "{}: {}",
-                "OS Version".bold(),
-                System::os_version().unwrap_or_default()
-            );
+                "{}: {}", c("OS Version"), System::os_version().unwrap_or_default());
         }
 
-        host(buf);
+        host(buf, c);
 
         // Host name
-        fn host(buf: &mut String){
-            let _ = writeln!(buf,
-                "{}: {}",
-                "Host".bold(),
-                System::host_name().unwrap_or_default()
-            );
+        fn host(buf: &mut String, c :fn(&str) -> ColoredString){
+            let _ = writeln!(buf, "{}: {}", c("Host"), System::host_name().unwrap_or_default());
         }
 
         //Uptime
-         let _ = writeln!(buf,
-            "{}: {}",
-            "Uptime".bold(),
-            format_uptime(System::uptime())
+         let _ = writeln!(buf, "{}: {}", c("Uptime"), format_uptime(System::uptime())
         );
     }

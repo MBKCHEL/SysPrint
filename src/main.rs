@@ -6,9 +6,7 @@ mod sysinfo;
 
 use clap::Parser;
 use parser::Arguments;
-use colored::*;
 use crate::sysinfo::combine::DisplayOptions;
-
 use crate::sysinfo::combine::SystemInfo;
 
 

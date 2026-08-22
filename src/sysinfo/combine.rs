@@ -42,23 +42,25 @@ impl SystemInfo {
 
         let mut buffer = String::with_capacity(2048);
 
+        let (_, _, c) = crate::logos::get_logo(opts.mini_mode);
+
         if opts.system {
-            system_info(&opts, &mut buffer);
+            system_info(&opts, &mut buffer, c);
         }
         if opts.cpu {
-            cpu_info(&opts, &mut buffer, &_sys);
+            cpu_info(&opts, &mut buffer, &_sys, c);
         }
         if opts.gpu {
-            get_gpu_info(&opts, &mut buffer);
+            get_gpu_info(&opts, &mut buffer, c);
         }
         if opts.memory {
-            memory_info(&opts, &mut buffer, &_sys);
+            memory_info(&opts, &mut buffer, &_sys, c);
         }
         if opts.other {
-            other_info(&opts, &mut buffer);
+            other_info(&opts, &mut buffer, c);
         }
         if opts.disks {
-            disk_info(&opts, &mut buffer);
+            disk_info(&opts, &mut buffer, c);
         }
 
         Self {

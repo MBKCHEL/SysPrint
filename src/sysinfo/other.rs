@@ -3,10 +3,10 @@ use std::env;
 use chrono::Local;
 use std::fmt::Write;
 use std::fs;
-use std::process::Command;
+use colored::{ColoredString};
 use crate::sysinfo::combine::DisplayOptions;
 
-pub fn other_info(opts: &DisplayOptions, buf: &mut String) {
+pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
     // --- Other Info ---
     if !opts.other {
         return;
@@ -15,19 +15,19 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String) {
     let _ = writeln!(buf,"{}", "--- Other Info ---".bold().cyan());
 
     // give link functions de_wm_check for variables lines
-    de_wm_check(buf);
+    de_wm_check(buf, c);
 
     // Functions de_wm_check
-    fn de_wm_check(buf: &mut String){
+    fn de_wm_check(buf: &mut String, c:fn(&str) -> ColoredString) {
         // Desktop Environment / Window Manager
         let desktop = env::var("XDG_CURRENT_DESKTOP")
             .or_else(|_| env::var("DESKTOP_SESSION"))
             .unwrap_or_else(|_| "Unknown".to_string());
-        let _ = writeln!(buf,"{}: {}", "DE/WM".bold(), desktop);
+        let _ = writeln!(buf,"{}: {}", c("DE"), desktop);
     }
 
 
-    fn get_shell(buf: &mut String) {
+    fn get_shell(buf: &mut String, c:fn(&str) -> ColoredString) {
         let shell_name = if let Ok(shell_path) = env::var("SHELL") {
             shell_path
                 .split('/')
@@ -40,23 +40,23 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String) {
                 .unwrap_or_else(|_| "Unknown".to_string())
         };
 
-        let _ = writeln!(buf,"{}: {}", "Shell".bold(), shell_name);
+        let _ = writeln!(buf,"{}: {}", c("Shell"), shell_name);
     }
 
-    get_shell(buf);
+    get_shell(buf, c);
 
-    fn system_time(buf: &mut String){
+    fn system_time(buf: &mut String, c:fn(&str) -> ColoredString) {
         let now = Local::now();
         now.format("%H:%M").to_string();
-        let _ = writeln!(buf,"{}: {}", "Locale Time".bold(), now.format("%H:%M").to_string());
+        let _ = writeln!(buf,"{}: {}", c("Locale Time"), now.format("%H:%M").to_string());
     }
 
 
     // give link functions battery for variables lines
-    battery(buf);
+    battery(buf, c);
 
     // Functions battery
-    fn battery(buf: &mut String){
+    fn battery(buf: &mut String, c: fn(&str) -> ColoredString) {
         let mut battery = "N/A (Desktop)".to_string();
 
         // Linux battery
@@ -146,9 +146,9 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String) {
             }
         }
 
-        let _ = writeln!(buf,"{}: {}", "Battery".bold(), battery);
+        let _ = writeln!(buf,"{}: {}", c("Battery"), battery);
 
 
     }
-    system_time(buf);
+    system_time(buf, c);
 }

@@ -3,7 +3,7 @@ use crate::logos;
 use crate::sysinfo::combine::SystemInfo;
 
 pub fn render(info: &SystemInfo) {
-    let (logo, logo_padding) = logos::get_logo(info.mini_mode);
+    let (logo, logo_padding, _) = logos::get_logo(info.mini_mode);
     
     let raw_lens: Vec<usize> = logo
         .iter()
