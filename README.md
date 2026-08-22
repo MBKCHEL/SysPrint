@@ -79,9 +79,15 @@ sudo cp target/release/sysprint /usr/local/bin/
 
 #### Auto-run on Terminal Startup (Optional)
 ```bash
+# For Bash
 echo "sysprint" >> ~/.bashrc
+
+# For Zsh
+echo "sysprint" >> ~/.zshrc
+
+# For Fish
+echo "sysprint" >> ~/.config/fish/config.fish
 ```
-(If using zsh, replace ~/.bashrc with ~/.zshrc)
 ### FreeBSD / OpenBSD / NetBSD
 Option 1: Fast Install (Precompiled Binary)
 Download the sysprint-freebsd binary from the Releases page
@@ -105,9 +111,15 @@ Download the `.exe` from the Releases page and run it.
    ```
 2. Remove from terminal auto-run (if added):
    ```
+   # Bash
    sed -i '/sysprint/d' ~/.bashrc
+
+    # Zsh
+    sed -i '/sysprint/d' ~/.zshrc
+
+   # Fish
+   fish -c "sed -i '/sysprint/d' ~/.config/fish/config.fish"
    ```
-   (If using zsh, replace ~/.bashrc with ~/.zshrc)
 
 
 ## Windows 
