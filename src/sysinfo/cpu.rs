@@ -2,7 +2,7 @@ use colored::Colorize;
 use sysinfo::{Components, System};
 use crate::sysinfo::combine::DisplayOptions;
 
-// --- CPU INFO ---
+// CPU INFO
 pub fn cpu_info(opts: &DisplayOptions, lines: &mut Vec<String>, sys: &System) {
     if !opts.cpu {
         return;
