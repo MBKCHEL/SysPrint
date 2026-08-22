@@ -13,3 +13,6 @@ toml = "1.1.4"
 dirs = "6.0.0"
 chrono = "0.4.45"
 serde_json = "1.0.151"
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
