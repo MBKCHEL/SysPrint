@@ -82,6 +82,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
         // FreeBSD battery
         #[cfg(target_os = "freebsd")]
         {
+            use std::process::Command;
             let output = Command::new("sysctl")
                 .arg("-n")
                 .arg("hw.acpi.battery.life")
@@ -97,6 +98,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
         // OpenBSD battery
         #[cfg(target_os = "openbsd")]
         {
+            use std::process::Command;
             // apm -l
             let output = Command::new("apm").arg("-l").output();
 
@@ -111,7 +113,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
         // NetBSD battery
         #[cfg(target_os = "netbsd")]
         {
-            //envstat
+            use std::process::Command;
             let output = Command::new("envstat").args(["-s", "bat0:charge"]).output();
 
             if let Ok(out) = output {
