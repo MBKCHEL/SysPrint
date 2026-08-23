@@ -35,6 +35,7 @@ show-memory-info = true
 show-disks-info = true
 show-other-info = true
 show-gpu-info = true
+mini-mode = false
 ```
 ## When a CLI flag contradicts the config, `config-stronger = true` makes the config win
 config-stronger = false
