@@ -1,10 +1,10 @@
-use sysinfo::System;
+use crate::sysinfo::cpu::cpu_info;
+use crate::sysinfo::disks::disk_info;
 use crate::sysinfo::gpu::get_gpu_info;
 use crate::sysinfo::memory::memory_info;
-use crate::sysinfo::system::system_info;
-use crate::sysinfo::cpu::cpu_info;
 use crate::sysinfo::other::other_info;
-use crate::sysinfo::disks::disk_info;
+use crate::sysinfo::system::system_info;
+use sysinfo::System;
 
 #[derive(Clone, Copy)]
 pub struct DisplayOptions {
@@ -69,3 +69,4 @@ impl SystemInfo {
         }
     }
 }
+
