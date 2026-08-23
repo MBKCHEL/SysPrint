@@ -4,18 +4,15 @@ mod parser;
 mod print;
 mod sysinfo;
 
-use clap::Parser;
-use parser::Arguments;
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;
-
+use clap::Parser;
+use parser::Arguments;
 
 fn main() {
     // For fucking Windows CMD
     #[cfg(windows)]
     let _ = colored::control::set_virtual_terminal(true);
-
-
 
     let args = Arguments::parse();
 
@@ -38,11 +35,27 @@ fn main() {
 
     let config_stronger = cfg.map(|c| c.config_stronger).unwrap_or(false);
     let opts = DisplayOptions {
-        system: decide(args.hide_system, cfg.map(|c| c.show_system_info), config_stronger),
+        system: decide(
+            args.hide_system,
+            cfg.map(|c| c.show_system_info),
+            config_stronger,
+        ),
         cpu: decide(args.hide_cpu, cfg.map(|c| c.show_cpu_info), config_stronger),
-        memory: decide(args.hide_memory, cfg.map(|c| c.show_memory_info), config_stronger),
-        disks: decide(args.hide_disks, cfg.map(|c| c.show_disks_info), config_stronger),
-        other: decide(args.hide_other, cfg.map(|c| c.show_other_info), config_stronger),
+        memory: decide(
+            args.hide_memory,
+            cfg.map(|c| c.show_memory_info),
+            config_stronger,
+        ),
+        disks: decide(
+            args.hide_disks,
+            cfg.map(|c| c.show_disks_info),
+            config_stronger,
+        ),
+        other: decide(
+            args.hide_other,
+            cfg.map(|c| c.show_other_info),
+            config_stronger,
+        ),
         gpu: decide(args.hide_gpu, cfg.map(|c| c.show_gpu_info), config_stronger),
         mini_mode: decide(args.mini, cfg.map(|c| c.mini_mode), config_stronger),
     };
@@ -67,3 +80,4 @@ fn decide(flag_hides: bool, config: Option<bool>, config_stronger: bool) -> bool
         config.unwrap_or(true)
     }
 }
+
