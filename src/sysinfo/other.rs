@@ -69,6 +69,9 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
         if env::var("FOOT_SOCKET").is_ok() {
             return "foot".to_string();
         }
+        if env::var("WT_SESSION").is_ok() {
+            return "Windows Terminal".to_string();
+        }
         if let Ok(term) = env::var("TERMINAL") {
             if !term.is_empty() {
                 return term;
