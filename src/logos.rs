@@ -1,10 +1,19 @@
 use sysinfo::System;
 use colored::*;
+use std::path::Path;
+use std::env;
 
 pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredString) {
-    let os_name = System::name().unwrap_or_default().to_lowercase();
+    let mut os_name = System::name().unwrap_or_default().to_lowercase();
 
-    
+    // Android/Termux
+    let is_android = Path::new("/system/build.prop").exists()
+        || env::var("PREFIX").map(|p| p.contains("com.termux")).unwrap_or(false);
+
+    if is_android {
+        os_name = "android".to_string();
+    }
+
     let (raw_logo, color_func): (&str, fn(&str) -> ColoredString) = if mini {
         // Mini
         match os_name.as_str() {
@@ -26,7 +35,7 @@ pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredSt
             s if s.contains("kali")     => (include_str!("../assets/mini/kali.txt"), |s| s.white().bold()),
             s if s.contains("artix")    => (include_str!("../assets/mini/artix.txt"), |s| s.blue().bold()),
             s if s.contains("astra")    => (include_str!("../assets/mini/astra.txt"), |s| s.blue().bold()),
-            s if s.contains("alpine")    => (include_str!("../assets/mini/alpine.txt"), |s| s.purple().bold()),
+            s if s.contains("alpine")   => (include_str!("../assets/mini/alpine.txt"), |s| s.purple().bold()),
             s if s.contains("zorinos") || s.contains("zorin") => (include_str!("../assets/mini/zorin.txt"), |s| s.blue().bold()),
             s if s.contains("pop") || s.contains("popos")     => (include_str!("../assets/mini/popos.txt"), |s| s.blue().bold()),
             s if s.contains("darwin") || s.contains("mac")    => (include_str!("../assets/mini/apple.txt"), |s| s.white().bold()),
@@ -53,7 +62,7 @@ pub fn get_logo(mini: bool) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredSt
             s if s.contains("kali")     => (include_str!("../assets/normal/kali.txt"), |s| s.white().bold()),
             s if s.contains("artix")    => (include_str!("../assets/normal/artix.txt"), |s| s.blue().bold()),
             s if s.contains("astra")    => (include_str!("../assets/normal/astra.txt"), |s| s.blue().bold()),
-            s if s.contains("alpine")    => (include_str!("../assets/normal/alpine.txt"), |s| s.purple().bold()),
+            s if s.contains("alpine")   => (include_str!("../assets/normal/alpine.txt"), |s| s.purple().bold()),
             s if s.contains("zorinos") || s.contains("zorin") => (include_str!("../assets/normal/zorin.txt"), |s| s.blue().bold()),
             s if s.contains("pop") || s.contains("popos")     => (include_str!("../assets/normal/popos.txt"), |s| s.blue().bold()),
             s if s.contains("darwin") || s.contains("mac")    => (include_str!("../assets/normal/apple.txt"), |s| s.white().bold()),
