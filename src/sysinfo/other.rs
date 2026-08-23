@@ -1,33 +1,32 @@
+use crate::sysinfo::combine::DisplayOptions;
+use chrono::Local;
+use colored::ColoredString;
 use colored::Colorize;
 use std::env;
-use chrono::Local;
 use std::fmt::Write;
 use std::fs;
-use colored::{ColoredString};
-use crate::sysinfo::combine::DisplayOptions;
 
-pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
+pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) {
     // --- Other Info ---
     if !opts.other {
         return;
     }
 
-    let _ = writeln!(buf,"{}", "--- Other Info ---".bold().cyan());
+    let _ = writeln!(buf, "{}", "--- Other Info ---".bold().cyan());
 
     // give link functions de_wm_check for variables lines
     de_wm_check(buf, c);
 
     // Functions de_wm_check
-    fn de_wm_check(buf: &mut String, c:fn(&str) -> ColoredString) {
+    fn de_wm_check(buf: &mut String, c: fn(&str) -> ColoredString) {
         // Desktop Environment / Window Manager
         let desktop = env::var("XDG_CURRENT_DESKTOP")
             .or_else(|_| env::var("DESKTOP_SESSION"))
             .unwrap_or_else(|_| "Unknown".to_string());
-        let _ = writeln!(buf,"{}: {}", c("DE"), desktop);
+        let _ = writeln!(buf, "{}: {}", c("DE"), desktop);
     }
 
-
-    fn get_shell(buf: &mut String, c:fn(&str) -> ColoredString) {
+    fn get_shell(buf: &mut String, c: fn(&str) -> ColoredString) {
         let shell_name = if let Ok(shell_path) = env::var("SHELL") {
             shell_path
                 .split('/')
@@ -40,17 +39,63 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
                 .unwrap_or_else(|_| "Unknown".to_string())
         };
 
-        let _ = writeln!(buf,"{}: {}", c("Shell"), shell_name);
+        let _ = writeln!(buf, "{}: {}", c("Shell"), shell_name);
     }
 
+    pub fn terminal_info(buf: &mut String, c: fn(&str) -> ColoredString) {
+        let term = if let Ok(term) = env::var("TERM_PROGRAM") {
+            if !term.is_empty() {
+                term
+            } else {
+                get_fallback_term()
+            }
+        } else {
+            get_fallback_term()
+        };
+
+        let _ = writeln!(buf, "{}: {}", c("Terminal"), term);
+    }
+
+    fn get_fallback_term() -> String {
+        if env::var("KITTY_WINDOW_ID").is_ok() {
+            return "kitty".to_string();
+        }
+        if env::var("ALACRITTY_SOCKET").is_ok() || env::var("ALACRITTY_LOG").is_ok() {
+            return "alacritty".to_string();
+        }
+        if env::var("KONSOLE_VERSION").is_ok() {
+            return "konsole".to_string();
+        }
+        if env::var("FOOT_SOCKET").is_ok() {
+            return "foot".to_string();
+        }
+        if let Ok(term) = env::var("TERMINAL") {
+            if !term.is_empty() {
+                return term;
+            }
+        }
+        if let Ok(term) = env::var("TERM") {
+            if term != "xterm-256color" && !term.is_empty() {
+                return term;
+            }
+        }
+
+        "Unknown".to_string()
+    }
+
+    terminal_info(buf, c);
     get_shell(buf, c);
 
-    fn system_time(buf: &mut String, c:fn(&str) -> ColoredString) {
+    fn system_time(buf: &mut String, c: fn(&str) -> ColoredString) {
         let now = Local::now();
         now.format("%H:%M").to_string();
-        let _ = writeln!(buf,"{}: {}", c("Locale Time"), now.format("%H:%M").to_string());
+        let _ = writeln!(
+            buf,
+            "{}: {}",
+            c("Locale Time"),
+            now.format("%H:%M").to_string()
+        );
     }
-
 
     // give link functions battery for variables lines
     battery(buf, c);
@@ -62,8 +107,6 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
         // Linux battery
         #[cfg(target_os = "linux")]
         {
-
-
             if let (Ok(cap), Ok(stat)) = (
                 fs::read_to_string("/sys/class/power_supply/BAT0/capacity"),
                 fs::read_to_string("/sys/class/power_supply/BAT0/status"),
@@ -76,8 +119,6 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
                 battery = format!("{}% [{}]", cap.trim(), stat.trim());
             }
         }
-
-
 
         // FreeBSD battery
         #[cfg(target_os = "freebsd")]
@@ -148,9 +189,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colore
             }
         }
 
-        let _ = writeln!(buf,"{}: {}", c("Battery"), battery);
-
-
+        let _ = writeln!(buf, "{}: {}", c("Battery"), battery);
     }
     system_time(buf, c);
 }
