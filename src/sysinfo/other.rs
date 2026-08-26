@@ -148,6 +148,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
 
     terminal_info(buf, c);
     get_shell(buf, c);
+    sysprint(buf, c);
 
     fn system_time(buf: &mut String, c: fn(&str) -> ColoredString) {
         let now = Local::now();
@@ -158,6 +159,10 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
             c("Locale Time"),
             now.format("%H:%M").to_string()
         );
+    }
+
+    fn sysprint(buf: &mut String, c: fn(&str) -> ColoredString) {
+        let _ = writeln!(buf, "{}: SysPrint v{}", c("Fetch"), env!("CARGO_PKG_VERSION"));
     }
 
     // give link functions battery for variables lines

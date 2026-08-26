@@ -595,7 +595,7 @@ dependencies = [
 
 [[package]]
 name = "sysprint"
-version = "0.1.0"
+version = "3.8.5"
 dependencies = [
  "chrono",
  "clap",
