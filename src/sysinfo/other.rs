@@ -26,6 +26,66 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
         let _ = writeln!(buf, "{}: {}", c("DE"), desktop);
     }
 
+    fn wm_check(buf: &mut String, c: fn(&str) -> ColoredString) {
+        let wm = if cfg!(target_os = "windows") {
+            if env::var("GLAZEWM_VERSION").is_ok() {
+                "GlazeWM".to_string()
+            } else if env::var("KOMOREBI_CONFIG_HOME").is_ok() {
+                "Komorebi".to_string()
+            } else {
+                "Explorer.exe (glitch edition)".to_string()
+            }
+        } else if cfg!(target_os = "macos") {
+            if env::var("YABAI_SOCKET").is_ok() {
+                "Yabai".to_string()
+            } else if env::var("AMETHYST_VERSION").is_ok() {
+                "Amethyst".to_string()
+            } else {
+                "Quartz Compositor".to_string()
+            }
+        } else {
+            // Linux / FreeBSD / OpenBSD
+            if env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
+                "Hyprland".to_string()
+            } else if env::var("I3SOCK").is_ok() {
+                "i3".to_string()
+            } else if env::var("SWAYSOCK").is_ok() {
+                "Sway".to_string()
+            } else if env::var("BSPWM_SOCKET").is_ok() {
+                "bspwm".to_string()
+            } else if env::var("HERBSTLUFTWM_SOCKET").is_ok() {
+                "herbstluftwm".to_string()
+            } else if let Ok(wm_env) = env::var("WINDOWMANAGER") {
+                wm_env.split('/').last().unwrap_or(&wm_env).to_string()
+            } else {
+                let desktop = env::var("XDG_CURRENT_DESKTOP")
+                    .or_else(|_| env::var("DESKTOP_SESSION"))
+                    .unwrap_or_default()
+                    .to_lowercase();
+
+                if desktop.contains("kde") || env::var("KDE_FULL_SESSION").is_ok() {
+                    "KWin".to_string()
+                } else if desktop.contains("gnome") {
+                    "Mutter".to_string()
+                } else if desktop.contains("xfce") {
+                    "Xfwm4".to_string()
+                } else if desktop.contains("cinnamon") {
+                    "Muffin".to_string()
+                } else if desktop.contains("mate") {
+                    "Marco".to_string()
+                } else if !desktop.is_empty() {
+                    desktop
+                } else {
+                    "Unknown".to_string()
+                }
+            }
+        };
+
+        let _ = writeln!(buf, "{}: {}", c("WM"), wm);
+    }
+
+    wm_check(buf, c);
+
     fn get_shell(buf: &mut String, c: fn(&str) -> ColoredString) {
         let shell_name = if let Ok(shell_path) = env::var("SHELL") {
             shell_path
