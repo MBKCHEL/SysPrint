@@ -14,7 +14,7 @@ A fast, lightweight, and customizable system information fetch tool written in R
 Windows <img width="972" height="494" alt="изображение" src="https://github.com/user-attachments/assets/b266bc19-46ad-45bc-b08b-61df368fc4f8" />
 Debian <img width="1005" height="570" alt="изображение" src="https://github.com/user-attachments/assets/95c5627f-4b99-4a92-9fbd-28b8b025d149" />
 Mint <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f748baf5-4be8-4286-b759-280d0ad794e5" />
-Arch <img width="1132" height="654" alt="image" src="https://github.com/user-attachments/assets/eec82d03-9940-4dd1-af78-6928ac2f5fa3" />
+Arch <img width="1117" height="727" alt="изображение" src="https://github.com/user-attachments/assets/126aee2f-c5a9-4f95-a137-e498e68b8022" />
 
 > 🐧 **Supported Logos:** Alpine, Android, MacOS, Arch, Artix, Astra Linux, EndeavourOS, CachyOS, Debian, Fedora, FreeBSD,NetBSD, OpenBSD Gentoo, Kali Linux, Manjaro, Linux Mint, NixOS, Pop!_OS, Ubuntu. Void Linux, Zorin OS, and Windows. More coming soon!  
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
