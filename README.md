@@ -22,10 +22,10 @@ Arch <img width="1117" height="727" alt="изображение" src="https://gi
 ---
 ### Config
 
-* **Linux / BSD:** `~/.config/.sysinfo.toml`
-* **Windows:** `%APPDATA%\.sysinfo.toml` *(usually `C:\Users\<Username>\AppData\Roaming\.sysinfo.toml`)*
+* **Linux / BSD:** `~/.config/.sysprint.toml`
+* **Windows:** `%APPDATA%\.sysprint.toml` *(usually `C:\Users\<Username>\AppData\Roaming\.sysprint.toml`)*
 
-### Example `.sysinfo.toml`
+### Example `.sysprint.toml`
 
 ```toml
 # SysPrint configuration
