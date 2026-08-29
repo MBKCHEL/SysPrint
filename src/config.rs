@@ -1,10 +1,10 @@
-//! Configuration file handling (`.sysinfo.toml`).
+//! Configuration file handling (`.sysprint.toml`).
 use std::fs;
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
 
-const FILE_NAME: &str = ".sysinfo.toml";
+const FILE_NAME: &str = ".sysprint.toml";
 
 /// Which sections are enabled.
 ///
@@ -74,6 +74,11 @@ pub fn generate() -> Result<PathBuf, String> {
             "config file {} already exists, refusing to overwrite",
             path.display()
         ));
+    }
+
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)
+            .map_err(|e| format!("failed to create directory {}: {e}", parent.display()))?;
     }
 
     let contents = format!(
