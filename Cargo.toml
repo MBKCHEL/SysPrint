@@ -1,6 +1,6 @@
 [package]
 name = "sysprint"
-version = "3.8.6"
+version = "3.8.7"
 edition = "2024"
 
 [dependencies]
