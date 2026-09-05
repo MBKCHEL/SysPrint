@@ -47,8 +47,41 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colo
         return;
     }
 
-    let name = get_generic_gpu_name();
+    let name = clean_gpu_name(&get_generic_gpu_name());
     let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+}
+
+fn clean_gpu_name(raw: &str) -> String {
+    let mut name = raw.to_string();
+    
+    let prefixes = [
+        "Advanced Micro Devices, Inc. [AMD/ATI]",
+        "Advanced Micro Devices, Inc.",
+        "NVIDIA Corporation",
+        "Intel Corporation",
+    ];
+
+    for prefix in prefixes {
+        if name.starts_with(prefix) {
+            name = name.replacen(prefix, "", 1).trim().to_string();
+            break;
+        }
+    }
+
+    if let Some(pos) = name.rfind("(rev ") {
+        name = name[..pos].trim().to_string();
+    }
+
+    // 3. Убираем внешние квадратные скобки, если они остались
+    if name.starts_with('[') && name.ends_with(']') {
+        name = name[1..name.len() - 1].trim().to_string();
+    }
+
+    if name.is_empty() {
+        "Unknown GPU".to_string()
+    } else {
+        name
+    }
 }
 
 fn get_nvidia_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
@@ -114,7 +147,7 @@ fn get_macos_gpu_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&gpu_name));
     if !vram.is_empty() {
         let _ = writeln!(buf, "{}: {}", c("VRAM"), vram);
     }
@@ -177,9 +210,7 @@ fn get_linux_sysfs_gpu(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
             }
         }
 
-        if gpu_name.is_empty() {
-            gpu_name = "Unknown GPU".to_string();
-        }
+        gpu_name = clean_gpu_name(&gpu_name);
 
         let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
 
@@ -243,7 +274,8 @@ fn get_windows_gpu_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool 
 
     if let Ok(json) = serde_json::from_str::<serde_json::Value>(&stdout) {
         let obj = if json.is_array() { &json[0] } else { &json };
-        let name = obj["Name"].as_str().unwrap_or("Unknown GPU");
+        let raw_name = obj["Name"].as_str().unwrap_or("Unknown GPU");
+        let name = clean_gpu_name(raw_name);
         let vram_bytes = obj["AdapterRAM"].as_f64().unwrap_or(0.0);
         let vram_gb = vram_bytes / 1024.0 / 1024.0 / 1024.0;
 
@@ -280,7 +312,7 @@ fn get_freebsd_gpu_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool 
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
 
     if let Ok(sysctl_out) = Command::new("sysctl").arg("-n").arg("dev.amdtemp.0.core0").output() {
         let temp_str = String::from_utf8_lossy(&sysctl_out.stdout).trim().to_string();
@@ -315,7 +347,7 @@ fn get_openbsd_gpu_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool 
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
     true
 }
 
@@ -342,7 +374,7 @@ fn get_netbsd_gpu_info(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
 
     if let Ok(env_out) = Command::new("envstat").args(["-s", "amdgpu:temperature"]).output() {
         let env_text = String::from_utf8_lossy(&env_out.stdout);
