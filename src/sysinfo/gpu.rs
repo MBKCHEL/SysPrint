@@ -53,7 +53,7 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colo
 
 fn clean_gpu_name(raw: &str) -> String {
     let mut name = raw.to_string();
-    
+
     let prefixes = [
         "Advanced Micro Devices, Inc. [AMD/ATI]",
         "Advanced Micro Devices, Inc.",
