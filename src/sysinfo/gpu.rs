@@ -1,5 +1,6 @@
 use crate::sysinfo::combine::DisplayOptions;
 use colored::{ColoredString, Colorize};
+use pci_ids::FromId;
 use std::fmt::Write;
 use std::fs;
 use std::path::Path;
@@ -161,17 +162,23 @@ fn get_linux_sysfs_gpu(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
         }
 
         if gpu_name.is_empty() {
-            let vendor_id = fs::read_to_string(device_path.join("vendor"))
-                .unwrap_or_default()
-                .trim()
-                .to_lowercase();
+            let vendor_hex = fs::read_to_string(device_path.join("vendor")).unwrap_or_default();
+            let device_hex = fs::read_to_string(device_path.join("device")).unwrap_or_default();
 
-            gpu_name = match vendor_id.as_str() {
-                "0x1002" => "AMD Radeon Graphics".to_string(),
-                "0x10de" => "Nvidia Graphics Card".to_string(),
-                "0x8086" => "Intel Graphics".to_string(),
-                _ => "Unknown GPU".to_string(),
-            };
+            let vendor_id = u16::from_str_radix(vendor_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
+            let device_id = u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
+
+            if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id) {
+                if let Some(device) = vendor.devices().find(|d| d.id() == device_id) {
+                    gpu_name = device.name().to_string();
+                } else {
+                    gpu_name = format!("{} Graphics", vendor.name());
+                }
+            }
+        }
+
+        if gpu_name.is_empty() {
+            gpu_name = "Unknown GPU".to_string();
         }
 
         let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
@@ -199,7 +206,7 @@ fn get_linux_sysfs_gpu(buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
             }
         }
 
-        // temp
+        // Temp
         let hwmon_dir = device_path.join("hwmon");
         if let Ok(hwmon_entries) = fs::read_dir(hwmon_dir) {
             for hwmon in hwmon_entries.flatten() {

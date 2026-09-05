@@ -1,10 +1,11 @@
 [package]
 name = "sysprint"
-version = "3.8.9"
+version = "3.9.0"
 edition = "2024"
 
 [dependencies]
 sysinfo = "0.39.6"
+pci-ids = "0.2.6"
 colored = "3.1.1"
 strip-ansi-escapes = "0.2.1"
 clap = { version = "4.6.6", features = ["derive"] }
