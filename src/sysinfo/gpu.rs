@@ -5,7 +5,7 @@ use std::path::Path;
 use std::process::Command;
 use crate::sysinfo::combine::DisplayOptions;
 
-pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
+pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) {
     if !opts.gpu {
         return;
     }
@@ -123,56 +123,112 @@ fn get_macos_gpu_info(buf: &mut String) -> bool {
 
 #[cfg(target_os = "linux")]
 fn get_linux_sysfs_gpu(buf: &mut String) -> bool {
-    let base_path = Path::new("/sys/class/drm/card0/device");
-    if !base_path.exists() {
+    let drm_path = Path::new("/sys/class/drm");
+    if !drm_path.exists() {
         return false;
     }
 
-    let name = get_generic_gpu_name();
-    let mut found_any = false;
+    let Ok(entries) = fs::read_dir(drm_path) else {
+        return false;
+    };
 
-    let vram_used_path = base_path.join("mem_info_vram_used");
-    let vram_total_path = base_path.join("mem_info_vram_total");
+    for entry in entries.flatten() {
+        let name_str = entry.file_name().to_string_lossy().into_owned();
 
-    let _ = writeln!(buf, "{}: {}", "GPU".bold(), name);
-
-    if vram_used_path.exists() && vram_total_path.exists() {
-        let used_bytes: f64 = fs::read_to_string(vram_used_path)
-            .unwrap_or_default()
-            .trim()
-            .parse()
-            .unwrap_or(0.0);
-        let total_bytes: f64 = fs::read_to_string(vram_total_path)
-            .unwrap_or_default()
-            .trim()
-            .parse()
-            .unwrap_or(0.0);
-
-        if total_bytes > 0.0 {
-            let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
-            let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
-            let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", "VRAM".bold(), used_gb, total_gb);
-            found_any = true;
+        if !name_str.starts_with("card") || name_str.contains('-') {
+            continue;
         }
-    }
 
-    let hwmon_dir = base_path.join("hwmon");
-    if let Ok(entries) = fs::read_dir(hwmon_dir) {
-        for entry in entries.flatten() {
-            let temp_path = entry.path().join("temp1_input");
-            if temp_path.exists() {
-                if let Ok(temp_raw) = fs::read_to_string(temp_path) {
-                    if let Ok(temp_mc) = temp_raw.trim().parse::<f64>() {
-                        let _ = writeln!(buf, "{}: {:.0}°C", "GPU Temp".bold(), temp_mc / 1000.0);
-                        found_any = true;
-                        break;
+        let device_path = entry.path().join("device");
+        if !device_path.exists() {
+            continue;
+        }
+
+        let mut gpu_name = String::new();
+
+        let vendor_id = fs::read_to_string(device_path.join("vendor"))
+            .unwrap_or_default()
+            .trim()
+            .to_lowercase();
+
+        let device_id = fs::read_to_string(device_path.join("device"))
+            .unwrap_or_default()
+            .trim()
+            .to_lowercase();
+        
+        if vendor_id.contains("0x1002") {
+            gpu_name = match device_id.as_str() {
+                "0x73ff" => "AMD Radeon RX 6600 / 6600 XT / 6650 XT".to_string(),
+                _ => "AMD Radeon Graphics".to_string(),
+            };
+        }
+        if gpu_name.is_empty() || gpu_name == "AMD Radeon Graphics" {
+            if let Ok(uevent) = fs::read_to_string(device_path.join("uevent")) {
+                for line in uevent.lines() {
+                    if line.starts_with("DRIVER=") {
+                        let driver = line.trim_start_matches("DRIVER=");
+                        if driver == "amdgpu" {
+                            gpu_name = "AMD Radeon GPU".to_string();
+                        }
                     }
                 }
             }
         }
+
+        if gpu_name.is_empty() || gpu_name == "AMD Radeon GPU" {
+            let generic_name = get_generic_gpu_name();
+            if generic_name != "Unknown GPU" {
+                gpu_name = generic_name;
+            }
+        }
+
+        if gpu_name.is_empty() {
+            gpu_name = "Unknown GPU".to_string();
+        }
+
+        let _ = writeln!(buf, "{}: {}", "GPU".bold(), gpu_name);
+
+        let vram_used_path = device_path.join("mem_info_vram_used");
+        let vram_total_path = device_path.join("mem_info_vram_total");
+
+        if vram_used_path.exists() && vram_total_path.exists() {
+            let used_bytes: f64 = fs::read_to_string(vram_used_path)
+                .unwrap_or_default()
+                .trim()
+                .parse()
+                .unwrap_or(0.0);
+            let total_bytes: f64 = fs::read_to_string(vram_total_path)
+                .unwrap_or_default()
+                .trim()
+                .parse()
+                .unwrap_or(0.0);
+
+            if total_bytes > 0.0 {
+                let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
+                let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
+                let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", "VRAM".bold(), used_gb, total_gb);
+            }
+        }
+
+        let hwmon_dir = device_path.join("hwmon");
+        if let Ok(hwmon_entries) = fs::read_dir(hwmon_dir) {
+            for hwmon in hwmon_entries.flatten() {
+                let temp_path = hwmon.path().join("temp1_input");
+                if temp_path.exists() {
+                    if let Ok(temp_raw) = fs::read_to_string(temp_path) {
+                        if let Ok(temp_mc) = temp_raw.trim().parse::<f64>() {
+                            let _ = writeln!(buf, "{}: {:.0}°C", "GPU Temp".bold(), temp_mc / 1000.0);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
-    found_any
+    false
 }
 
 #[cfg(windows)]
