@@ -71,8 +71,7 @@ fn clean_gpu_name(raw: &str) -> String {
     if let Some(pos) = name.rfind("(rev ") {
         name = name[..pos].trim().to_string();
     }
-
-    // 3. Убираем внешние квадратные скобки, если они остались
+    
     if name.starts_with('[') && name.ends_with(']') {
         name = name[1..name.len() - 1].trim().to_string();
     }
