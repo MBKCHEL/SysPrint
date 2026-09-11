@@ -34,7 +34,7 @@ jobs:
             use_cross: false
           - os: ubuntu-latest
             target: x86_64-unknown-freebsd
-            artifact_name: sysprint-freebsd
+            artifact_name: sysprint-bsd
             binary_name: sysprint
             use_cross: true
 
