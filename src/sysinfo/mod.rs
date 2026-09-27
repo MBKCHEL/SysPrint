@@ -1,7 +1,11 @@
+pub mod battery;
 pub mod combine;
 pub mod cpu;
+pub mod desktop;
 pub mod disks;
 pub mod gpu;
 pub mod memory;
+pub mod network;
 pub mod other;
 pub mod system;
+pub mod terminal;

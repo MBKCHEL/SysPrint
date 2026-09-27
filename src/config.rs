@@ -13,36 +13,115 @@ const FILE_NAME: &str = "config.toml";
 /// conflict between a CLI flag and the config file:
 /// - `true` — the config value always wins;
 /// - `false` — an explicitly passed CLI flag wins (config is the fallback).
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default)]
 pub struct Config {
-    pub show_system_info: bool,
-    pub show_cpu_info: bool,
-    pub show_memory_info: bool,
-    pub show_disks_info: bool,
-    pub show_other_info: bool,
-    pub show_gpu_info: bool,
-    pub config_stronger: bool,
+    // Custom logo override by name (e.g. "arch", "debian", "ubuntu", "fedora", "windows", "tux")
+    pub logo: String,
+
+    // Modes & behavior
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
     pub compact_mode: bool,
-    pub hide_fetch_info: bool,
+    pub config_stronger: bool,
+
+    // Master section toggles
+    pub show_system_info: bool,
+    pub show_cpu_info: bool,
+    pub show_gpu_info: bool,
+    pub show_memory_info: bool,
+    pub show_other_info: bool,
+    pub show_disks_info: bool,
+
+    // Granular System toggles
+    pub show_os: bool,
+    pub show_kernel: bool,
+    pub show_os_version: bool,
+    pub show_init: bool,
+    pub show_host: bool,
+    pub show_user: bool,
+    pub show_uptime: bool,
+    pub show_processes: bool,
+
+    // Granular CPU toggles
+    pub show_cpu_name: bool,
+    pub show_cpu_freq: bool,
+    pub show_cpu_usage: bool,
+    pub show_cpu_temp: bool,
+    pub show_cpu_cores: bool,
+    pub show_cpu_arch: bool,
+
+    // Granular GPU toggles
+    pub show_gpu_name: bool,
+    pub show_gpu_temp: bool,
+    pub show_gpu_vram: bool,
+
+    // Granular Memory toggles
+    pub show_ram: bool,
+    pub show_swap: bool,
+
+    // Granular Other toggles
+    pub show_de: bool,
+    pub show_wm: bool,
+    pub show_terminal: bool,
+    pub show_shell: bool,
+    pub show_local_ip: bool,
+    pub show_battery: bool,
+    pub show_locale_time: bool,
+    pub show_fetch_info: bool,
+
+    // Granular Disks toggles
+    pub show_disks: bool,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
-            show_system_info: true,
-            show_cpu_info: true,
-            show_memory_info: true,
-            show_disks_info: true,
-            show_other_info: true,
-            show_gpu_info: true,
-            config_stronger: false,
+            logo: String::new(),
             mini_logo_mode: false,
             fast_mode: false,
             compact_mode: false,
-            hide_fetch_info: false,
+            config_stronger: false,
+
+            show_system_info: true,
+            show_cpu_info: true,
+            show_gpu_info: true,
+            show_memory_info: true,
+            show_other_info: true,
+            show_disks_info: true,
+
+            show_os: true,
+            show_kernel: true,
+            show_os_version: true,
+            show_init: true,
+            show_host: true,
+            show_user: true,
+            show_uptime: true,
+            show_processes: true,
+
+            show_cpu_name: true,
+            show_cpu_freq: true,
+            show_cpu_usage: true,
+            show_cpu_temp: true,
+            show_cpu_cores: true,
+            show_cpu_arch: true,
+
+            show_gpu_name: true,
+            show_gpu_temp: true,
+            show_gpu_vram: true,
+
+            show_ram: true,
+            show_swap: true,
+
+            show_de: true,
+            show_wm: true,
+            show_terminal: true,
+            show_shell: true,
+            show_local_ip: true,
+            show_battery: true,
+            show_locale_time: true,
+            show_fetch_info: true,
+            show_disks: true,
         }
     }
 }
@@ -85,14 +164,101 @@ pub fn generate() -> Result<PathBuf, String> {
             .map_err(|e| format!("failed to create directory {}: {e}", parent.display()))?;
     }
 
-    let contents = format!(
-        "# SysPrint configuration\n\
-         # When a CLI flag contradicts the config, `config-stronger = true` makes the config win.\n\
-         \n# When `fast-mode = true`, SysPrint will be fast, omitting Temp and VRAM GPU info.\n\
-         {}\n",
-        toml::to_string_pretty(&Config::default()).map_err(|e| e.to_string())?
-    );
+    let contents = r#"# SysPrint Configuration
+
+# Custom logo override by name (e.g. "arch", "debian", "ubuntu", "fedora", "windows", "tux", "apple", "gentoo", etc.)
+# Leave empty for automatic OS detection.
+logo = ""
+
+# Modes & behavior
+mini-logo-mode = false
+fast-mode = false
+compact-mode = false
+config-stronger = false
+
+# Master section toggles
+show-system-info = true
+show-cpu-info = true
+show-gpu-info = true
+show-memory-info = true
+show-other-info = true
+show-disks-info = true
+
+# Granular: System
+show-os = true
+show-kernel = true
+show-os-version = true
+show-init = true
+show-host = true
+show-user = true
+show-uptime = true
+show-processes = true
+
+# Granular: CPU
+show-cpu-name = true
+show-cpu-freq = true
+show-cpu-usage = true
+show-cpu-temp = true
+show-cpu-cores = true
+show-cpu-arch = true
+
+# Granular: GPU
+show-gpu-name = true
+show-gpu-temp = true
+show-gpu-vram = true
+
+# Granular: Memory
+show-ram = true
+show-swap = true
+
+# Granular: Other
+show-de = true
+show-wm = true
+show-terminal = true
+show-shell = true
+show-local-ip = true
+show-battery = true
+show-locale-time = true
+show-fetch-info = true
+
+# Granular: Disks
+show-disks = true
+"#;
+
 
     fs::write(&path, contents).map_err(|e| format!("failed to write {}: {e}", path.display()))?;
+
     Ok(path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_config_defaults() {
+        let cfg = Config::default();
+        assert!(cfg.show_system_info);
+        assert!(cfg.show_cpu_info);
+        assert!(cfg.show_disks);
+        assert_eq!(cfg.logo, "");
+    }
+
+    #[test]
+    fn test_config_deserialize_partial() {
+        let toml_str = r#"
+            logo = "debian"
+            config-stronger = true
+            show-cpu-temp = false
+            show-disks = false
+        "#;
+        let cfg: Config = toml::from_str(toml_str).unwrap();
+        assert_eq!(cfg.logo, "debian");
+        assert!(cfg.config_stronger);
+        assert!(!cfg.show_cpu_temp);
+        assert!(!cfg.show_disks);
+        // Defaults preserved
+        assert!(cfg.show_cpu_name);
+        assert!(cfg.show_system_info);
+    }
 }

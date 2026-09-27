@@ -23,7 +23,12 @@ fn format_uptime(seconds: u64) -> String {
 }
 
 // --- SYSTEM INFO ---
-pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) {
+pub fn system_info(
+    opts: &DisplayOptions,
+    buf: &mut String,
+    sys: &System,
+    c: fn(&str) -> ColoredString,
+) {
     if !opts.system {
         return;
     }
@@ -32,15 +37,27 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Color
         let _ = writeln!(buf, "{}", "--- System INFO ---".bold().cyan());
     }
 
-    os_name(buf, c);
-    check_kernel(buf, c);
-    if opts.compact_mode{
+    if opts.os {
+        os_name(buf, c);
+    }
+    if opts.kernel {
+        check_kernel(buf, c);
+    }
+    if opts.compact_mode {
         return;
     }
-    os_version(buf, c);
-    init_info(buf, c);
-    host(buf, c);
-    user_info(buf, c);
+    if opts.os_version {
+        os_version(buf, c);
+    }
+    if opts.init {
+        init_info(buf, c);
+    }
+    if opts.host {
+        host(buf, c);
+    }
+    if opts.user {
+        user_info(buf, c);
+    }
 
     // OS_name
     fn os_name(buf: &mut String, c: fn(&str) -> ColoredString) {
@@ -49,12 +66,28 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Color
 
     // OS_version
     fn os_version(buf: &mut String, c: fn(&str) -> ColoredString) {
-        let _ = writeln!(
-            buf,
-            "{}: {}",
-            c("OS Version"),
-            System::os_version().unwrap_or_default()
-        );
+        let version = System::os_version()
+            .filter(|v| !v.trim().is_empty())
+            .or_else(|| {
+                #[cfg(target_os = "linux")]
+                {
+                    if let Ok(content) = fs::read_to_string("/etc/os-release") {
+                        for line in content.lines() {
+                            if let Some(rest) = line.strip_prefix("BUILD_ID=") {
+                                let val = rest.trim().trim_matches('"').trim_matches('\'');
+                                if !val.is_empty() {
+                                    return Some(val.to_string());
+                                }
+                            }
+                        }
+                    }
+                }
+                None
+            });
+
+        if let Some(v) = version {
+            let _ = writeln!(buf, "{}: {}", c("OS Version"), v);
+        }
     }
 
     // Host name
@@ -129,6 +162,48 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Color
         let _ = writeln!(buf, "{}: {}", c("User"), username);
     }
 
-    //Uptime
-    let _ = writeln!(buf, "{}: {}", c("Uptime"), format_uptime(System::uptime()));
+    // Uptime
+    if opts.uptime {
+        let _ = writeln!(buf, "{}: {}", c("Uptime"), format_uptime(System::uptime()));
+    }
+
+    // Processes
+    if opts.processes {
+        let proc_count = get_process_count(sys);
+        if proc_count > 0 {
+            let _ = writeln!(buf, "{}: {}", c("Processes"), proc_count);
+        }
+    }
 }
+
+fn get_process_count(sys: &System) -> usize {
+    #[cfg(target_os = "linux")]
+    {
+        if let Ok(entries) = fs::read_dir("/proc") {
+            let count = entries
+                .flatten()
+                .filter(|e| e.file_name().to_string_lossy().chars().all(|c| c.is_ascii_digit()))
+                .count();
+            if count > 0 {
+                return count;
+            }
+        }
+    }
+    sys.processes().len()
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_format_uptime() {
+        assert_eq!(format_uptime(45), "0m");
+        assert_eq!(format_uptime(120), "2m");
+        assert_eq!(format_uptime(3660), "1h 1m");
+        assert_eq!(format_uptime(90060), "1d 1h 1m");
+    }
+}
+
+

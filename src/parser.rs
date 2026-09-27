@@ -47,4 +47,11 @@ pub struct Arguments {
     #[arg(long = "hide-fetch-info")]
     pub hide_fetch_info: bool,
 
+    /// Override OS logo by name (e.g. arch, debian, ubuntu, fedora, windows, tux, apple, gentoo)
+    #[arg(short = 'l', long = "logo")]
+    pub logo: Option<String>,
+
+    /// Do not pause at exit on Windows
+    #[arg(long = "no-pause")]
+    pub no_pause: bool,
 }

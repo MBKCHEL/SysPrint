@@ -1,3 +1,5 @@
+[English](README.md) | [Русский](README_RU.md)
+
 # SysPrint
 
 A fast, lightweight, and customizable system information fetch tool written in Rust. Inspired by `neofetch` and `fastfetch`.
@@ -19,7 +21,7 @@ Arch (LapTop) <img width="1142" height="801" alt="image" src="https://github.com
 Artix <img width="1254" height="759" alt="image" src="https://github.com/user-attachments/assets/1ce05a92-367c-4d50-a314-662a2cc913df" />
 NixOS  <img width="1201" height="766" alt="изображение" src="https://github.com/user-attachments/assets/a37252bb-5167-48c0-a14a-fe7d790f050a" />
 
-> 🐧 **Supported Logos:** Alpine, Android, MacOS, Arch, Artix, Astra Linux, EndeavourOS, CachyOS, Debian, Fedora, FreeBSD,NetBSD, OpenBSD, OpenSUSE,Gentoo, Kali Linux, Manjaro, Linux Mint, NixOS, Pop!_OS, Ubuntu. Void Linux, Zorin OS, and Windows. More coming soon!  
+> 🐧 **Supported Logos:** AlmaLinux, Alpine, Alt Linux, Android, Apple (macOS), Arch, Artix, Asahi, Astra Linux, CachyOS, CentOS, ChromeOS, Debian, Deepin, Elementary OS, EndeavourOS, Fedora, FreeBSD, Garuda, Gentoo, Kali Linux, KDE neon, Kubuntu, Lubuntu, Manjaro, Linux Mint, MX Linux, NetBSD, NixOS, OpenBSD, openSUSE, Parrot OS, Pop!_OS, Proxmox, Raspberry Pi OS, RHEL, Rocky Linux, Slackware, Solus, SteamOS, Tails, TrueNAS, Tux, Ubuntu, Void Linux, Windows, Xubuntu, Zorin OS. More coming soon!  
 > *If your distro isn't explicitly supported yet, SysPrint will fall back to the standard GNU/Linux penguin Tux logo.*
 
 ---
@@ -28,27 +30,92 @@ NixOS  <img width="1201" height="766" alt="изображение" src="https://
 * **Linux / BSD:** `~/.config/sysprint/config.toml`
 * **Windows:** `%APPDATA%\sysprint\config.toml` *(usually `C:\Users\Имя\AppData\Roaming\sysprint\config.toml`)*
 
-### Example `.sysprint.toml`
+### Example `config.toml`
 
 ```toml
-# SysPrint configuration
-show-system-info = true
-show-cpu-info = true
-show-memory-info = true
-show-disks-info = true
-show-other-info = true
-show-gpu-info = true
-mini-mode = false
-```
-## When a CLI flag contradicts the config, `config-stronger = true` makes the config win
+# SysPrint Configuration
+
+# Custom logo override by name (e.g. "arch", "debian", "ubuntu", "fedora", "windows", "tux", "apple", "gentoo", etc.)
+# Leave empty for automatic OS detection.
+logo = ""
+
+# Modes & behavior
+mini-logo-mode = false
+fast-mode = false
+compact-mode = false
 config-stronger = false
 
+# Master section toggles
+show-system-info = true
+show-cpu-info = true
+show-gpu-info = true
+show-memory-info = true
+show-other-info = true
+show-disks-info = true
 
+# Granular: System
+show-os = true
+show-kernel = true
+show-os-version = true
+show-init = true
+show-host = true
+show-user = true
+show-uptime = true
+show-processes = true
+
+# Granular: CPU
+show-cpu-name = true
+show-cpu-freq = true
+show-cpu-usage = true
+show-cpu-temp = true
+show-cpu-cores = true
+show-cpu-arch = true
+
+# Granular: GPU
+show-gpu-name = true
+show-gpu-temp = true
+show-gpu-vram = true
+
+# Granular: Memory
+show-ram = true
+show-swap = true
+
+# Granular: Other
+show-de = true
+show-wm = true
+show-terminal = true
+show-shell = true
+show-local-ip = true
+show-battery = true
+show-locale-time = true
+show-fetch-info = true
+
+# Granular: Disks
+show-disks = true
+```
+
+## CLI Arguments
+
+| Flag / Option | Description |
+|---|---|
+| `--logo <NAME>` | Override ASCII logo with a specific system logo (e.g. `debian`, `arch`, `ubuntu`, `fedora`, `windows`, `apple`, `tux`, etc.) |
+| `--mini` | Display a small 5-line mini ASCII logo |
+| `--fast-mode` | Skip heavy telemetry (disks, network interfaces, multi-pass CPU usage) for ultra-fast startup |
+| `--compact-mode` | Show concise output without decorative headers and deep details |
+| `--generate-config` | Generate a new default `config.toml` in the user's config directory |
+| `--no-pause` | Windows: do not wait for Enter keypress before exiting |
+| `--hide-system` | Hide the System Information section |
+| `--hide-cpu` | Hide the CPU section |
+| `--hide-gpu` | Hide the GPU section |
+| `--hide-memory` | Hide the Memory / Swap section |
+| `--hide-other` | Hide the Other (Desktop, Shell, IP, Battery) section |
+| `--hide-disks` | Hide the Disks section |
+| `--hide-fetch-info` | Hide the final "SysPrint vX.Y.Z" footer line |
 
 ## Features
 - 🚀 Blazing fast performance thanks to Rust
 - 🎨 Beautiful ASCII art logos and colored CLI output
-- 💻 Displays CPU, RAM, OS, Kernel, info using the `sysinfo` crate
+- 💻 Displays CPU, RAM, Swap, GPU, OS, Processes, IP, Disks and more using the `sysinfo` crate
 
 ---
 
@@ -57,20 +124,14 @@ config-stronger = false
 ### Linux
 
 #### Option 1: Fast Install (Precompiled Binary)
-Download the latest binary from the (https://github.com/MBKCHEL/SysPrint/releases/tag/3.7.1) and install to download folder:
+Download the latest binary from the [Releases page](https://github.com/MBKCHEL/SysPrint/releases/latest) and install to download folder:
 ```bash
 chmod +x ~/Downloads/sysprint-linux
 sudo mv ~/Downloads/sysprint-linux /usr/local/bin/sysprint
 ```
 To run:
-``` bash
-sysprint
-```
-
-*Или Если у вас русский интерфейс:*
 ```bash
-chmod +x ~/Загрузки/sysprint-linux
-sudo mv ~/Загрузки/sysprint-linux /usr/local/bin/sysprint
+sysprint
 ```
 
 #### Option 2: Build from Source
