@@ -37,11 +37,6 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
         return;
     }
 
-    #[cfg(windows)]
-    if get_windows_gpu_info(opts, buf, fast_mode, c) {
-        return;
-    }
-
     #[cfg(target_os = "freebsd")]
     if get_freebsd_gpu_info(opts, buf, c) {
         return;
@@ -57,8 +52,10 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
         return;
     }
 
-    let name = clean_gpu_name(&get_generic_gpu_name());
-    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    if opts.gpu_name {
+        let name = clean_gpu_name(&get_generic_gpu_name());
+        let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    }
 }
 
 fn clean_gpu_name(raw: &str) -> String {
@@ -113,13 +110,15 @@ pub fn get_nvidia_fast_info(
         let info_path = entry.path().join("information");
         if let Ok(content) = fs::read_to_string(info_path) {
             for line in content.lines() {
-                if line.starts_with("Model:") {
-                    if let Some(pos) = line.find(':') {
-                        let raw_name = line[pos + 1..].trim();
+                if line.starts_with("Model:")
+                    && let Some(pos) = line.find(':')
+                {
+                    let raw_name = line[pos + 1..].trim();
+                    if opts.gpu_name {
                         let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(raw_name));
-                        found_gpu = true;
-                        break;
                     }
+                    found_gpu = true;
+                    break;
                 }
             }
         }
@@ -128,7 +127,7 @@ pub fn get_nvidia_fast_info(
 
     if !found_gpu { return false; }
 
-    if fast_mode || opts.compact_mode {
+    if fast_mode || opts.compact_mode || (!opts.gpu_vram && !opts.gpu_temp) {
         return true;
     }
 
@@ -136,16 +135,20 @@ pub fn get_nvidia_fast_info(
         .args(["--query-gpu=memory.used,memory.total,temperature.gpu", "--format=csv,noheader,nounits"])
         .output();
 
-    if let Ok(out) = output {
-        if out.status.success() {
-            let text = String::from_utf8_lossy(&out.stdout);
-            if let Some(line) = text.lines().next() {
-                let parts: Vec<&str> = line.split(',').map(|s| s.trim()).collect();
-                if parts.len() == 3 {
-                    let used_mb: f64 = parts[0].parse().unwrap_or(0.0);
-                    let total_mb: f64 = parts[1].parse().unwrap_or(0.0);
-                    let temp = parts[2];
+    if let Ok(out) = output
+        && out.status.success()
+    {
+        let text = String::from_utf8_lossy(&out.stdout);
+        if let Some(line) = text.lines().next() {
+            let parts: Vec<&str> = line.split(',').map(|s| s.trim()).collect();
+            if parts.len() == 3 {
+                let used_mb: f64 = parts[0].parse().unwrap_or(0.0);
+                let total_mb: f64 = parts[1].parse().unwrap_or(0.0);
+                let temp = parts[2];
+                if opts.gpu_vram {
                     let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), used_mb / 1024.0, total_mb / 1024.0);
+                }
+                if opts.gpu_temp {
                     let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
                 }
             }
@@ -162,7 +165,7 @@ fn get_nvidia_info(
     fast_mode: bool,
     c: fn(&str) -> ColoredString,
 ) -> bool {
-    let query_args = if fast_mode || opts.compact_mode {
+    let query_args = if fast_mode || opts.compact_mode || (!opts.gpu_vram && !opts.gpu_temp) {
         vec!["--query-gpu=gpu_name", "--format=csv,noheader,nounits"]
     } else {
         vec![
@@ -191,9 +194,11 @@ fn get_nvidia_info(
     }
 
     let name = parts[0];
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(name));
+    if opts.gpu_name {
+        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(name));
+    }
 
-    if fast_mode || opts.compact_mode {
+    if fast_mode || opts.compact_mode || (!opts.gpu_vram && !opts.gpu_temp) {
         return true;
     }
 
@@ -202,14 +207,18 @@ fn get_nvidia_info(
         let mem_used: f64 = parts[2].parse().unwrap_or(0.0) / 1024.0;
         let temp = parts[3];
 
-        let _ = writeln!(
-            buf,
-            "{}: {:.2} GB / {:.2} GB",
-            c("VRAM"),
-            mem_used,
-            mem_total
-        );
-        let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
+        if opts.gpu_vram {
+            let _ = writeln!(
+                buf,
+                "{}: {:.2} GB / {:.2} GB",
+                c("VRAM"),
+                mem_used,
+                mem_total
+            );
+        }
+        if opts.gpu_temp {
+            let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
+        }
     }
 
     true
@@ -246,8 +255,10 @@ fn get_macos_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Co
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&gpu_name));
-    if !opts.compact_mode && !vram.is_empty() {
+    if opts.gpu_name {
+        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&gpu_name));
+    }
+    if !opts.compact_mode && opts.gpu_vram && !vram.is_empty() {
         let _ = writeln!(buf, "{}: {}", c("VRAM"), vram);
     }
 
@@ -304,46 +315,49 @@ fn get_linux_sysfs_gpu(
             }
         }
 
-        gpu_name = clean_gpu_name(&gpu_name);
-
-        let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
+        if opts.gpu_name {
+            let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
+        }
 
         if fast_mode || opts.compact_mode {
             return true;
         }
 
-        let vram_used_path = device_path.join("mem_info_vram_used");
-        let vram_total_path = device_path.join("mem_info_vram_total");
+        if opts.gpu_vram {
+            let vram_used_path = device_path.join("mem_info_vram_used");
+            let vram_total_path = device_path.join("mem_info_vram_total");
 
-        if vram_used_path.exists() && vram_total_path.exists() {
-            let used_bytes: f64 = fs::read_to_string(vram_used_path)
-                .unwrap_or_default()
-                .trim()
-                .parse()
-                .unwrap_or(0.0);
-            let total_bytes: f64 = fs::read_to_string(vram_total_path)
-                .unwrap_or_default()
-                .trim()
-                .parse()
-                .unwrap_or(0.0);
+            if vram_used_path.exists() && vram_total_path.exists() {
+                let used_bytes: f64 = fs::read_to_string(vram_used_path)
+                    .unwrap_or_default()
+                    .trim()
+                    .parse()
+                    .unwrap_or(0.0);
+                let total_bytes: f64 = fs::read_to_string(vram_total_path)
+                    .unwrap_or_default()
+                    .trim()
+                    .parse()
+                    .unwrap_or(0.0);
 
-            if total_bytes > 0.0 {
-                let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
-                let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
-                let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), used_gb, total_gb);
+                if total_bytes > 0.0 {
+                    let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
+                    let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
+                    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), used_gb, total_gb);
+                }
             }
         }
 
-        let hwmon_dir = device_path.join("hwmon");
-        if let Ok(hwmon_entries) = fs::read_dir(hwmon_dir) {
-            for hwmon in hwmon_entries.flatten() {
-                let temp_path = hwmon.path().join("temp1_input");
-                if temp_path.exists() {
-                    if let Ok(temp_raw) = fs::read_to_string(temp_path) {
-                        if let Ok(temp_mc) = temp_raw.trim().parse::<f64>() {
-                            let _ = writeln!(buf, "{}: {:.0}°C", c("GPU Temp"), temp_mc / 1000.0);
-                            break;
-                        }
+        if opts.gpu_temp {
+            let hwmon_dir = device_path.join("hwmon");
+            if let Ok(hwmon_entries) = fs::read_dir(hwmon_dir) {
+                for hwmon in hwmon_entries.flatten() {
+                    let temp_path = hwmon.path().join("temp1_input");
+                    if temp_path.exists()
+                        && let Ok(temp_raw) = fs::read_to_string(temp_path)
+                        && let Ok(temp_mc) = temp_raw.trim().parse::<f64>()
+                    {
+                        let _ = writeln!(buf, "{}: {:.0}°C", c("GPU Temp"), temp_mc / 1000.0);
+                        break;
                     }
                 }
             }
@@ -382,22 +396,26 @@ fn get_windows_gpu_info(
         if let Ok(gpu_sub_key) = video_key.open_subkey(&subkey_name) {
             if let Ok(driver_desc) = gpu_sub_key.get_value::<String, _>("DriverDesc") {
                 let clean_name = clean_gpu_name(&driver_desc);
-                let _ = writeln!(buf, "{}: {}", c("GPU"), clean_name);
+                if opts.gpu_name {
+                    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_name);
+                }
                 found = true;
 
-                if fast_mode || opts.compact_mode {
+                if fast_mode || opts.compact_mode || !opts.gpu_vram {
                     return true;
                 }
 
-                if let Ok(mem_bytes) = gpu_sub_key.get_value::<u64, _>("HardwareInformation.MemorySize") {
-                    let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
-                    if gb > 0.0 {
-                        let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
-                    }
-                } else if let Ok(mem_bytes) = gpu_sub_key.get_value::<u32, _>("HardwareInformation.MemorySize") {
-                    let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
-                    if gb > 0.0 {
-                        let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
+                if opts.gpu_vram {
+                    if let Ok(mem_bytes) = gpu_sub_key.get_value::<u64, _>("HardwareInformation.MemorySize") {
+                        let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
+                        if gb > 0.0 {
+                            let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
+                        }
+                    } else if let Ok(mem_bytes) = gpu_sub_key.get_value::<u32, _>("HardwareInformation.MemorySize") {
+                        let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
+                        if gb > 0.0 {
+                            let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
+                        }
                     }
                 }
 
@@ -411,11 +429,7 @@ fn get_windows_gpu_info(
 
 #[cfg(target_os = "freebsd")]
 fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
-    let output = match Command::new("sh")
-        .arg("-c")
-        .arg("pciconf -lv | grep -B 4 -i 'class=0x03'")
-        .output()
-    {
+    let output = match Command::new("pciconf").arg("-lv").output() {
         Ok(out) => out,
         Err(_) => return false,
     };
@@ -423,10 +437,17 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
     let text = String::from_utf8_lossy(&output.stdout);
     let mut name = String::new();
 
-    for line in text.lines() {
-        if line.trim().starts_with("device") {
-            if let Some(pos) = line.find("='") {
-                name = line[pos + 2..].trim_matches('\'').to_string();
+    for block in text.split("\n\n") {
+        if block.to_lowercase().contains("class=0x03") {
+            for line in block.lines() {
+                if line.trim().starts_with("device") {
+                    if let Some(pos) = line.find("='") {
+                        name = line[pos + 2..].trim_matches('\'').to_string();
+                        break;
+                    }
+                }
+            }
+            if !name.is_empty() {
                 break;
             }
         }
@@ -436,9 +457,11 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    if opts.gpu_name {
+        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    }
 
-    if opts.compact_mode {
+    if opts.compact_mode || opts.fast_mode || !opts.gpu_temp {
         return true;
     }
 
@@ -459,18 +482,14 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
 }
 
 #[cfg(target_os = "openbsd")]
-fn get_openbsd_gpu_info(_opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
-    let output = match Command::new("sh")
-        .arg("-c")
-        .arg("pcidump -v | grep -i 'vga'")
-        .output()
-    {
+fn get_openbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
+    let output = match Command::new("pcidump").arg("-v").output() {
         Ok(out) => out,
         Err(_) => return false,
     };
 
     let text = String::from_utf8_lossy(&output.stdout);
-    let line = match text.lines().next() {
+    let line = match text.lines().find(|l| l.to_lowercase().contains("vga")) {
         Some(l) => l,
         None => return false,
     };
@@ -485,23 +504,21 @@ fn get_openbsd_gpu_info(_opts: &DisplayOptions, buf: &mut String, c: fn(&str) ->
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    if opts.gpu_name {
+        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    }
     true
 }
 
 #[cfg(target_os = "netbsd")]
 fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
-    let output = match Command::new("sh")
-        .arg("-c")
-        .arg("pcictl pci0 list | grep -i 'display'")
-        .output()
-    {
+    let output = match Command::new("pcictl").args(["pci0", "list"]).output() {
         Ok(out) => out,
         Err(_) => return false,
     };
 
     let text = String::from_utf8_lossy(&output.stdout);
-    let line = match text.lines().next() {
+    let line = match text.lines().find(|l| l.to_lowercase().contains("display")) {
         Some(l) => l,
         None => return false,
     };
@@ -516,9 +533,11 @@ fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> C
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    if opts.gpu_name {
+        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    }
 
-    if opts.compact_mode {
+    if opts.compact_mode || opts.fast_mode || !opts.gpu_temp {
         return true;
     }
 
@@ -548,10 +567,10 @@ fn get_generic_gpu_name() -> String {
             let text = String::from_utf8_lossy(&output.stdout);
             for line in text.lines() {
                 let trimmed = line.trim();
-                if trimmed.starts_with("Chipset Model:") {
-                    if let Some(pos) = trimmed.find(':') {
-                        return trimmed[pos + 1..].trim().to_string();
-                    }
+                if trimmed.starts_with("Chipset Model:")
+                    && let Some(pos) = trimmed.find(':')
+                {
+                    return trimmed[pos + 1..].trim().to_string();
                 }
             }
         }
@@ -564,29 +583,29 @@ fn get_generic_gpu_name() -> String {
         use std::path::Path;
 
         let drm_path = Path::new("/sys/class/drm");
-        if drm_path.exists() {
-            if let Ok(entries) = fs::read_dir(drm_path) {
-                for entry in entries.flatten() {
-                    let name_str = entry.file_name().to_string_lossy().into_owned();
-                    if name_str.starts_with("card") && !name_str.contains('-') {
-                        let device_path = entry.path().join("device");
-                        let vendor_hex =
-                            fs::read_to_string(device_path.join("vendor")).unwrap_or_default();
-                        let device_hex =
-                            fs::read_to_string(device_path.join("device")).unwrap_or_default();
+        if drm_path.exists()
+            && let Ok(entries) = fs::read_dir(drm_path)
+        {
+            for entry in entries.flatten() {
+                let name_str = entry.file_name().to_string_lossy().into_owned();
+                if name_str.starts_with("card") && !name_str.contains('-') {
+                    let device_path = entry.path().join("device");
+                    let vendor_hex =
+                        fs::read_to_string(device_path.join("vendor")).unwrap_or_default();
+                    let device_hex =
+                        fs::read_to_string(device_path.join("device")).unwrap_or_default();
 
-                        let vendor_id =
-                            u16::from_str_radix(vendor_hex.trim().trim_start_matches("0x"), 16)
-                                .unwrap_or(0);
-                        let device_id =
-                            u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16)
-                                .unwrap_or(0);
+                    let vendor_id =
+                        u16::from_str_radix(vendor_hex.trim().trim_start_matches("0x"), 16)
+                            .unwrap_or(0);
+                    let device_id =
+                        u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16)
+                            .unwrap_or(0);
 
-                        if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id) {
-                            if let Some(device) = vendor.devices().find(|d| d.id() == device_id) {
-                                return device.name().to_string();
-                            }
-                        }
+                    if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id)
+                        && let Some(device) = vendor.devices().find(|d| d.id() == device_id)
+                    {
+                        return device.name().to_string();
                     }
                 }
             }
@@ -617,4 +636,26 @@ fn get_generic_gpu_name() -> String {
     }
 
     "Unknown GPU".to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_clean_gpu_name() {
+        assert_eq!(
+            clean_gpu_name("NVIDIA Corporation GA106 [GeForce RTX 3060] (rev a1)"),
+            "GA106 [GeForce RTX 3060]"
+        );
+        assert_eq!(
+            clean_gpu_name("[GeForce RTX 3060]"),
+            "GeForce RTX 3060"
+        );
+        assert_eq!(
+            clean_gpu_name("Advanced Micro Devices, Inc. [AMD/ATI] Navi 22 [Radeon RX 6700/6700 XT/6750 XT]"),
+            "Navi 22 [Radeon RX 6700/6700 XT/6750 XT]"
+        );
+        assert_eq!(clean_gpu_name(""), "Unknown GPU");
+    }
 }

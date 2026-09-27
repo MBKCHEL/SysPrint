@@ -6,7 +6,7 @@ use crate::sysinfo::combine::DisplayOptions;
 
 // --- DISKS INFO ---
 pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
-    if !opts.disks {
+    if !opts.disks || !opts.show_disks || opts.fast_mode {
         return;
     }
 
@@ -16,11 +16,15 @@ pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colored
 
     let disks = Disks::new_with_refreshed_list();
     for disk in &disks {
+        let mount_point = disk.mount_point().to_string_lossy();
+        if opts.compact_mode && mount_point != "/" && !mount_point.starts_with("C:") {
+            continue;
+        }
+
         let total_gb = disk.total_space() as f64 / 1024.0 / 1024.0 / 1024.0;
         let available_gb = disk.available_space() as f64 / 1024.0 / 1024.0 / 1024.0;
         let used_gb = total_gb - available_gb;
 
-        let mount_point = disk.mount_point().to_string_lossy();
         let _ = writeln!(buf,
             "{}: {:.2} GB / {:.2} GB ({})",
                          c(&mount_point),

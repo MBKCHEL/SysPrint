@@ -13,15 +13,27 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c :fn(&st
         let _ = writeln!(buf, "{}", "--- CPU INFO ---".bold().cyan());
     }
 
-    cpu_name(buf, sys, c);
+    if opts.cpu_name {
+        cpu_name(buf, sys, c);
+    }
     if opts.compact_mode {
         return;
     }
-    ggz_cpu(buf, sys, c);
-    cpu_usage(buf, sys, c);
-    cpu_temperature(buf, c);
-    cpu_cores_and_threads(buf, sys, c);
-    cpu_arch(buf, c);
+    if opts.cpu_freq {
+        ggz_cpu(buf, sys, c);
+    }
+    if opts.cpu_usage && !opts.fast_mode {
+        cpu_usage(buf, sys, c);
+    }
+    if opts.cpu_temp && !opts.fast_mode {
+        cpu_temperature(buf, c);
+    }
+    if opts.cpu_cores {
+        cpu_cores_and_threads(buf, sys, c);
+    }
+    if opts.cpu_arch {
+        cpu_arch(buf, c);
+    }
 
     fn cpu_name(buf: &mut String, sys: &System, c :fn(&str) -> ColoredString){
         let cpus = sys.cpus();
