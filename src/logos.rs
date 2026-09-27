@@ -4,7 +4,11 @@ use std::path::Path;
 use std::env;
 
 pub fn is_valid_logo(name: &str) -> bool {
-    let lower = name.trim().to_lowercase();
+    let trimmed = name.trim();
+    if Path::new(trimmed).is_file() {
+        return true;
+    }
+    let lower = trimmed.to_lowercase();
     matches!(
         lower.as_str(),
         "alpine"
@@ -14,6 +18,7 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "android"
             | "apple"
             | "arch"
+            | "archlinux"
             | "artix"
             | "asahi"
             | "astra"
@@ -70,6 +75,25 @@ pub fn is_valid_logo(name: &str) -> bool {
 }
 
 pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredString) {
+    if let Some(custom) = custom_logo {
+        let p = Path::new(custom.trim());
+        if p.is_file()
+            && let Ok(file_content) = std::fs::read_to_string(p)
+        {
+            let default_color: fn(&str) -> ColoredString = |s| s.white().bold();
+            let max_width = file_content.lines().map(|l| l.chars().count()).max().unwrap_or(0);
+            let logo_lines = file_content
+                .lines()
+                .map(|line| {
+                    let char_count = line.chars().count();
+                    let padding = " ".repeat(max_width.saturating_sub(char_count));
+                    default_color(&format!("{line}{padding}"))
+                })
+                .collect();
+            return (logo_lines, max_width, default_color);
+        }
+    }
+
     let os_name = match custom_logo {
         Some(name) if !name.trim().is_empty() => name.trim().to_lowercase(),
         _ => {
@@ -228,6 +252,20 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
     (logo_lines, max_width, color_func)
 }
 
+pub fn resolve_color(color_name: &str) -> Option<fn(&str) -> ColoredString> {
+    match color_name.trim().to_lowercase().as_str() {
+        "cyan" | "bright-cyan" | "bright_cyan" => Some(|s| s.bright_cyan().bold()),
+        "blue" | "bright-blue" | "bright_blue" => Some(|s| s.bright_blue().bold()),
+        "green" | "bright-green" | "bright_green" => Some(|s| s.bright_green().bold()),
+        "red" | "bright-red" | "bright_red" => Some(|s| s.bright_red().bold()),
+        "yellow" | "bright-yellow" | "bright_yellow" => Some(|s| s.bright_yellow().bold()),
+        "magenta" | "purple" | "bright-magenta" | "bright_magenta" => Some(|s| s.bright_magenta().bold()),
+        "white" | "bright-white" | "bright_white" => Some(|s| s.bright_white().bold()),
+        "black" => Some(|s| s.black().bold()),
+        _ => None,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -240,8 +278,8 @@ mod tests {
         assert!(is_valid_logo("windows"));
         assert!(is_valid_logo("mac"));
         assert!(is_valid_logo("tux"));
+        assert!(is_valid_logo("archlinux"));
         assert!(!is_valid_logo("unknown_os"));
-        assert!(!is_valid_logo("archlinux"));
     }
 
     #[test]
@@ -249,5 +287,24 @@ mod tests {
         let (lines, width, _) = get_logo(false, Some("debian"));
         assert!(!lines.is_empty());
         assert!(width > 0);
+    }
+
+    #[test]
+    fn test_resolve_color() {
+        assert!(resolve_color("cyan").is_some());
+        assert!(resolve_color("red").is_some());
+        assert!(resolve_color("magenta").is_some());
+        assert!(resolve_color("invalid_color").is_none());
+    }
+
+    #[test]
+    fn test_file_logo() {
+        let tmp = std::env::temp_dir().join("test_logo.txt");
+        std::fs::write(&tmp, "HELLO\nWORLD").unwrap();
+        assert!(is_valid_logo(tmp.to_str().unwrap()));
+        let (lines, width, _) = get_logo(false, Some(tmp.to_str().unwrap()));
+        assert_eq!(lines.len(), 2);
+        assert_eq!(width, 5);
+        let _ = std::fs::remove_file(tmp);
     }
 }

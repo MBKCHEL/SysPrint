@@ -39,10 +39,17 @@ NixOS  <img width="1201" height="766" alt="изображение" src="https://
 # Leave empty for automatic OS detection.
 logo = ""
 
+# Color customization
+# Supported: "auto", "cyan", "blue", "green", "red", "magenta", "yellow", "white", "black"
+# "auto" uses the default color of the current distribution's logo.
+accent-color = "auto"
+header-color = "auto"
+
 # Modes & behavior
 mini-logo-mode = false
 fast-mode = false
 compact-mode = false
+show-progress-bars = false
 config-stronger = false
 
 # Master section toggles
@@ -85,6 +92,7 @@ show-de = true
 show-wm = true
 show-terminal = true
 show-shell = true
+show-resolution = true
 show-local-ip = true
 show-battery = true
 show-locale-time = true
@@ -92,16 +100,25 @@ show-fetch-info = true
 
 # Granular: Disks
 show-disks = true
+show-all-disks = false
 ```
 
 ## CLI Arguments
 
 | Flag / Option | Description |
 |---|---|
-| `--logo <NAME>` | Override ASCII logo with a specific system logo (e.g. `debian`, `arch`, `ubuntu`, `fedora`, `windows`, `apple`, `tux`, etc.) |
+| `--logo <NAME\|PATH>` | Override ASCII logo with a system logo (e.g. `debian`, `arch`, `ubuntu`, `fedora`, `windows`, `apple`, `tux`, etc.) or path to a custom text file (`./art.txt`) |
+| `-C, --color <COLOR>` | Override accent color (`auto`, `cyan`, `blue`, `green`, `red`, `magenta`, `yellow`, `white`, `black`) |
+| `-b, --bars` | Display visual progress bars for RAM, Swap, CPU, Disks, and Battery |
+| `--cpu-usage` | Measure and display CPU usage percentage (requires ~200ms sample delay) |
+| `--all-disks` | Display all mount points including pseudo, loop, and container filesystems |
+| `--time` | Display execution time in milliseconds next to SysPrint version |
+| `--no-logo` | Do not display ASCII logo |
+| `--json` | Output all system information in structured JSON format and exit |
 | `--mini` | Display a small 5-line mini ASCII logo |
-| `--fast-mode` | Skip heavy telemetry (disks, network interfaces, multi-pass CPU usage) for ultra-fast startup |
+| `--fast-mode` | Skip heavy telemetry (disks, network interfaces, shell subprocess) for ultra-fast startup |
 | `--compact-mode` | Show concise output without decorative headers and deep details |
+| `--config-path` | Print the path to the configuration file and exit |
 | `--generate-config` | Generate a new default `config.toml` in the user's config directory |
 | `--no-pause` | Windows: do not wait for Enter keypress before exiting |
 | `--hide-system` | Hide the System Information section |

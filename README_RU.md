@@ -39,10 +39,17 @@ NixOS <img width="1201" height="766" alt="изображение" src="https://g
 # Оставьте пустым для автоопределения системы.
 logo = ""
 
+# Настройка цветов
+# Доступные цвета: "auto", "cyan", "blue", "green", "red", "magenta", "yellow", "white", "black"
+# "auto" использует фирменный цвет логотипа текущего дистрибутива.
+accent-color = "auto"
+header-color = "auto"
+
 # Режимы работы
 mini-logo-mode = false
 fast-mode = false
 compact-mode = false
+show-progress-bars = false
 config-stronger = false
 
 # Главные переключатели секций
@@ -66,7 +73,7 @@ show-processes = true
 # Построчные переключатели: Процессор (CPU)
 show-cpu-name = true
 show-cpu-freq = true
-show-cpu-usage = false # Замер загрузки CPU занимает ~200ms
+show-cpu-usage = false # Замер нагрузки процессора требует задержки ~200ms
 show-cpu-temp = true
 show-cpu-cores = true
 show-cpu-arch = true
@@ -85,6 +92,7 @@ show-de = true
 show-wm = true
 show-terminal = true
 show-shell = true
+show-resolution = true
 show-local-ip = true
 show-battery = true
 show-locale-time = true
@@ -92,16 +100,25 @@ show-fetch-info = true
 
 # Построчные переключатели: Диски
 show-disks = true
+show-all-disks = false
 ```
 
 ## Аргументы командной строки (CLI)
 
 | Флаг / Опция | Описание |
 |---|---|
-| `--logo <NAME>` | Принудительно установить логотип (например: `debian`, `arch`, `ubuntu`, `fedora`, `windows`, `apple`, `tux`, `centos` и т.д.) |
+| `--logo <NAME\|PATH>` | Принудительно установить логотип (например: `debian`, `arch`, `ubuntu`, `fedora`, `windows`, `apple`, `tux`, `centos` и т.д.) или указать путь к текстовому файлу (`./art.txt`) |
+| `-C, --color <COLOR>` | Переопределить акцентный цвет (`auto`, `cyan`, `blue`, `green`, `red`, `magenta`, `yellow`, `white`, `black`) |
+| `-b, --bars` | Отображать графические шкалы прогресса для RAM, Swap, CPU, дисков и батареи |
+| `--cpu-usage` | Измерить и отобразить процент нагрузки процессора (требует задержки выборки ~200ms) |
+| `--all-disks` | Отображать все точки монтирования, включая виртуальные, loop и контейнерные ФС |
+| `--time` | Отображать время выполнения в миллисекундах рядом с версией SysPrint |
+| `--no-logo` | Не отображать ASCII-логотип (вывод только текста без отступа слева) |
+| `--json` | Вывести все собранные данные о системе в формате JSON и выйти |
 | `--mini` | Отображать компактный 5-строчный mini ASCII-логотип |
-| `--fast-mode` | Пропустить ресурсоемкие вызовы (диски, сетевые интерфейсы, замер дельты CPU) для мгновенного запуска |
+| `--fast-mode` | Пропустить ресурсоемкие вызовы (диски, сетевые интерфейсы, подпроцессы шелла) для мгновенного запуска |
 | `--compact-mode` | Компактный режим вывода без разделителей и подробных деталей |
+| `--config-path` | Вывести путь к файлу конфигурации и выйти |
 | `--generate-config` | Сгенерировать новый дефолтный `config.toml` в каталоге пользователя |
 | `--no-pause` | Windows: не ждать нажатия клавиши Enter перед выходом |
 | `--hide-system` | Скрыть секцию System |

@@ -14,15 +14,22 @@ const FILE_NAME: &str = "config.toml";
 /// - `true` — the config value always wins;
 /// - `false` — an explicitly passed CLI flag wins (config is the fallback).
 #[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "kebab-case", default)]
+#[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
 pub struct Config {
     // Custom logo override by name (e.g. "arch", "debian", "ubuntu", "fedora", "windows", "tux")
     pub logo: String,
+
+    // Color customization
+    pub accent_color: String,
+    pub header_color: String,
 
     // Modes & behavior
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
     pub compact_mode: bool,
+    pub show_progress_bars: bool,
+    pub no_logo: bool,
+    pub show_time: bool,
     pub config_stronger: bool,
 
     // Master section toggles
@@ -65,6 +72,7 @@ pub struct Config {
     pub show_wm: bool,
     pub show_terminal: bool,
     pub show_shell: bool,
+    pub show_resolution: bool,
     pub show_local_ip: bool,
     pub show_battery: bool,
     pub show_locale_time: bool,
@@ -72,15 +80,21 @@ pub struct Config {
 
     // Granular Disks toggles
     pub show_disks: bool,
+    pub show_all_disks: bool,
 }
 
 impl Default for Config {
     fn default() -> Self {
         Self {
             logo: String::new(),
+            accent_color: "auto".to_string(),
+            header_color: "auto".to_string(),
             mini_logo_mode: false,
             fast_mode: false,
             compact_mode: false,
+            show_progress_bars: false,
+            no_logo: false,
+            show_time: false,
             config_stronger: false,
 
             show_system_info: true,
@@ -117,11 +131,13 @@ impl Default for Config {
             show_wm: true,
             show_terminal: true,
             show_shell: true,
+            show_resolution: true,
             show_local_ip: true,
             show_battery: true,
             show_locale_time: true,
             show_fetch_info: true,
             show_disks: true,
+            show_all_disks: false,
         }
     }
 }
@@ -136,10 +152,7 @@ pub fn load() -> Result<Option<Config>, String> {
     let path = config_path();
     let contents = match fs::read_to_string(&path) {
         Ok(contents) => contents,
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-            let _ = generate();
-            return Ok(Some(Config::default()));
-        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(None),
         Err(e) => return Err(format!("failed to read {}: {e}", path.display())),
     };
 
@@ -170,10 +183,19 @@ pub fn generate() -> Result<PathBuf, String> {
 # Leave empty for automatic OS detection.
 logo = ""
 
+# Color customization
+# Supported: "auto", "cyan", "blue", "green", "red", "magenta", "yellow", "white", "black"
+# "auto" uses the default color of the current distribution's logo.
+accent-color = "auto"
+header-color = "auto"
+
 # Modes & behavior
 mini-logo-mode = false
 fast-mode = false
 compact-mode = false
+show-progress-bars = false
+no-logo = false
+show-time = false
 config-stronger = false
 
 # Master section toggles
@@ -216,6 +238,7 @@ show-de = true
 show-wm = true
 show-terminal = true
 show-shell = true
+show-resolution = true
 show-local-ip = true
 show-battery = true
 show-locale-time = true
@@ -223,6 +246,7 @@ show-fetch-info = true
 
 # Granular: Disks
 show-disks = true
+show-all-disks = false # Set true to show pseudo, loop, and container filesystems
 "#;
 
 
@@ -260,5 +284,13 @@ mod tests {
         // Defaults preserved
         assert!(cfg.show_cpu_name);
         assert!(cfg.show_system_info);
+    }
+
+    #[test]
+    fn test_deny_unknown_fields() {
+        let toml_str = r#"
+            show-cpu-tempp = false
+        "#;
+        assert!(toml::from_str::<Config>(toml_str).is_err());
     }
 }

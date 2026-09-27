@@ -1,6 +1,5 @@
 use crate::sysinfo::combine::DisplayOptions;
 use colored::ColoredString;
-use colored::Colorize;
 use std::env;
 use std::fmt::Write;
 use std::fs;
@@ -34,7 +33,7 @@ pub fn system_info(
     }
 
     if !opts.compact_mode {
-        let _ = writeln!(buf, "{}", "--- System INFO ---".bold().cyan());
+        let _ = writeln!(buf, "{}", opts.format_header("--- System INFO ---", c));
     }
 
     if opts.os {
@@ -73,7 +72,10 @@ pub fn system_info(
                 {
                     if let Ok(content) = fs::read_to_string("/etc/os-release") {
                         for line in content.lines() {
-                            if let Some(rest) = line.strip_prefix("BUILD_ID=") {
+                            if let Some(rest) = line.strip_prefix("VERSION_ID=")
+                                .or_else(|| line.strip_prefix("BUILD_ID="))
+                                .or_else(|| line.strip_prefix("VERSION="))
+                            {
                                 let val = rest.trim().trim_matches('"').trim_matches('\'');
                                 if !val.is_empty() {
                                     return Some(val.to_string());

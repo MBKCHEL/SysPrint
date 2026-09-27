@@ -2,10 +2,15 @@
 use clap::Parser;
 
 #[derive(Parser)]
+#[command(version)]
 pub struct Arguments {
     /// Write a default configuration file to the user config directory and exit
     #[arg(long)]
     pub generate_config: bool,
+
+    /// Print the path to the configuration file and exit
+    #[arg(long = "config-path")]
+    pub config_path: bool,
 
     /// Hide System section
     #[arg(long = "hide-system")]
@@ -47,6 +52,14 @@ pub struct Arguments {
     #[arg(short = 'c', long = "compact-mode")]
     pub compact_mode: bool,
 
+    /// Display visual progress bars for RAM, Swap, CPU, Disks, and Battery
+    #[arg(short = 'b', long = "bars")]
+    pub bars: bool,
+
+    /// Display all mount points including pseudo, loop, and container filesystems
+    #[arg(long = "all-disks")]
+    pub all_disks: bool,
+
     /// Hide "Fetch: SysPrint"
     #[arg(long = "hide-fetch-info")]
     pub hide_fetch_info: bool,
@@ -54,6 +67,22 @@ pub struct Arguments {
     /// Override OS logo by name (e.g. arch, debian, ubuntu, fedora, windows, tux, apple, gentoo)
     #[arg(short = 'l', long = "logo")]
     pub logo: Option<String>,
+
+    /// Override accent color (auto, cyan, blue, green, red, magenta, yellow, white, black)
+    #[arg(short = 'C', long = "color")]
+    pub color: Option<String>,
+
+    /// Output all gathered system information as JSON and exit
+    #[arg(long)]
+    pub json: bool,
+
+    /// Display execution time in milliseconds next to SysPrint version
+    #[arg(long = "time")]
+    pub time: bool,
+
+    /// Do not display ASCII logo
+    #[arg(long = "no-logo")]
+    pub no_logo: bool,
 
     /// Do not pause at exit on Windows
     #[arg(long = "no-pause")]

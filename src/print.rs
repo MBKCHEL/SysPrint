@@ -2,6 +2,11 @@ use std::io::{self, BufWriter, Write};
 use crate::sysinfo::combine::SystemInfo;
 
 pub fn render(info: &SystemInfo) {
+    if info.logo.is_empty() {
+        print!("{}", info.buffer);
+        return;
+    }
+
     let raw_lens: Vec<usize> = info
         .logo
         .iter()

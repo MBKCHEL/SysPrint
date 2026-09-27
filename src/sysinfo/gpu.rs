@@ -1,5 +1,5 @@
 use crate::sysinfo::combine::DisplayOptions;
-use colored::{ColoredString, Colorize};
+use colored::ColoredString;
 use std::fmt::Write;
 use std::process::Command;
 
@@ -9,7 +9,7 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
     }
 
     if !opts.compact_mode {
-        let _ = writeln!(buf, "{}", "--- GPU INFO ---".bold().cyan());
+        let _ = writeln!(buf, "{}", opts.format_header("--- GPU INFO ---", c));
     }
 
     #[cfg(target_os = "linux")]
@@ -465,19 +465,6 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
         return true;
     }
 
-    if let Ok(sysctl_out) = Command::new("sysctl")
-        .arg("-n")
-        .arg("dev.amdtemp.0.core0")
-        .output()
-    {
-        let temp_str = String::from_utf8_lossy(&sysctl_out.stdout)
-            .trim()
-            .to_string();
-        if !temp_str.is_empty() {
-            let _ = writeln!(buf, "{}: {}", c("GPU Temp"), temp_str);
-        }
-    }
-
     true
 }
 
@@ -636,6 +623,16 @@ fn get_generic_gpu_name() -> String {
     }
 
     "Unknown GPU".to_string()
+}
+
+pub fn get_primary_gpu_name() -> Option<String> {
+    let raw = get_generic_gpu_name();
+    let clean = clean_gpu_name(&raw);
+    if clean == "Unknown GPU" {
+        None
+    } else {
+        Some(clean)
+    }
 }
 
 #[cfg(test)]

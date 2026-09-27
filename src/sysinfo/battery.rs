@@ -1,9 +1,8 @@
+use crate::sysinfo::combine::DisplayOptions;
 use colored::ColoredString;
 use std::fmt::Write;
 
-pub fn battery_info(buf: &mut String, c: fn(&str) -> ColoredString) {
-    let mut battery_str = String::new();
-
+pub fn get_battery_raw() -> Option<(u8, Option<String>)> {
     #[cfg(target_os = "linux")]
     {
         use std::fs;
@@ -15,14 +14,13 @@ pub fn battery_info(buf: &mut String, c: fn(&str) -> ColoredString) {
                     let cap = fs::read_to_string(path.join("capacity")).unwrap_or_default();
                     let stat = fs::read_to_string(path.join("status")).unwrap_or_default();
 
-                    if !cap.trim().is_empty() {
-                        let status_str = if stat.trim().is_empty() {
-                            "".to_string()
+                    if let Ok(pct) = cap.trim().parse::<u8>() {
+                        let status_opt = if stat.trim().is_empty() {
+                            None
                         } else {
-                            format!(" [{}]", stat.trim())
+                            Some(stat.trim().to_string())
                         };
-                        battery_str = format!("{}%{}", cap.trim(), status_str);
-                        break;
+                        return Some((pct, status_opt));
                     }
                 }
             }
@@ -50,12 +48,25 @@ pub fn battery_info(buf: &mut String, c: fn(&str) -> ColoredString) {
 
         unsafe {
             if GetSystemPowerStatus(&mut status) != 0 && status.battery_life_percent != 255 {
-                battery_str = format!("{}%", status.battery_life_percent);
+                return Some((status.battery_life_percent, None));
             }
         }
     }
 
-    if !battery_str.is_empty() {
-        let _ = writeln!(buf, "{}: {}", c("Battery"), battery_str);
+    None
+}
+
+pub fn battery_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) {
+    if let Some((percent, status)) = get_battery_raw() {
+        let status_str = match status {
+            Some(s) => format!(" [{s}]"),
+            None => String::new(),
+        };
+        let bar = if opts.progress_bars {
+            format!("{} ", crate::sysinfo::combine::make_bar(percent as f64, 10, c))
+        } else {
+            String::new()
+        };
+        let _ = writeln!(buf, "{}: {}{}%{}", c("Battery"), bar, percent, status_str);
     }
 }

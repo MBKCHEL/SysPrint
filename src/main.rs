@@ -16,6 +16,11 @@ fn main() {
 
     let args = Arguments::parse();
 
+    if args.config_path {
+        println!("{}", config::config_path().display());
+        return;
+    }
+
     if args.generate_config {
         match config::generate() {
             Ok(path) => println!("Default config written to {}", path.display()),
@@ -61,11 +66,35 @@ fn main() {
         None
     };
 
+    let accent_color = if config_stronger {
+        cfg.as_ref()
+            .map(|c| c.accent_color.trim())
+            .filter(|s| !s.is_empty() && *s != "auto")
+            .map(|s| s.to_string())
+            .or(args.color)
+    } else {
+        args.color.or_else(|| {
+            cfg.as_ref()
+                .map(|c| c.accent_color.trim())
+                .filter(|s| !s.is_empty() && *s != "auto")
+                .map(|s| s.to_string())
+        })
+    };
+
+    let header_color = cfg
+        .as_ref()
+        .map(|c| c.header_color.trim())
+        .filter(|s| !s.is_empty() && *s != "auto")
+        .map(|s| s.to_string());
+
     let opts = DisplayOptions {
         custom_logo,
         mini_logo_mode: decide_enable(args.mini, cfg.as_ref().map(|c| c.mini_logo_mode), config_stronger),
         fast_mode: decide_enable(args.fast_mode, cfg.as_ref().map(|c| c.fast_mode), config_stronger),
         compact_mode: decide_enable(args.compact_mode, cfg.as_ref().map(|c| c.compact_mode), config_stronger),
+        progress_bars: decide_enable(args.bars, cfg.as_ref().map(|c| c.show_progress_bars), config_stronger),
+        no_logo: decide_enable(args.no_logo, cfg.as_ref().map(|c| c.no_logo), config_stronger),
+        show_time: decide_enable(args.time, cfg.as_ref().map(|c| c.show_time), config_stronger),
 
         system: decide_show(args.hide_system, cfg.as_ref().map(|c| c.show_system_info), config_stronger),
         cpu: decide_show(args.hide_cpu, cfg.as_ref().map(|c| c.show_cpu_info), config_stronger),
@@ -105,6 +134,7 @@ fn main() {
         wm: cfg.as_ref().map(|c| c.show_wm).unwrap_or(true),
         terminal: cfg.as_ref().map(|c| c.show_terminal).unwrap_or(true),
         shell: cfg.as_ref().map(|c| c.show_shell).unwrap_or(true),
+        resolution: cfg.as_ref().map(|c| c.show_resolution).unwrap_or(true),
         local_ip: cfg.as_ref().map(|c| c.show_local_ip).unwrap_or(true),
         battery: cfg.as_ref().map(|c| c.show_battery).unwrap_or(true),
         locale_time: cfg.as_ref().map(|c| c.show_locale_time).unwrap_or(true),
@@ -115,7 +145,16 @@ fn main() {
         ),
 
         show_disks: cfg.as_ref().map(|c| c.show_disks).unwrap_or(true),
+        all_disks: decide_enable(args.all_disks, cfg.as_ref().map(|c| c.show_all_disks), config_stronger),
+        accent_color,
+        header_color,
     };
+
+    if args.json {
+        let json_str = sysinfo::json::collect_json(&opts);
+        println!("{json_str}");
+        return;
+    }
 
     let info = SystemInfo::collect(opts);
     print::render(&info);
