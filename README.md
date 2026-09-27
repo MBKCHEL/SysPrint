@@ -66,7 +66,7 @@ show-processes = true
 # Granular: CPU
 show-cpu-name = true
 show-cpu-freq = true
-show-cpu-usage = true
+show-cpu-usage = false # Measuring CPU usage takes ~200ms
 show-cpu-temp = true
 show-cpu-cores = true
 show-cpu-arch = true
@@ -106,6 +106,7 @@ show-disks = true
 | `--no-pause` | Windows: do not wait for Enter keypress before exiting |
 | `--hide-system` | Hide the System Information section |
 | `--hide-cpu` | Hide the CPU section |
+| `--cpu-usage` | Display CPU usage percentage (requires ~200ms sample delay) |
 | `--hide-gpu` | Hide the GPU section |
 | `--hide-memory` | Hide the Memory / Swap section |
 | `--hide-other` | Hide the Other (Desktop, Shell, IP, Battery) section |

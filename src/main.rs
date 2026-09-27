@@ -85,7 +85,11 @@ fn main() {
 
         cpu_name: cfg.as_ref().map(|c| c.show_cpu_name).unwrap_or(true),
         cpu_freq: cfg.as_ref().map(|c| c.show_cpu_freq).unwrap_or(true),
-        cpu_usage: cfg.as_ref().map(|c| c.show_cpu_usage).unwrap_or(true),
+        cpu_usage: decide_enable(
+            args.cpu_usage,
+            cfg.as_ref().map(|c| c.show_cpu_usage),
+            config_stronger,
+        ),
         cpu_temp: cfg.as_ref().map(|c| c.show_cpu_temp).unwrap_or(true),
         cpu_cores: cfg.as_ref().map(|c| c.show_cpu_cores).unwrap_or(true),
         cpu_arch: cfg.as_ref().map(|c| c.show_cpu_arch).unwrap_or(true),

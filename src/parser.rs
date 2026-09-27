@@ -15,6 +15,10 @@ pub struct Arguments {
     #[arg(long = "hide-cpu")]
     pub hide_cpu: bool,
 
+    /// Display CPU usage percentage (requires ~200ms sample delay)
+    #[arg(long = "cpu-usage")]
+    pub cpu_usage: bool,
+
     /// Hide Memory section
     #[arg(long = "hide-memory")]
     pub hide_memory: bool,

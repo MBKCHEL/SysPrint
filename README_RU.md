@@ -66,7 +66,7 @@ show-processes = true
 # Построчные переключатели: Процессор (CPU)
 show-cpu-name = true
 show-cpu-freq = true
-show-cpu-usage = true
+show-cpu-usage = false # Замер загрузки CPU занимает ~200ms
 show-cpu-temp = true
 show-cpu-cores = true
 show-cpu-arch = true
@@ -106,6 +106,7 @@ show-disks = true
 | `--no-pause` | Windows: не ждать нажатия клавиши Enter перед выходом |
 | `--hide-system` | Скрыть секцию System |
 | `--hide-cpu` | Скрыть секцию CPU |
+| `--cpu-usage` | Отображать процент загрузки CPU (требует задержки ~200ms для замера) |
 | `--hide-gpu` | Скрыть секцию GPU |
 | `--hide-memory` | Скрыть секцию памяти и Swap |
 | `--hide-other` | Скрыть секцию прочей информации (DE, WM, Shell, IP, батарея) |

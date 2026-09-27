@@ -88,7 +88,7 @@ impl Default for DisplayOptions {
 
             cpu_name: true,
             cpu_freq: true,
-            cpu_usage: true,
+            cpu_usage: false,
             cpu_temp: true,
             cpu_cores: true,
             cpu_arch: true,

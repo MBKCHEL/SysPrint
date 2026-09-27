@@ -101,7 +101,7 @@ impl Default for Config {
 
             show_cpu_name: true,
             show_cpu_freq: true,
-            show_cpu_usage: true,
+            show_cpu_usage: false,
             show_cpu_temp: true,
             show_cpu_cores: true,
             show_cpu_arch: true,
@@ -197,7 +197,7 @@ show-processes = true
 # Granular: CPU
 show-cpu-name = true
 show-cpu-freq = true
-show-cpu-usage = true
+show-cpu-usage = false # Measuring CPU usage takes ~200ms
 show-cpu-temp = true
 show-cpu-cores = true
 show-cpu-arch = true
