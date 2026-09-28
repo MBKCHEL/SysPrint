@@ -29,6 +29,7 @@ pub struct DisplayOptions {
     pub host: bool,
     pub user: bool,
     pub uptime: bool,
+    pub load_avg: bool,
     pub processes: bool,
 
     // Granular CPU
@@ -127,6 +128,7 @@ impl Default for DisplayOptions {
             host: true,
             user: true,
             uptime: true,
+            load_avg: true,
             processes: true,
 
             cpu_name: true,

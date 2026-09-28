@@ -68,6 +68,7 @@ show-init = true
 show-host = true
 show-user = true
 show-uptime = true
+show-load-avg = true
 show-processes = true
 
 # Построчные переключатели: Процессор (CPU)

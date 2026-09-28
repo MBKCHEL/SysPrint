@@ -44,7 +44,13 @@ pub struct SystemJson {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uptime: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub load_avg: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub processes: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub running_processes: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub zombie_processes: Option<usize>,
 }
 
 #[derive(Serialize)]
@@ -130,20 +136,17 @@ pub fn collect_json(opts: &DisplayOptions) -> String {
     }
 
     let system = if opts.system {
+        let proc_stats = if opts.processes {
+            Some(crate::sysinfo::system::get_process_stats(&sys, opts.fast_mode))
+        } else {
+            None
+        };
         Some(SystemJson {
             os: if opts.os { System::name() } else { None },
             kernel: if opts.kernel { System::kernel_version() } else { None },
             os_version: if opts.os_version { System::os_version() } else { None },
             init: if opts.init {
-                #[cfg(target_os = "linux")]
-                {
-                    std::fs::read_link("/sbin/init")
-                        .or_else(|_| std::fs::read_link("/proc/1/exe"))
-                        .ok()
-                        .and_then(|p| p.file_name().map(|n| n.to_string_lossy().into_owned()))
-                }
-                #[cfg(not(target_os = "linux"))]
-                None
+                Some(crate::sysinfo::system::get_init_system())
             } else {
                 None
             },
@@ -159,26 +162,19 @@ pub fn collect_json(opts: &DisplayOptions) -> String {
             } else {
                 None
             },
-            processes: if opts.processes {
-                #[cfg(target_os = "linux")]
-                {
-                    std::fs::read_dir("/proc")
-                        .ok()
-                        .map(|entries| {
-                            entries
-                                .filter_map(|e| e.ok())
-                                .filter(|e| e.file_name().to_string_lossy().chars().all(|c| c.is_ascii_digit()))
-                                .count()
-                        })
-                }
-                #[cfg(not(target_os = "linux"))]
-                {
-                    sys.refresh_processes(sysinfo::ProcessesToUpdate::All, true);
-                    Some(sys.processes().len())
+            load_avg: if opts.load_avg {
+                let load = System::load_average();
+                if load.one > 0.0 || load.five > 0.0 || load.fifteen > 0.0 {
+                    Some(format!("{:.2}, {:.2}, {:.2}", load.one, load.five, load.fifteen))
+                } else {
+                    None
                 }
             } else {
                 None
             },
+            processes: proc_stats.as_ref().and_then(|s| if s.total > 0 { Some(s.total) } else { None }),
+            running_processes: proc_stats.as_ref().and_then(|s| if s.running > 0 || s.zombie > 0 { Some(s.running) } else { None }),
+            zombie_processes: proc_stats.as_ref().and_then(|s| if s.running > 0 || s.zombie > 0 { Some(s.zombie) } else { None }),
         })
     } else {
         None

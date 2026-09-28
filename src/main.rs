@@ -110,6 +110,7 @@ fn main() {
         host: cfg.as_ref().map(|c| c.show_host).unwrap_or(true),
         user: cfg.as_ref().map(|c| c.show_user).unwrap_or(true),
         uptime: cfg.as_ref().map(|c| c.show_uptime).unwrap_or(true),
+        load_avg: cfg.as_ref().map(|c| c.show_load_avg).unwrap_or(true),
         processes: cfg.as_ref().map(|c| c.show_processes).unwrap_or(true),
 
         cpu_name: cfg.as_ref().map(|c| c.show_cpu_name).unwrap_or(true),

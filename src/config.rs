@@ -48,6 +48,7 @@ pub struct Config {
     pub show_host: bool,
     pub show_user: bool,
     pub show_uptime: bool,
+    pub show_load_avg: bool,
     pub show_processes: bool,
 
     // Granular CPU toggles
@@ -111,6 +112,7 @@ impl Default for Config {
             show_host: true,
             show_user: true,
             show_uptime: true,
+            show_load_avg: true,
             show_processes: true,
 
             show_cpu_name: true,
@@ -214,6 +216,7 @@ show-init = true
 show-host = true
 show-user = true
 show-uptime = true
+show-load-avg = true
 show-processes = true
 
 # Granular: CPU
