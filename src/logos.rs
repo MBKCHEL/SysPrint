@@ -15,42 +15,65 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "almalinux"
             | "alt"
             | "altlinux"
+            | "amazon"
+            | "amazonlinux"
+            | "amzn"
             | "android"
+            | "antix"
             | "apple"
             | "arch"
             | "archlinux"
             | "artix"
             | "asahi"
             | "astra"
+            | "bodhi"
+            | "bodhilinux"
             | "cachyos"
             | "centos"
+            | "chimera"
+            | "chimeralinux"
             | "chrome"
             | "chromeos"
             | "chromium"
+            | "clear"
+            | "clearlinux"
             | "debian"
             | "deepin"
+            | "devuan"
+            | "dragonfly"
+            | "dragonflybsd"
             | "elementary"
             | "endeavour"
             | "fedora"
             | "freebsd"
             | "garuda"
             | "gentoo"
+            | "guix"
             | "kali"
+            | "kaos"
             | "kdeneon"
             | "kubuntu"
             | "lubuntu"
+            | "mageia"
             | "manjaro"
             | "mint"
             | "mx"
             | "neon"
             | "netbsd"
             | "nixos"
+            | "nobara"
             | "openbsd"
             | "opensuse"
+            | "oracle"
+            | "oraclelinux"
             | "parrot"
             | "pop"
             | "popos"
             | "proxmox"
+            | "puppy"
+            | "puppylinux"
+            | "qubes"
+            | "qubesos"
             | "raspbian"
             | "raspberry"
             | "redhat"
@@ -64,6 +87,8 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "truenas"
             | "tux"
             | "ubuntu"
+            | "vanilla"
+            | "vanillaos"
             | "void"
             | "windows"
             | "xubuntu"
@@ -123,6 +148,7 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("arch")    => (include_str!("../assets/mini/a/arch.txt"), |s| s.blue().bold()),
 
             // Debian Based
+            s if s.contains("devuan")   => (include_str!("../assets/mini/d/devuan.txt"), |s| s.purple().bold()),
             s if s.contains("kali")     => (include_str!("../assets/mini/k/kali.txt"), |s| s.white().bold()),
             s if s.contains("parrot")   => (include_str!("../assets/mini/p/parrot.txt"), |s| s.cyan().bold()),
             s if s.contains("astra")    => (include_str!("../assets/mini/a/astra.txt"), |s| s.blue().bold()),
@@ -148,14 +174,28 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("rhel") || s.contains("redhat") => (include_str!("../assets/mini/r/rhel.txt"), |s| s.red().bold()),
             s if s.contains("rocky")    => (include_str!("../assets/mini/r/rocky.txt"), |s| s.green().bold()),
             s if s.contains("alma")     => (include_str!("../assets/mini/a/almalinux.txt"), |s| s.blue().bold()),
+            s if s.contains("oracle")   => (include_str!("../assets/mini/o/oracle.txt"), |s| s.red().bold()),
+            s if s.contains("amazon") || s == "amzn" => (include_str!("../assets/mini/a/amazon.txt"), |s| s.yellow().bold()),
 
             // BSD & Storage
+            s if s.contains("dragonfly") => (include_str!("../assets/mini/d/dragonfly.txt"), |s| s.red().bold()),
             s if s.contains("truenas")  => (include_str!("../assets/mini/t/truenas.txt"), |s| s.cyan().bold()),
             s if s.contains("freebsd")  => (include_str!("../assets/mini/f/freebsd.txt"), |s| s.red().bold()),
             s if s.contains("netbsd")   => (include_str!("../assets/mini/n/netbsd.txt"), |s| s.yellow().bold()),
             s if s.contains("openbsd")  => (include_str!("../assets/mini/o/openbsd.txt"), |s| s.yellow().bold()),
 
             // Independent & Others
+            s if s.contains("nobara")   => (include_str!("../assets/mini/n/nobara.txt"), |s| s.purple().bold()),
+            s if s.contains("mageia")   => (include_str!("../assets/mini/m/mageia.txt"), |s| s.cyan().bold()),
+            s if s.contains("antix")    => (include_str!("../assets/mini/a/antix.txt"), |s| s.blue().bold()),
+            s if s.contains("kaos")     => (include_str!("../assets/mini/k/kaos.txt"), |s| s.blue().bold()),
+            s if s.contains("vanilla")  => (include_str!("../assets/mini/v/vanilla.txt"), |s| s.yellow().bold()),
+            s if s.contains("bodhi")    => (include_str!("../assets/mini/b/bodhi.txt"), |s| s.green().bold()),
+            s if s.contains("guix")     => (include_str!("../assets/mini/g/guix.txt"), |s| s.yellow().bold()),
+            s if s.contains("chimera")  => (include_str!("../assets/mini/c/chimera.txt"), |s| s.red().bold()),
+            s if s.contains("clearlinux") || s.contains("clear-linux") || s == "clear" => (include_str!("../assets/mini/c/clearlinux.txt"), |s| s.blue().bold()),
+            s if s.contains("qubes")    => (include_str!("../assets/mini/q/qubes.txt"), |s| s.blue().bold()),
+            s if s.contains("puppy")    => (include_str!("../assets/mini/p/puppy.txt"), |s| s.blue().bold()),
             s if s.contains("steamos") || s.contains("steamdeck") => (include_str!("../assets/mini/s/steamos.txt"), |s| s.blue().bold()),
             s if s.contains("chrome")   => (include_str!("../assets/mini/c/chromeos.txt"), |s| s.green().bold()),
             s if s.contains("mx")       => (include_str!("../assets/mini/m/mx.txt"), |s| s.white().bold()),
@@ -186,6 +226,7 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("arch")    => (include_str!("../assets/normal/a/arch.txt"), |s| s.blue().bold()),
 
             // Debian Based
+            s if s.contains("devuan")   => (include_str!("../assets/normal/d/devuan.txt"), |s| s.purple().bold()),
             s if s.contains("kali")     => (include_str!("../assets/normal/k/kali.txt"), |s| s.white().bold()),
             s if s.contains("parrot")   => (include_str!("../assets/normal/p/parrot.txt"), |s| s.cyan().bold()),
             s if s.contains("astra")    => (include_str!("../assets/normal/a/astra.txt"), |s| s.blue().bold()),
@@ -211,14 +252,28 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("rhel") || s.contains("redhat") => (include_str!("../assets/normal/r/rhel.txt"), |s| s.red().bold()),
             s if s.contains("rocky")    => (include_str!("../assets/normal/r/rocky.txt"), |s| s.green().bold()),
             s if s.contains("alma")     => (include_str!("../assets/normal/a/almalinux.txt"), |s| s.blue().bold()),
+            s if s.contains("oracle")   => (include_str!("../assets/normal/o/oracle.txt"), |s| s.red().bold()),
+            s if s.contains("amazon") || s == "amzn" => (include_str!("../assets/normal/a/amazon.txt"), |s| s.yellow().bold()),
 
             // BSD & Storage
+            s if s.contains("dragonfly") => (include_str!("../assets/normal/d/dragonfly.txt"), |s| s.red().bold()),
             s if s.contains("truenas")  => (include_str!("../assets/normal/t/truenas.txt"), |s| s.cyan().bold()),
             s if s.contains("freebsd")  => (include_str!("../assets/normal/f/freebsd.txt"), |s| s.red().bold()),
             s if s.contains("netbsd")   => (include_str!("../assets/normal/n/netbsd.txt"), |s| s.yellow().bold()),
             s if s.contains("openbsd")  => (include_str!("../assets/normal/o/openbsd.txt"), |s| s.yellow().bold()),
 
             // Independent & Others
+            s if s.contains("nobara")   => (include_str!("../assets/normal/n/nobara.txt"), |s| s.purple().bold()),
+            s if s.contains("mageia")   => (include_str!("../assets/normal/m/mageia.txt"), |s| s.cyan().bold()),
+            s if s.contains("antix")    => (include_str!("../assets/normal/a/antix.txt"), |s| s.blue().bold()),
+            s if s.contains("kaos")     => (include_str!("../assets/normal/k/kaos.txt"), |s| s.blue().bold()),
+            s if s.contains("vanilla")  => (include_str!("../assets/normal/v/vanilla.txt"), |s| s.yellow().bold()),
+            s if s.contains("bodhi")    => (include_str!("../assets/normal/b/bodhi.txt"), |s| s.green().bold()),
+            s if s.contains("guix")     => (include_str!("../assets/normal/g/guix.txt"), |s| s.yellow().bold()),
+            s if s.contains("chimera")  => (include_str!("../assets/normal/c/chimera.txt"), |s| s.red().bold()),
+            s if s.contains("clearlinux") || s.contains("clear-linux") || s == "clear" => (include_str!("../assets/normal/c/clearlinux.txt"), |s| s.blue().bold()),
+            s if s.contains("qubes")    => (include_str!("../assets/normal/q/qubes.txt"), |s| s.blue().bold()),
+            s if s.contains("puppy")    => (include_str!("../assets/normal/p/puppy.txt"), |s| s.blue().bold()),
             s if s.contains("steamos") || s.contains("steamdeck") => (include_str!("../assets/normal/s/steamos.txt"), |s| s.blue().bold()),
             s if s.contains("chrome")   => (include_str!("../assets/normal/c/chromeos.txt"), |s| s.green().bold()),
             s if s.contains("mx")       => (include_str!("../assets/normal/m/mx.txt"), |s| s.white().bold()),
@@ -287,6 +342,25 @@ mod tests {
         let (lines, width, _) = get_logo(false, Some("debian"));
         assert!(!lines.is_empty());
         assert!(width > 0);
+    }
+
+    #[test]
+    fn test_new_distros_logos() {
+        let distros = [
+            "nobara", "devuan", "mageia", "antix", "kaos",
+            "vanilla", "bodhi", "guix", "chimera", "clearlinux",
+            "dragonfly", "oracle", "amazon", "qubes", "puppy",
+        ];
+        for d in distros {
+            assert!(is_valid_logo(d), "is_valid_logo failed for {d}");
+            let (normal_lines, normal_w, _) = get_logo(false, Some(d));
+            assert!(!normal_lines.is_empty(), "normal logo empty for {d}");
+            assert!(normal_w > 0, "normal logo width 0 for {d}");
+
+            let (mini_lines, mini_w, _) = get_logo(true, Some(d));
+            assert!(!mini_lines.is_empty(), "mini logo empty for {d}");
+            assert!(mini_w > 0, "mini logo width 0 for {d}");
+        }
     }
 
     #[test]
