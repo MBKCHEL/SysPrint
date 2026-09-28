@@ -275,7 +275,11 @@ pub fn collect_json(opts: &DisplayOptions) -> String {
                 None
             },
             local_ip: if opts.local_ip {
-                crate::sysinfo::network::get_local_ip_string()
+                if opts.fast_mode {
+                    crate::sysinfo::network::get_fast_local_ip()
+                } else {
+                    crate::sysinfo::network::get_local_ip_string()
+                }
             } else {
                 None
             },

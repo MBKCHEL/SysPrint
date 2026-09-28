@@ -190,12 +190,20 @@ impl SystemInfo {
         }
 
         let start = std::time::Instant::now();
-        let mut sys = System::new_with_specifics(
-            RefreshKind::nothing()
-                .with_cpu(CpuRefreshKind::everything())
-                .with_memory(MemoryRefreshKind::everything())
-                .with_processes(ProcessRefreshKind::nothing()),
-        );
+        let mut sys = if opts.fast_mode {
+            System::new_with_specifics(
+                RefreshKind::nothing()
+                    .with_cpu(CpuRefreshKind::nothing().with_frequency())
+                    .with_memory(MemoryRefreshKind::everything()),
+            )
+        } else {
+            System::new_with_specifics(
+                RefreshKind::nothing()
+                    .with_cpu(CpuRefreshKind::everything())
+                    .with_memory(MemoryRefreshKind::everything())
+                    .with_processes(ProcessRefreshKind::nothing()),
+            )
+        };
 
         if opts.system {
             system_info(&opts, &mut buffer, &sys, c);

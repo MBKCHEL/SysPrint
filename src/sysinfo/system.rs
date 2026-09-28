@@ -222,9 +222,29 @@ pub fn parse_stat_state(content: &str) -> Option<char> {
     rest.chars().next()
 }
 
+pub fn parse_loadavg_processes(content: &str) -> Option<(usize, usize)> {
+    let mut parts = content.split_whitespace();
+    let fourth = parts.nth(3)?;
+    let mut slash_parts = fourth.split('/');
+    let running = slash_parts.next()?.parse::<usize>().ok()?;
+    let total = slash_parts.next()?.parse::<usize>().ok()?;
+    Some((running, total))
+}
+
 pub fn get_process_stats(sys: &System, fast_mode: bool) -> ProcessStats {
     #[cfg(target_os = "linux")]
     {
+        if fast_mode
+            && let Ok(content) = fs::read_to_string("/proc/loadavg")
+            && let Some((running, total)) = parse_loadavg_processes(&content)
+        {
+            return ProcessStats {
+                total,
+                running,
+                zombie: 0,
+            };
+        }
+
         if let Ok(entries) = fs::read_dir("/proc") {
             let mut total = 0;
             let mut running = 0;
@@ -286,6 +306,15 @@ mod tests {
 
         let stat_parens = "9999 (complex (name)) S 1 9999 1 0 -1";
         assert_eq!(parse_stat_state(stat_parens), Some('S'));
+    }
+
+    #[test]
+    fn test_parse_loadavg_processes() {
+        let sample = "0.75 0.79 0.78 3/214 3482\n";
+        assert_eq!(parse_loadavg_processes(sample), Some((3, 214)));
+
+        let invalid = "invalid data";
+        assert_eq!(parse_loadavg_processes(invalid), None);
     }
 }
 

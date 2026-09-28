@@ -44,7 +44,7 @@ pub fn other_info(
         resolution_info(buf, c);
     }
     if opts.local_ip {
-        local_ip(buf, c);
+        local_ip(opts.fast_mode, buf, c);
     }
     if opts.battery {
         battery_info(opts, buf, c);

@@ -13,6 +13,11 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
     }
 
     #[cfg(target_os = "linux")]
+    if get_linux_sysfs_gpu(opts, buf, fast_mode, c) {
+        return;
+    }
+
+    #[cfg(target_os = "linux")]
     if get_nvidia_fast_info(opts, buf, fast_mode, c) {
         return;
     }
@@ -23,17 +28,12 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
     }
 
     #[cfg(any(target_os = "linux", windows))]
-    if get_nvidia_info(opts, buf, fast_mode, c) {
+    if !fast_mode && get_nvidia_info(opts, buf, fast_mode, c) {
         return;
     }
 
     #[cfg(target_os = "macos")]
     if get_macos_gpu_info(opts, buf, c) {
-        return;
-    }
-
-    #[cfg(target_os = "linux")]
-    if get_linux_sysfs_gpu(opts, buf, fast_mode, c) {
         return;
     }
 
@@ -173,6 +173,11 @@ fn get_nvidia_info(
             "--format=csv,noheader,nounits",
         ]
     };
+
+    #[cfg(target_os = "linux")]
+    if !std::path::Path::new("/proc/driver/nvidia").exists() {
+        return false;
+    }
 
     let output = Command::new("nvidia-smi")
         .args(&query_args)

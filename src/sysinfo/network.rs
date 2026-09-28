@@ -43,8 +43,27 @@ pub fn get_local_ip_string() -> Option<String> {
     None
 }
 
-pub fn local_ip(buf: &mut String, c: fn(&str) -> ColoredString) {
-    if let Some(ip_str) = get_local_ip_string() {
-        let _ = writeln!(buf, "{}: {}", c("Local IP"), ip_str);
+pub fn get_fast_local_ip() -> Option<String> {
+    use std::net::UdpSocket;
+    let socket = UdpSocket::bind("0.0.0.0:0").ok()?;
+    socket.connect("1.1.1.1:80").ok()?;
+    let local_addr = socket.local_addr().ok()?;
+    let ip = local_addr.ip();
+    if ip.is_loopback() || ip.is_unspecified() {
+        None
+    } else {
+        Some(ip.to_string())
+    }
+}
+
+pub fn local_ip(fast_mode: bool, buf: &mut String, c: fn(&str) -> ColoredString) {
+    let ip_str = if fast_mode {
+        get_fast_local_ip()
+    } else {
+        get_local_ip_string()
+    };
+
+    if let Some(ip) = ip_str {
+        let _ = writeln!(buf, "{}: {}", c("Local IP"), ip);
     }
 }
