@@ -26,8 +26,15 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "artix"
             | "asahi"
             | "astra"
+            | "athena"
+            | "athenaos"
+            | "azure"
+            | "azurelinux"
+            | "bazzite"
+            | "bedrock"
             | "bodhi"
             | "bodhilinux"
+            | "bsd"
             | "cachyos"
             | "centos"
             | "chimera"
@@ -37,6 +44,7 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "chromium"
             | "clear"
             | "clearlinux"
+            | "cosmic"
             | "debian"
             | "deepin"
             | "devuan"
@@ -44,31 +52,51 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "dragonflybsd"
             | "elementary"
             | "endeavour"
+            | "endeavouros"
             | "fedora"
+            | "femboy"
+            | "femboyos"
             | "freebsd"
             | "garuda"
             | "gentoo"
+            | "ghostbsd"
+            | "gnome"
+            | "gnu"
+            | "graphene"
+            | "grapheneos"
             | "guix"
             | "kali"
             | "kaos"
+            | "kde"
+            | "kdelinux"
             | "kdeneon"
+            | "kernel"
+            | "kernelos"
             | "kubuntu"
             | "lubuntu"
             | "mageia"
             | "manjaro"
+            | "midnightbsd"
+            | "minix"
             | "mint"
             | "mx"
             | "neon"
             | "netbsd"
             | "nixos"
             | "nobara"
+            | "nomadbsd"
+            | "obsidian"
+            | "obsidianos"
+            | "omarchy"
             | "openbsd"
             | "opensuse"
+            | "openwrt"
             | "oracle"
             | "oraclelinux"
             | "parrot"
             | "pop"
             | "popos"
+            | "postmarketos"
             | "proxmox"
             | "puppy"
             | "puppylinux"
@@ -77,19 +105,27 @@ pub fn is_valid_logo(name: &str) -> bool {
             | "raspbian"
             | "raspberry"
             | "redhat"
+            | "redos"
             | "rhel"
             | "rocky"
             | "slackware"
+            | "solaris"
             | "solus"
+            | "star"
             | "steamos"
             | "steamdeck"
+            | "swagarch"
             | "tails"
+            | "templeos"
+            | "trisquel"
             | "truenas"
             | "tux"
+            | "ublinux"
             | "ubuntu"
             | "vanilla"
             | "vanillaos"
             | "void"
+            | "whonix"
             | "windows"
             | "xubuntu"
             | "zorin"
@@ -141,7 +177,7 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             // Arch Based
             s if s.contains("cachyos")  => (include_str!("../assets/mini/c/cachyos.txt"), |s| s.green().bold()),
             s if s.contains("manjaro")  => (include_str!("../assets/mini/m/manjaro.txt"), |s| s.green().bold()),
-            s if s.contains("endeavour") => (include_str!("../assets/mini/e/endeavour.txt"), |s| s.purple().bold()),
+            s if s.contains("endeavour") => (include_str!("../assets/mini/e/endeavouros.txt"), |s| s.purple().bold()),
             s if s.contains("artix")    => (include_str!("../assets/mini/a/artix.txt"), |s| s.blue().bold()),
             s if s.contains("garuda")   => (include_str!("../assets/mini/g/garuda.txt"), |s| s.red().bold()),
             s if s.contains("asahi")    => (include_str!("../assets/mini/a/asahi.txt"), |s| s.red().bold()),
@@ -178,14 +214,42 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("amazon") || s == "amzn" => (include_str!("../assets/mini/a/amazon.txt"), |s| s.yellow().bold()),
 
             // BSD & Storage
-            s if s.contains("dragonfly") => (include_str!("../assets/mini/d/dragonfly.txt"), |s| s.red().bold()),
-            s if s.contains("truenas")  => (include_str!("../assets/mini/t/truenas.txt"), |s| s.cyan().bold()),
-            s if s.contains("freebsd")  => (include_str!("../assets/mini/f/freebsd.txt"), |s| s.red().bold()),
-            s if s.contains("netbsd")   => (include_str!("../assets/mini/n/netbsd.txt"), |s| s.yellow().bold()),
-            s if s.contains("openbsd")  => (include_str!("../assets/mini/o/openbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("ghostbsd")    => (include_str!("../assets/mini/g/ghostbsd.txt"), |s| s.cyan().bold()),
+            s if s.contains("midnightbsd") => (include_str!("../assets/mini/m/midnightbsd.txt"), |s| s.blue().bold()),
+            s if s.contains("nomadbsd")    => (include_str!("../assets/mini/n/nomadbsd.txt"), |s| s.blue().bold()),
+            s if s.contains("dragonfly")   => (include_str!("../assets/mini/d/dragonfly.txt"), |s| s.red().bold()),
+            s if s.contains("truenas")     => (include_str!("../assets/mini/t/truenas.txt"), |s| s.cyan().bold()),
+            s if s.contains("freebsd")     => (include_str!("../assets/mini/f/freebsd.txt"), |s| s.red().bold()),
+            s if s.contains("netbsd")      => (include_str!("../assets/mini/n/netbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("openbsd")     => (include_str!("../assets/mini/o/openbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("solaris")     => (include_str!("../assets/mini/s/solaris.txt"), |s| s.red().bold()),
+            s if s == "bsd" || s.contains("bsd") => (include_str!("../assets/mini/b/bsd.txt"), |s| s.red().bold()),
 
             // Independent & Others
+            s if s.contains("athena")     => (include_str!("../assets/mini/a/athenaos.txt"), |s| s.blue().bold()),
+            s if s.contains("azure")      => (include_str!("../assets/mini/a/azurelinux.txt"), |s| s.blue().bold()),
+            s if s.contains("bedrock")    => (include_str!("../assets/mini/b/bedrock.txt"), |s| s.white().bold()),
+            s if s.contains("cosmic")     => (include_str!("../assets/mini/c/cosmic.txt"), |s| s.blue().bold()),
+            s if s.contains("femboy")     => (include_str!("../assets/mini/f/femboyos.txt"), |s| s.purple().bold()),
+            s if s.contains("gnome")      => (include_str!("../assets/mini/g/gnome.txt"), |s| s.blue().bold()),
+            s if s.contains("gnu")        => (include_str!("../assets/mini/g/gnu.txt"), |s| s.yellow().bold()),
+            s if s.contains("graphene")   => (include_str!("../assets/mini/g/grapheneos.txt"), |s| s.cyan().bold()),
+            s if s.contains("kdelinux") || s == "kde" => (include_str!("../assets/mini/k/kdelinux.txt"), |s| s.cyan().bold()),
+            s if s.contains("kernelos") || s == "kernel" => (include_str!("../assets/mini/k/kernelos.txt"), |s| s.blue().bold()),
+            s if s.contains("minix")      => (include_str!("../assets/mini/m/minix.txt"), |s| s.blue().bold()),
+            s if s.contains("obsidian")   => (include_str!("../assets/mini/o/obsidianos.txt"), |s| s.purple().bold()),
+            s if s.contains("omarchy")    => (include_str!("../assets/mini/o/omarchy.txt"), |s| s.green().bold()),
+            s if s.contains("openwrt")    => (include_str!("../assets/mini/o/openwrt.txt"), |s| s.cyan().bold()),
+            s if s.contains("postmarketos") => (include_str!("../assets/mini/p/postmarketos.txt"), |s| s.green().bold()),
+            s if s.contains("redos")      => (include_str!("../assets/mini/r/redos.txt"), |s| s.red().bold()),
+            s if s == "star" || s.contains("staros") => (include_str!("../assets/mini/s/star.txt"), |s| s.yellow().bold()),
+            s if s.contains("swagarch")   => (include_str!("../assets/mini/s/swagarch.txt"), |s| s.blue().bold()),
+            s if s.contains("templeos")   => (include_str!("../assets/mini/t/templeos.txt"), |s| s.white().bold()),
+            s if s.contains("trisquel")   => (include_str!("../assets/mini/t/trisquel.txt"), |s| s.blue().bold()),
+            s if s.contains("ublinux")    => (include_str!("../assets/mini/u/ublinux.txt"), |s| s.blue().bold()),
             s if s.contains("nobara")   => (include_str!("../assets/mini/n/nobara.txt"), |s| s.purple().bold()),
+            s if s.contains("bazzite")  => (include_str!("../assets/mini/b/bazzite.txt"), |s| s.purple().bold()),
+            s if s.contains("whonix")   => (include_str!("../assets/mini/w/whonix.txt"), |s| s.cyan().bold()),
             s if s.contains("mageia")   => (include_str!("../assets/mini/m/mageia.txt"), |s| s.cyan().bold()),
             s if s.contains("antix")    => (include_str!("../assets/mini/a/antix.txt"), |s| s.blue().bold()),
             s if s.contains("kaos")     => (include_str!("../assets/mini/k/kaos.txt"), |s| s.blue().bold()),
@@ -219,7 +283,7 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             // Arch Based
             s if s.contains("cachyos")  => (include_str!("../assets/normal/c/cachyos.txt"), |s| s.green().bold()),
             s if s.contains("manjaro")  => (include_str!("../assets/normal/m/manjaro.txt"), |s| s.green().bold()),
-            s if s.contains("endeavour") => (include_str!("../assets/normal/e/endeavour.txt"), |s| s.purple().bold()),
+            s if s.contains("endeavour") => (include_str!("../assets/normal/e/endeavouros.txt"), |s| s.purple().bold()),
             s if s.contains("artix")    => (include_str!("../assets/normal/a/artix.txt"), |s| s.blue().bold()),
             s if s.contains("garuda")   => (include_str!("../assets/normal/g/garuda.txt"), |s| s.red().bold()),
             s if s.contains("asahi")    => (include_str!("../assets/normal/a/asahi.txt"), |s| s.red().bold()),
@@ -256,14 +320,42 @@ pub fn get_logo(mini_logo: bool, custom_logo: Option<&str>) -> (Vec<ColoredStrin
             s if s.contains("amazon") || s == "amzn" => (include_str!("../assets/normal/a/amazon.txt"), |s| s.yellow().bold()),
 
             // BSD & Storage
-            s if s.contains("dragonfly") => (include_str!("../assets/normal/d/dragonfly.txt"), |s| s.red().bold()),
-            s if s.contains("truenas")  => (include_str!("../assets/normal/t/truenas.txt"), |s| s.cyan().bold()),
-            s if s.contains("freebsd")  => (include_str!("../assets/normal/f/freebsd.txt"), |s| s.red().bold()),
-            s if s.contains("netbsd")   => (include_str!("../assets/normal/n/netbsd.txt"), |s| s.yellow().bold()),
-            s if s.contains("openbsd")  => (include_str!("../assets/normal/o/openbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("ghostbsd")    => (include_str!("../assets/normal/g/ghostbsd.txt"), |s| s.cyan().bold()),
+            s if s.contains("midnightbsd") => (include_str!("../assets/normal/m/midnightbsd.txt"), |s| s.blue().bold()),
+            s if s.contains("nomadbsd")    => (include_str!("../assets/normal/n/nomadbsd.txt"), |s| s.blue().bold()),
+            s if s.contains("dragonfly")   => (include_str!("../assets/normal/d/dragonfly.txt"), |s| s.red().bold()),
+            s if s.contains("truenas")     => (include_str!("../assets/normal/t/truenas.txt"), |s| s.cyan().bold()),
+            s if s.contains("freebsd")     => (include_str!("../assets/normal/f/freebsd.txt"), |s| s.red().bold()),
+            s if s.contains("netbsd")      => (include_str!("../assets/normal/n/netbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("openbsd")     => (include_str!("../assets/normal/o/openbsd.txt"), |s| s.yellow().bold()),
+            s if s.contains("solaris")     => (include_str!("../assets/normal/s/solaris.txt"), |s| s.red().bold()),
+            s if s == "bsd" || s.contains("bsd") => (include_str!("../assets/normal/b/bsd.txt"), |s| s.red().bold()),
 
             // Independent & Others
+            s if s.contains("athena")     => (include_str!("../assets/normal/a/athenaos.txt"), |s| s.blue().bold()),
+            s if s.contains("azure")      => (include_str!("../assets/normal/a/azurelinux.txt"), |s| s.blue().bold()),
+            s if s.contains("bedrock")    => (include_str!("../assets/normal/b/bedrock.txt"), |s| s.white().bold()),
+            s if s.contains("cosmic")     => (include_str!("../assets/normal/c/cosmic.txt"), |s| s.blue().bold()),
+            s if s.contains("femboy")     => (include_str!("../assets/normal/f/femboyos.txt"), |s| s.purple().bold()),
+            s if s.contains("gnome")      => (include_str!("../assets/normal/g/gnome.txt"), |s| s.blue().bold()),
+            s if s.contains("gnu")        => (include_str!("../assets/normal/g/gnu.txt"), |s| s.yellow().bold()),
+            s if s.contains("graphene")   => (include_str!("../assets/normal/g/grapheneos.txt"), |s| s.cyan().bold()),
+            s if s.contains("kdelinux") || s == "kde" => (include_str!("../assets/normal/k/kdelinux.txt"), |s| s.cyan().bold()),
+            s if s.contains("kernelos") || s == "kernel" => (include_str!("../assets/normal/k/kernelos.txt"), |s| s.blue().bold()),
+            s if s.contains("minix")      => (include_str!("../assets/normal/m/minix.txt"), |s| s.blue().bold()),
+            s if s.contains("obsidian")   => (include_str!("../assets/normal/o/obsidianos.txt"), |s| s.purple().bold()),
+            s if s.contains("omarchy")    => (include_str!("../assets/normal/o/omarchy.txt"), |s| s.green().bold()),
+            s if s.contains("openwrt")    => (include_str!("../assets/normal/o/openwrt.txt"), |s| s.cyan().bold()),
+            s if s.contains("postmarketos") => (include_str!("../assets/normal/p/postmarketos.txt"), |s| s.green().bold()),
+            s if s.contains("redos")      => (include_str!("../assets/normal/r/redos.txt"), |s| s.red().bold()),
+            s if s == "star" || s.contains("staros") => (include_str!("../assets/normal/s/star.txt"), |s| s.yellow().bold()),
+            s if s.contains("swagarch")   => (include_str!("../assets/normal/s/swagarch.txt"), |s| s.blue().bold()),
+            s if s.contains("templeos")   => (include_str!("../assets/normal/t/templeos.txt"), |s| s.white().bold()),
+            s if s.contains("trisquel")   => (include_str!("../assets/normal/t/trisquel.txt"), |s| s.blue().bold()),
+            s if s.contains("ublinux")    => (include_str!("../assets/normal/u/ublinux.txt"), |s| s.blue().bold()),
             s if s.contains("nobara")   => (include_str!("../assets/normal/n/nobara.txt"), |s| s.purple().bold()),
+            s if s.contains("bazzite")  => (include_str!("../assets/normal/b/bazzite.txt"), |s| s.purple().bold()),
+            s if s.contains("whonix")   => (include_str!("../assets/normal/w/whonix.txt"), |s| s.cyan().bold()),
             s if s.contains("mageia")   => (include_str!("../assets/normal/m/mageia.txt"), |s| s.cyan().bold()),
             s if s.contains("antix")    => (include_str!("../assets/normal/a/antix.txt"), |s| s.blue().bold()),
             s if s.contains("kaos")     => (include_str!("../assets/normal/k/kaos.txt"), |s| s.blue().bold()),
@@ -350,6 +442,13 @@ mod tests {
             "nobara", "devuan", "mageia", "antix", "kaos",
             "vanilla", "bodhi", "guix", "chimera", "clearlinux",
             "dragonfly", "oracle", "amazon", "qubes", "puppy",
+            "bazzite", "whonix",
+            "athenaos", "azurelinux", "bedrock", "bsd", "cosmic",
+            "endeavouros", "femboyos", "ghostbsd", "gnome", "gnu",
+            "grapheneos", "kdelinux", "kernelos", "midnightbsd",
+            "minix", "nomadbsd", "obsidianos", "omarchy", "openwrt",
+            "postmarketos", "redos", "solaris", "star", "swagarch",
+            "templeos", "trisquel", "ublinux",
         ];
         for d in distros {
             assert!(is_valid_logo(d), "is_valid_logo failed for {d}");
