@@ -7,7 +7,12 @@ use std::fmt::Write;
 use std::fs;
 use std::time::Instant;
 
-pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString, start_time: Instant) {
+pub fn other_info(
+    opts: &DisplayOptions,
+    buf: &mut String,
+    c: fn(&str) -> ColoredString,
+    start_time: Instant,
+) {
     if !opts.other.enabled {
         return;
     }
@@ -16,7 +21,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
         let _ = writeln!(buf, "{}", "--- Other INFO ---".bold().cyan());
     }
 
-    if opts.other.de{
+    if opts.other.de {
         de_check(buf, c);
     }
     if !opts.hide_fetch_info {
@@ -25,19 +30,19 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Colore
     if opts.compact_mode {
         return;
     }
-    if opts.other.wm{
+    if opts.other.wm {
         wm_check(buf, c);
     }
-    if opts.other.terminal{
+    if opts.other.terminal {
         terminal_info(buf, c);
     }
-    if opts.other.shell{
+    if opts.other.shell {
         get_shell(buf, c);
     }
-    if opts.other.battery{
+    if opts.other.battery {
         battery_info(buf, c);
     }
-    if opts.other.locale_time{
+    if opts.other.locale_time {
         system_time(buf, c);
     }
 }
@@ -76,10 +81,10 @@ fn wm_check(buf: &mut String, c: fn(&str) -> ColoredString) {
             "Niri".to_string()
         } else if env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
             "Hyprland".to_string()
-        } else if env::var("I3SOCK").is_ok() {
-            "i3".to_string()
         } else if env::var("SWAYSOCK").is_ok() {
             "Sway".to_string()
+        } else if env::var("I3SOCK").is_ok() {
+            "i3".to_string()
         } else if env::var("BSPWM_SOCKET").is_ok() {
             "bspwm".to_string()
         } else if env::var("HERBSTLUFTWM_SOCKET").is_ok() {
@@ -226,7 +231,12 @@ fn system_time(buf: &mut String, c: fn(&str) -> ColoredString) {
     let _ = writeln!(buf, "{}: {}", c("Locale Time"), now.format("%H:%M"));
 }
 
-fn sysprint_info(buf: &mut String, c: fn(&str) -> ColoredString, start_time: Instant, opts: &DisplayOptions, ) {
+fn sysprint_info(
+    buf: &mut String,
+    c: fn(&str) -> ColoredString,
+    start_time: Instant,
+    opts: &DisplayOptions,
+) {
     let time_str = if opts.show_sysprint_start_time {
         let ms = start_time.elapsed().as_secs_f64() * 1000.0;
         format!(" ({:.2} ms)", ms)
