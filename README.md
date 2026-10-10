@@ -81,6 +81,24 @@ cargo build --release
 sudo cp target/release/sysprint /usr/local/bin/
 ```
 
+##### Nix / NixOS
+For Nix or NixOS, you can install the program as follows:
+
+1. Quick start
+```bash
+nix run github:MBKCHEL/SysPrint
+```
+
+2. Through flake
+```nix
+inputs = {
+  nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  sysprint = {
+    url = github:MBKCHEL/SysPrint;
+  };
+};
+```
+
 #### Auto-run on Terminal Startup (Optional)
 ```bash
 # For Bash
