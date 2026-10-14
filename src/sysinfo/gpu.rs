@@ -62,6 +62,7 @@ fn clean_gpu_name(raw: &str) -> String {
     let prefixes = [
         "Advanced Micro Devices, Inc. [AMD/ATI]",
         "Advanced Micro Devices, Inc.",
+        "Radeon Vega Mobile Series",
         "NVIDIA Corporation",
         "Intel Corporation",
     ];
@@ -74,6 +75,10 @@ fn clean_gpu_name(raw: &str) -> String {
     }
 
     if let Some(pos) = name.rfind("(rev ") {
+        name = name[..pos].trim().to_string();
+    }
+
+    if let Some(pos) = name.rfind("[Radeon Vega") {
         name = name[..pos].trim().to_string();
     }
 
