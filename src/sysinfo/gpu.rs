@@ -13,6 +13,11 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
     }
 
     #[cfg(target_os = "linux")]
+    if get_linux_sysfs_gpu(opts, buf, fast_mode, c) {
+        return;
+    }
+
+    #[cfg(target_os = "linux")]
     if get_nvidia_fast_info(opts, buf, fast_mode, c) {
         return;
     }
@@ -24,11 +29,6 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
 
     #[cfg(target_os = "macos")]
     if get_macos_gpu_info(opts, buf, c) {
-        return;
-    }
-
-    #[cfg(target_os = "linux")]
-    if get_linux_sysfs_gpu(opts, buf, fast_mode, c) {
         return;
     }
 
