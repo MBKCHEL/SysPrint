@@ -11,6 +11,10 @@ pub struct Arguments {
     #[arg(long)]
     pub logo: Option<String>,
 
+    /// Logo Color
+    #[arg(long)]
+    pub logo_color: Option<String>,
+
     /// Hide System section
     #[arg(long = "hide-system")]
     pub hide_system: bool,

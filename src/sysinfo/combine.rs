@@ -8,7 +8,7 @@ use crate::sysinfo::memory::memory_info;
 use crate::sysinfo::other::other_info;
 use crate::sysinfo::system::system_info;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
-use crate::logos::get_logo;
+use crate::logos;
 
 #[derive(Clone)]
 pub struct DisplayOptions {
@@ -18,8 +18,8 @@ pub struct DisplayOptions {
     pub memory: MemoryConfig,
     pub other: OtherConfig,
     pub disks: DisksConfig,
-
     pub logo: String,
+    pub logo_color: String,
     pub mini_logo_mode: bool,
     pub compact_mode: bool,
     pub fast_mode: bool,
@@ -37,6 +37,7 @@ impl Default for DisplayOptions {
             other: OtherConfig::default(),
             disks: DisksConfig::default(),
             logo: String::from("default"),
+            logo_color: String::from("default"),
             mini_logo_mode: false,
             compact_mode: false,
             fast_mode: false,
@@ -49,6 +50,7 @@ impl Default for DisplayOptions {
 pub struct SystemInfo {
     pub buffer: String,
     pub logo: String,
+    pub logo_color: String,
     pub mini_logo_mode: bool,
 }
 
@@ -57,7 +59,6 @@ impl SystemInfo {
         let start_time = std::time::Instant::now();
         let mut buffer = String::with_capacity(2048);
 
-        let (_, _, c) = get_logo(opts.mini_logo_mode, &opts.logo);
 
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
@@ -65,43 +66,47 @@ impl SystemInfo {
                 .with_memory(MemoryRefreshKind::everything()),
         );
 
+        let (_, _, c) = logos::get_logo(opts.mini_logo_mode, &opts.logo, &opts.logo_color);
+        
         if opts.compact_mode {
-            system_info(&opts, &mut buffer, c);
-            cpu_info(&opts, &mut buffer, &_sys, c);
-            get_gpu_info(&opts, &mut buffer, opts.fast_mode, c);
-            memory_info(&opts, &mut buffer, &_sys, c);
-            other_info(&opts, &mut buffer, c, start_time);
+            system_info(&opts, &mut buffer, &c);
+            cpu_info(&opts, &mut buffer, &_sys, &c);
+            get_gpu_info(&opts, &mut buffer, opts.fast_mode, &c);
+            memory_info(&opts, &mut buffer, &_sys, &c);
+            other_info(&opts, &mut buffer, &c, start_time);
 
             return Self {
                 buffer,
                 logo: opts.logo,
+                logo_color: opts.logo_color,
                 mini_logo_mode: opts.mini_logo_mode,
             };
         }
 
         // --- STANDARD / FULL MODE BRANCH ---
         if opts.system.enabled {
-            system_info(&opts, &mut buffer, c);
+            system_info(&opts, &mut buffer, &c);
         }
         if opts.cpu.enabled {
-            cpu_info(&opts, &mut buffer, &_sys, c);
+            cpu_info(&opts, &mut buffer, &_sys, &c);
         }
         if opts.gpu.enabled {
-            get_gpu_info(&opts, &mut buffer, opts.fast_mode, c);
+            get_gpu_info(&opts, &mut buffer, opts.fast_mode, &c);
         }
         if opts.memory.enabled {
-            memory_info(&opts, &mut buffer, &_sys, c);
+            memory_info(&opts, &mut buffer, &_sys, &c);
         }
         if opts.other.enabled {
-            other_info(&opts, &mut buffer, c, start_time);
+            other_info(&opts, &mut buffer, &c, start_time);
         }
         if opts.disks.enabled {
-            disk_info(&opts, &mut buffer, c);
+            disk_info(&opts, &mut buffer, &c);
         }
 
         Self {
             buffer,
             logo: opts.logo,
+            logo_color: opts.logo_color,
             mini_logo_mode: opts.mini_logo_mode,
         }
     }

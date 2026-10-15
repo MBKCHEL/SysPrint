@@ -1,15 +1,15 @@
 use crate::sysinfo::combine::DisplayOptions;
-use colored::ColoredString;
 use colored::Colorize;
 use std::fmt::Write;
 use sysinfo::System;
+use crate::logos::parse_color;
 
 // --- MEMORY INFO ---
 pub fn memory_info(
     opts: &DisplayOptions,
     buf: &mut String,
     sys: &System,
-    c: fn(&str) -> ColoredString,
+    c: &str
 ) {
     if !opts.memory.enabled {
         return;
@@ -20,13 +20,5 @@ pub fn memory_info(
     }
     let total_ram = sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_ram = sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
-    let _ = writeln!(
-        buf,
-        "{}: {:.2} GB / {:.2} GB",
-        c("RAM"),
-        used_ram,
-        total_ram
-    );
-
-
+    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("RAM", c), used_ram, total_ram);
 }

@@ -1,9 +1,10 @@
-use std::fmt::Write;
-use colored::{ColoredString, Colorize};
-use sysinfo::{Components, System};
 use crate::sysinfo::combine::DisplayOptions;
+use crate::logos::parse_color;
+use colored::Colorize;
+use std::fmt::Write;
+use sysinfo::{Components, System};
 
-pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: fn(&str) -> ColoredString) {
+pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &str) {
     if !opts.cpu.enabled {
         return;
     }
@@ -37,33 +38,33 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: fn(&st
     }
 }
 
-fn cpu_name(buf: &mut String, sys: &System, c: fn(&str) -> ColoredString) {
+fn cpu_name(buf: &mut String, sys: &System, c: &str) {
     let cpus = sys.cpus();
     if let Some(cpu) = cpus.first() {
-        let _ = writeln!(buf, "{}: {}", c("CPU name"), cpu.brand().trim());
+        let _ = writeln!(buf, "{}: {}", parse_color("CPU name", c), cpu.brand().trim());
     } else {
         let _ = writeln!(buf, "CPU: Unknown");
     }
 }
 
-fn ggz_cpu(buf: &mut String, sys: &System, c: fn(&str) -> ColoredString) {
+fn ggz_cpu(buf: &mut String, sys: &System, c: &str) {
     let cpus = sys.cpus();
     if let Some(cpu) = cpus.first() {
         let freq_ghz = cpu.frequency() as f64 / 1000.0;
-        let _ = writeln!(buf, "{}: {:.2} GHz", c("GHz"), freq_ghz);
+        let _ = writeln!(buf, "{}: {:.2} GHz", parse_color("GHz", c), freq_ghz);
     }
 }
 
-fn cpu_usage(buf: &mut String, sys: &System, c: fn(&str) -> ColoredString) {
+fn cpu_usage(buf: &mut String, sys: &System, c: &str) {
     let usage = sys.global_cpu_usage();
     if usage > 99.9 && cfg!(target_os = "windows") {
-        let _ = writeln!(buf, "{}: N/A", c("CPU Usage"));
+        let _ = writeln!(buf, "{}: N/A", parse_color("CPU Usage", c));
     } else {
-        let _ = writeln!(buf, "{}: {:.1}%", c("CPU Usage"), usage);
+        let _ = writeln!(buf, "{}: {:.1}%", parse_color("CPU Usage", c), usage);
     }
 }
 
-fn cpu_temperature(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn cpu_temperature(buf: &mut String, c: &str) {
     let components = Components::new_with_refreshed_list();
     let cpu_temp = components.iter().find_map(|comp| {
         let label = comp.label().to_lowercase();
@@ -80,26 +81,26 @@ fn cpu_temperature(buf: &mut String, c: fn(&str) -> ColoredString) {
     });
 
     if let Some(temp) = cpu_temp {
-        let _ = writeln!(buf, "{}: {:.1}°C", c("CPU Temp"), temp);
+        let _ = writeln!(buf, "{}: {:.1}°C", parse_color("CPU Temp", c), temp);
     }
 }
 
 fn cpu_cores_and_threads(
     buf: &mut String,
     sys: &System,
-    c: fn(&str) -> ColoredString,
+    c: &str,
     show_cores: bool,
     show_threads: bool,
 ) {
     if show_cores {
-        let _ = writeln!(buf, "{}: {}", c("Cores"), System::physical_core_count().unwrap_or(0));
+        let _ = writeln!(buf, "{}: {}", parse_color("Cores", c), System::physical_core_count().unwrap_or(0));
     }
     if show_threads {
         let cpus = sys.cpus();
-        let _ = writeln!(buf, "{}: {}", c("Threads"), cpus.len());
+        let _ = writeln!(buf, "{}: {}", parse_color("Threads", c), cpus.len());
     }
 }
 
-fn cpu_arch(buf: &mut String, c: fn(&str) -> ColoredString) {
-    let _ = writeln!(buf, "{}: {}", c("Architecture"), std::env::consts::ARCH);
+fn cpu_arch(buf: &mut String, c: &str) {
+    let _ = writeln!(buf, "{}: {}", parse_color("Architecture", c), std::env::consts::ARCH);
 }

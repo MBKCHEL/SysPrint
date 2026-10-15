@@ -1,9 +1,10 @@
 use crate::sysinfo::combine::DisplayOptions;
-use colored::{ColoredString, Colorize};
+use crate::logos::parse_color;
+use colored::Colorize;
 use std::fmt::Write;
 use std::process::Command;
 
-pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c: fn(&str) -> ColoredString) {
+pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c: &str) {
     if !opts.gpu.enabled {
         return;
     }
@@ -53,7 +54,7 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
     }
 
     let name = clean_gpu_name(&get_generic_gpu_name());
-    let _ = writeln!(buf, "{}: {}", c("GPU"), name);
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), name);
 }
 
 fn clean_gpu_name(raw: &str) -> String {
@@ -98,7 +99,7 @@ pub fn get_nvidia_fast_info(
     opts: &DisplayOptions,
     buf: &mut String,
     fast_mode: bool,
-    c: fn(&str) -> ColoredString,
+    c: &str,
 ) -> bool {
     use std::fs;
     use std::path::Path;
@@ -116,7 +117,7 @@ pub fn get_nvidia_fast_info(
                 if line.starts_with("Model:") {
                     if let Some(pos) = line.find(':') {
                         let raw_name = line[pos + 1..].trim();
-                        let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(raw_name));
+                        let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(raw_name));
                         found_gpu = true;
                         break;
                     }
@@ -146,10 +147,10 @@ pub fn get_nvidia_fast_info(
                     let total_mb: f64 = parts[1].parse().unwrap_or(0.0);
                     let temp = parts[2];
                     if opts.gpu.vram {
-                        let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), used_mb / 1024.0, total_mb / 1024.0);
+                        let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("VRAM", c), used_mb / 1024.0, total_mb / 1024.0);
                     }
                     if opts.gpu.temp {
-                        let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
+                        let _ = writeln!(buf, "{}: {}°C", parse_color("GPU Temp", c), temp);
                     }
                 }
             }
@@ -164,7 +165,7 @@ fn get_nvidia_info(
     opts: &DisplayOptions,
     buf: &mut String,
     fast_mode: bool,
-    c: fn(&str) -> ColoredString,
+    c: &str,
 ) -> bool {
     let query_args = if fast_mode || opts.compact_mode {
         vec!["--query-gpu=gpu_name", "--format=csv,noheader,nounits"]
@@ -195,7 +196,7 @@ fn get_nvidia_info(
     }
 
     let name = parts[0];
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(name));
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(name));
 
     if fast_mode || opts.compact_mode {
         return true;
@@ -210,13 +211,13 @@ fn get_nvidia_info(
             let _ = writeln!(
                 buf,
                 "{}: {:.2} GB / {:.2} GB",
-                c("VRAM"),
+                parse_color("VRAM", c),
                 mem_used,
                 mem_total
             );
         }
         if opts.gpu.temp {
-            let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), temp);
+            let _ = writeln!(buf, "{}: {}°C", parse_color("GPU Temp", c), temp);
         }
     }
 
@@ -224,7 +225,7 @@ fn get_nvidia_info(
 }
 
 #[cfg(target_os = "macos")]
-fn get_macos_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
+fn get_macos_gpu_info(opts: &DisplayOptions, buf: &mut String, c: &str) -> bool {
     let output = match Command::new("system_profiler")
         .arg("SPDisplaysDataType")
         .output()
@@ -254,9 +255,9 @@ fn get_macos_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> Co
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&gpu_name));
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(&gpu_name));
     if !opts.compact_mode && opts.gpu.vram {
-        let _ = writeln!(buf, "{}: {}", c("VRAM"), vram);
+        let _ = writeln!(buf, "{}: {}", parse_color("VRAM", c), vram);
     }
 
     true
@@ -267,7 +268,7 @@ fn get_linux_sysfs_gpu(
     opts: &DisplayOptions,
     buf: &mut String,
     fast_mode: bool,
-    c: fn(&str) -> ColoredString,
+    c: &str,
 ) -> bool {
     use pci_ids::FromId;
     use std::fs;
@@ -298,13 +299,9 @@ fn get_linux_sysfs_gpu(
         let vendor_id =
             u16::from_str_radix(vendor_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
 
-        // --- ВОТ ЭТОТ БЛОК РЕШАЕТ ПРОБЛЕМУ ---
-        // Если это карточка NVIDIA, пропускаем её в sysfs,
-        // чтобы отдать наоткуп функциям get_nvidia_fast_info / get_nvidia_info
         if vendor_id == 0x10de {
             continue;
         }
-        // -------------------------------------
 
         let device_hex = fs::read_to_string(device_path.join("device")).unwrap_or_default();
         let device_id =
@@ -321,7 +318,7 @@ fn get_linux_sysfs_gpu(
 
         gpu_name = clean_gpu_name(&gpu_name);
 
-        let _ = writeln!(buf, "{}: {}", c("GPU"), gpu_name);
+        let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), gpu_name);
 
         if fast_mode || opts.compact_mode {
             return true;
@@ -345,7 +342,7 @@ fn get_linux_sysfs_gpu(
             if total_bytes > 0.0 {
                 let used_gb = used_bytes / 1024.0 / 1024.0 / 1024.0;
                 let total_gb = total_bytes / 1024.0 / 1024.0 / 1024.0;
-                let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", c("VRAM"), used_gb, total_gb);
+                let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("VRAM", c), used_gb, total_gb);
             }
         }
 
@@ -357,7 +354,7 @@ fn get_linux_sysfs_gpu(
                     if temp_path.exists() {
                         if let Ok(temp_raw) = fs::read_to_string(temp_path) {
                             if let Ok(temp_mc) = temp_raw.trim().parse::<f64>() {
-                                let _ = writeln!(buf, "{}: {:.0}°C", c("GPU Temp"), temp_mc / 1000.0);
+                                let _ = writeln!(buf, "{}: {:.0}°C", parse_color("GPU Temp", c), temp_mc / 1000.0);
                                 break;
                             }
                         }
@@ -377,7 +374,7 @@ fn get_windows_gpu_info(
     opts: &DisplayOptions,
     buf: &mut String,
     fast_mode: bool,
-    c: fn(&str) -> ColoredString,
+    c: &str,
 ) -> bool {
     use winreg::enums::*;
     use winreg::RegKey;
@@ -399,7 +396,7 @@ fn get_windows_gpu_info(
         if let Ok(gpu_sub_key) = video_key.open_subkey(&subkey_name) {
             if let Ok(driver_desc) = gpu_sub_key.get_value::<String, _>("DriverDesc") {
                 let clean_name = clean_gpu_name(&driver_desc);
-                let _ = writeln!(buf, "{}: {}", c("GPU"), clean_name);
+                let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_name);
                 found = true;
 
                 if fast_mode || opts.compact_mode {
@@ -410,12 +407,12 @@ fn get_windows_gpu_info(
                     if let Ok(mem_bytes) = gpu_sub_key.get_value::<u64, _>("HardwareInformation.MemorySize") {
                         let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
                         if gb > 0.0 {
-                            let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
+                            let _ = writeln!(buf, "{}: {:.2} GB", parse_color("VRAM", c), gb);
                         }
                     } else if let Ok(mem_bytes) = gpu_sub_key.get_value::<u32, _>("HardwareInformation.MemorySize") {
                         let gb = mem_bytes as f64 / 1024.0 / 1024.0 / 1024.0;
                         if gb > 0.0 {
-                            let _ = writeln!(buf, "{}: {:.2} GB", c("VRAM"), gb);
+                            let _ = writeln!(buf, "{}: {:.2} GB", parse_color("VRAM", c), gb);
                         }
                     }
                 }
@@ -429,7 +426,7 @@ fn get_windows_gpu_info(
 }
 
 #[cfg(target_os = "freebsd")]
-fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
+fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: &str) -> bool {
     let output = match Command::new("sh")
         .arg("-c")
         .arg("pciconf -lv | grep -B 4 -i 'class=0x03'")
@@ -455,7 +452,7 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(&name));
 
     if opts.compact_mode {
         return true;
@@ -471,7 +468,7 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
                 .trim()
                 .to_string();
             if !temp_str.is_empty() {
-                let _ = writeln!(buf, "{}: {}", c("GPU Temp"), temp_str);
+                let _ = writeln!(buf, "{}: {}", parse_color("GPU Temp", c), temp_str);
             }
         }
     }
@@ -480,7 +477,7 @@ fn get_freebsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> 
 }
 
 #[cfg(target_os = "openbsd")]
-fn get_openbsd_gpu_info(_opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
+fn get_openbsd_gpu_info(_opts: &DisplayOptions, buf: &mut String, c: &str) -> bool {
     let output = match Command::new("sh")
         .arg("-c")
         .arg("pcidump -v | grep -i 'vga'")
@@ -506,12 +503,12 @@ fn get_openbsd_gpu_info(_opts: &DisplayOptions, buf: &mut String, c: fn(&str) ->
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(&name));
     true
 }
 
 #[cfg(target_os = "netbsd")]
-fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> ColoredString) -> bool {
+fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: &str) -> bool {
     let output = match Command::new("sh")
         .arg("-c")
         .arg("pcictl pci0 list | grep -i 'display'")
@@ -537,7 +534,7 @@ fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> C
         return false;
     }
 
-    let _ = writeln!(buf, "{}: {}", c("GPU"), clean_gpu_name(&name));
+    let _ = writeln!(buf, "{}: {}", parse_color("GPU", c), clean_gpu_name(&name));
 
     if opts.compact_mode {
         return true;
@@ -552,7 +549,7 @@ fn get_netbsd_gpu_info(opts: &DisplayOptions, buf: &mut String, c: fn(&str) -> C
             if let Some(temp_line) = env_text.lines().find(|l| l.contains("degC")) {
                 let parts: Vec<&str> = temp_line.split_whitespace().collect();
                 if parts.len() >= 2 {
-                    let _ = writeln!(buf, "{}: {}°C", c("GPU Temp"), parts[1]);
+                    let _ = writeln!(buf, "{}: {}°C", parse_color("GPU Temp", c), parts[1]);
                 }
             }
         }
@@ -625,7 +622,8 @@ fn get_generic_gpu_name() -> String {
         let path = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfba-08002be10318}";
 
         if let Ok(video_key) = hklm.open_subkey(path) {
-            for subkey_name in video_key.enum_keys().flatten() {
+            let subkey_names: Vec<String> = video_key.enum_keys().flatten().collect();
+            for subkey_name in subkey_names {
                 if subkey_name.len() == 4 && subkey_name.chars().all(|ch| ch.is_ascii_digit()) {
                     if let Ok(gpu_sub_key) = video_key.open_subkey(&subkey_name) {
                         if let Ok(driver_desc) = gpu_sub_key.get_value::<String, _>("DriverDesc") {

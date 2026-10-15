@@ -1,11 +1,11 @@
 use colored::Colorize;
 use sysinfo::{Disks};
-use colored::{ColoredString};
 use std::fmt::Write;
+use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
 
 // --- DISKS INFO ---
-pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> ColoredString) {
+pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
     if !opts.disks.enabled {
         return;
     }
@@ -21,12 +21,6 @@ pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c :fn(&str) -> Colored
         let used_gb = total_gb - available_gb;
 
         let mount_point = disk.mount_point().to_string_lossy();
-        let _ = writeln!(buf,
-            "{}: {:.2} GB / {:.2} GB ({})",
-                         c(&mount_point),
-                         used_gb,
-                         total_gb,
-                         disk.file_system()
-                             .to_string_lossy());
+        let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB ({})", parse_color(&mount_point, c), used_gb, total_gb, disk.file_system().to_string_lossy());
     }
 }

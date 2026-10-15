@@ -9,6 +9,7 @@ const FILE_NAME: &str = "config.toml";
 #[serde(rename_all = "kebab-case", default)]
 pub struct Config {
     pub logo: String,
+    pub logo_color: String,
     pub config_stronger: bool,
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
@@ -168,6 +169,7 @@ impl Default for Config {
     fn default() -> Self {
         Self {
             logo: String::from("default"),
+            logo_color: String::from("default"),
             config_stronger: false,
             mini_logo_mode: false,
             fast_mode: false,

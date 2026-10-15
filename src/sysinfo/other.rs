@@ -1,6 +1,6 @@
 use crate::sysinfo::combine::DisplayOptions;
+use crate::logos::parse_color;
 use chrono::Local;
-use colored::ColoredString;
 use colored::Colorize;
 use std::env;
 use std::fmt::Write;
@@ -10,7 +10,7 @@ use std::time::Instant;
 pub fn other_info(
     opts: &DisplayOptions,
     buf: &mut String,
-    c: fn(&str) -> ColoredString,
+    c: &str,
     start_time: Instant,
 ) {
     if !opts.other.enabled {
@@ -47,7 +47,7 @@ pub fn other_info(
     }
 }
 
-fn de_check(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn de_check(buf: &mut String, c: &str) {
     let desktop = if cfg!(windows) {
         "Explorer".to_string()
     } else {
@@ -56,10 +56,10 @@ fn de_check(buf: &mut String, c: fn(&str) -> ColoredString) {
             .unwrap_or_else(|_| "Unknown".to_string())
     };
 
-    let _ = writeln!(buf, "{}: {}", c("DE"), desktop);
+    let _ = writeln!(buf, "{}: {}", parse_color("DE", c), desktop);
 }
 
-fn wm_check(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn wm_check(buf: &mut String, c: &str) {
     let wm = if cfg!(target_os = "windows") {
         if env::var("GLAZEWM_VERSION").is_ok() {
             "GlazeWM".to_string()
@@ -130,10 +130,10 @@ fn wm_check(buf: &mut String, c: fn(&str) -> ColoredString) {
         wm
     };
 
-    let _ = writeln!(buf, "{}: {}", c("WM"), wm_display);
+    let _ = writeln!(buf, "{}: {}", parse_color("WM", c), wm_display);
 }
 
-fn get_shell(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn get_shell(buf: &mut String, c: &str) {
     let shell_name = if let Ok(shell_path) = env::var("SHELL") {
         shell_path
             .split('/')
@@ -146,10 +146,10 @@ fn get_shell(buf: &mut String, c: fn(&str) -> ColoredString) {
             .unwrap_or_else(|_| "Unknown".to_string())
     };
 
-    let _ = writeln!(buf, "{}: {}", c("Shell"), shell_name);
+    let _ = writeln!(buf, "{}: {}", parse_color("Shell", c), shell_name);
 }
 
-fn terminal_info(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn terminal_info(buf: &mut String, c: &str) {
     let term = if cfg!(windows) {
         "cmd".to_string()
     } else {
@@ -159,10 +159,10 @@ fn terminal_info(buf: &mut String, c: fn(&str) -> ColoredString) {
             .unwrap_or_else(|| env::var("TERM").unwrap_or_else(|_| "Unknown".to_string()))
     };
 
-    let _ = writeln!(buf, "{}: {}", c("Terminal"), term);
+    let _ = writeln!(buf, "{}: {}", parse_color("Terminal", c), term);
 }
 
-fn battery_info(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn battery_info(buf: &mut String, c: &str) {
     let mut battery_str = String::new();
 
     #[cfg(target_os = "linux")]
@@ -222,18 +222,18 @@ fn battery_info(buf: &mut String, c: fn(&str) -> ColoredString) {
     }
 
     if !battery_str.is_empty() {
-        let _ = writeln!(buf, "{}: {}", c("Battery"), battery_str);
+        let _ = writeln!(buf, "{}: {}", parse_color("Battery", c), battery_str);
     }
 }
 
-fn system_time(buf: &mut String, c: fn(&str) -> ColoredString) {
+fn system_time(buf: &mut String, c: &str) {
     let now = Local::now();
-    let _ = writeln!(buf, "{}: {}", c("Locale Time"), now.format("%H:%M"));
+    let _ = writeln!(buf, "{}: {}", parse_color("Locale Time", c), now.format("%H:%M"));
 }
 
 fn sysprint_info(
     buf: &mut String,
-    c: fn(&str) -> ColoredString,
+    c: &str,
     start_time: Instant,
     opts: &DisplayOptions,
 ) {
@@ -247,7 +247,7 @@ fn sysprint_info(
     let _ = writeln!(
         buf,
         "{}: SysPrint v{}{}",
-        c("Fetch "),
+        parse_color("Fetch ", c),
         env!("CARGO_PKG_VERSION"),
         time_str
     );
