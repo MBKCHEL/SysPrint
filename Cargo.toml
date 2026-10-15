@@ -1,7 +1,8 @@
 [package]
 name = "sysprint"
-version = "4.3.6"
+version = "4.3.7"
 edition = "2024"
+license = "GPL-3"
 
 [dependencies]
 sysinfo = "0.39.6"
@@ -13,8 +14,6 @@ serde = { version = "1.0.229", features = ["derive"] }
 toml = "1.1.4"
 dirs = "6.0.0"
 chrono = "0.4.45"
-serde_json = "1.0.151"
-nvml-wrapper = "0.13.0"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "0.56.0"

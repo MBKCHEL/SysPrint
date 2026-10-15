@@ -8,6 +8,7 @@ use crate::sysinfo::memory::memory_info;
 use crate::sysinfo::other::other_info;
 use crate::sysinfo::system::system_info;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
+use crate::logos::get_logo;
 
 #[derive(Clone)]
 pub struct DisplayOptions {
@@ -18,6 +19,7 @@ pub struct DisplayOptions {
     pub other: OtherConfig,
     pub disks: DisksConfig,
 
+    pub logo: String,
     pub mini_logo_mode: bool,
     pub compact_mode: bool,
     pub fast_mode: bool,
@@ -34,6 +36,7 @@ impl Default for DisplayOptions {
             memory: MemoryConfig::default(),
             other: OtherConfig::default(),
             disks: DisksConfig::default(),
+            logo: String::from("default"),
             mini_logo_mode: false,
             compact_mode: false,
             fast_mode: false,
@@ -45,6 +48,7 @@ impl Default for DisplayOptions {
 
 pub struct SystemInfo {
     pub buffer: String,
+    pub logo: String,
     pub mini_logo_mode: bool,
 }
 
@@ -52,7 +56,8 @@ impl SystemInfo {
     pub fn collect(opts: DisplayOptions) -> Self {
         let start_time = std::time::Instant::now();
         let mut buffer = String::with_capacity(2048);
-        let (_, _, c) = crate::logos::get_logo(opts.mini_logo_mode);
+
+        let (_, _, c) = get_logo(opts.mini_logo_mode, &opts.logo);
 
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
@@ -69,6 +74,7 @@ impl SystemInfo {
 
             return Self {
                 buffer,
+                logo: opts.logo,
                 mini_logo_mode: opts.mini_logo_mode,
             };
         }
@@ -95,6 +101,7 @@ impl SystemInfo {
 
         Self {
             buffer,
+            logo: opts.logo,
             mini_logo_mode: opts.mini_logo_mode,
         }
     }

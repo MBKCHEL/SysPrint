@@ -13,7 +13,8 @@ macro_rules! include_logo {
     };
 }
 
-pub fn get_logo(mini_logo: bool) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredString) {
+pub fn get_logo(mini_logo: bool, logo: &str) -> (Vec<ColoredString>, usize, fn(&str) -> ColoredString) {
+
     let mut os_name = System::name().unwrap_or_default().to_lowercase();
 
     // Android / Termux
@@ -24,6 +25,10 @@ pub fn get_logo(mini_logo: bool) -> (Vec<ColoredString>, usize, fn(&str) -> Colo
 
     if is_android {
         os_name = "android".to_string();
+    }
+
+    if logo != "default"{
+        os_name = logo.to_string().to_lowercase();
     }
 
     let (raw_logo, color_func): (&'static str, fn(&str) -> ColoredString) =

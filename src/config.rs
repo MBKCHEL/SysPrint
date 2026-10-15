@@ -1,15 +1,14 @@
 //! Configuration file handling (`config.toml`).
 use std::fs;
 use std::path::PathBuf;
-
 use serde::{Deserialize, Serialize};
-
 const CONFIG_DIR_NAME: &str = "sysprint";
 const FILE_NAME: &str = "config.toml";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default)]
 pub struct Config {
+    pub logo: String,
     pub config_stronger: bool,
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
@@ -168,6 +167,7 @@ impl Default for DisksConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            logo: String::from("default"),
             config_stronger: false,
             mini_logo_mode: false,
             fast_mode: false,

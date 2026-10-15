@@ -7,6 +7,10 @@ pub struct Arguments {
     #[arg(long)]
     pub generate_config: bool,
 
+    /// Print logos
+    #[arg(long)]
+    pub logo: Option<String>,
+
     /// Hide System section
     #[arg(long = "hide-system")]
     pub hide_system: bool,
