@@ -1,4 +1,6 @@
 //! Argument parsing.
+use std::path::PathBuf;
+
 use clap::Parser;
 
 #[derive(Parser)]
@@ -14,6 +16,10 @@ pub struct Arguments {
     /// Logo Color
     #[arg(long)]
     pub logo_color: Option<String>,
+
+    /// Path to custom logo
+    #[arg(long)]
+    pub custom_logo_path: Option<String>,
 
     /// Hide System section
     #[arg(long = "hide-system")]

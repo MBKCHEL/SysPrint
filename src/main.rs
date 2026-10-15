@@ -4,6 +4,9 @@ mod parser;
 mod print;
 mod sysinfo;
 
+use std::path::Path;
+use std::path::PathBuf;
+
 use crate::config::Config;
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;
@@ -36,6 +39,8 @@ fn main() {
 
     let logo_cfg = decide_string(args.logo, cfg.logo, config_stronger);
     let logo_color_cfg = decide_string(args.logo_color, cfg.logo_color, config_stronger);
+    let custom_logo_path_cfg =
+        decide_string(args.custom_logo_path, cfg.custom_logo_path, config_stronger);
 
     let mut system_cfg = cfg.system;
     system_cfg.enabled = decide(args.hide_system, system_cfg.enabled, config_stronger);
@@ -64,6 +69,7 @@ fn main() {
         disks: disks_cfg,
         logo: logo_cfg,
         logo_color: logo_color_cfg,
+        custom_logo_path: custom_logo_path_cfg,
         mini_logo_mode: decide_bool(args.mini, cfg.mini_logo_mode, config_stronger),
         fast_mode: decide_bool(args.fast_mode, cfg.fast_mode, config_stronger),
         compact_mode: decide_bool(args.compact_mode, cfg.compact_mode, config_stronger),

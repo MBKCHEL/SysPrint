@@ -1,6 +1,5 @@
-use crate::config::{
-    CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OtherConfig, SystemConfig,
-};
+use crate::config::{CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OtherConfig, SystemConfig};
+use crate::logos;
 use crate::sysinfo::cpu::cpu_info;
 use crate::sysinfo::disks::disk_info;
 use crate::sysinfo::gpu::get_gpu_info;
@@ -8,7 +7,6 @@ use crate::sysinfo::memory::memory_info;
 use crate::sysinfo::other::other_info;
 use crate::sysinfo::system::system_info;
 use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
-use crate::logos;
 
 #[derive(Clone)]
 pub struct DisplayOptions {
@@ -20,6 +18,7 @@ pub struct DisplayOptions {
     pub disks: DisksConfig,
     pub logo: String,
     pub logo_color: String,
+    pub custom_logo_path: String,
     pub mini_logo_mode: bool,
     pub compact_mode: bool,
     pub fast_mode: bool,
@@ -38,6 +37,7 @@ impl Default for DisplayOptions {
             disks: DisksConfig::default(),
             logo: String::from("default"),
             logo_color: String::from("default"),
+            custom_logo_path: String::from("default"),
             mini_logo_mode: false,
             compact_mode: false,
             fast_mode: false,
@@ -51,6 +51,7 @@ pub struct SystemInfo {
     pub buffer: String,
     pub logo: String,
     pub logo_color: String,
+    pub custom_logo_path: String,
     pub mini_logo_mode: bool,
 }
 
@@ -59,15 +60,14 @@ impl SystemInfo {
         let start_time = std::time::Instant::now();
         let mut buffer = String::with_capacity(2048);
 
-
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
                 .with_cpu(CpuRefreshKind::everything())
                 .with_memory(MemoryRefreshKind::everything()),
         );
 
-        let (_, _, c) = logos::get_logo(opts.mini_logo_mode, &opts.logo, &opts.logo_color);
-        
+        let (_, _, c) = logos::get_logo(opts.mini_logo_mode, &opts.logo, &opts.logo_color, &opts.custom_logo_path);
+
         if opts.compact_mode {
             system_info(&opts, &mut buffer, &c);
             cpu_info(&opts, &mut buffer, &_sys, &c);
@@ -79,6 +79,7 @@ impl SystemInfo {
                 buffer,
                 logo: opts.logo,
                 logo_color: opts.logo_color,
+                custom_logo_path: opts.custom_logo_path,
                 mini_logo_mode: opts.mini_logo_mode,
             };
         }
@@ -107,6 +108,7 @@ impl SystemInfo {
             buffer,
             logo: opts.logo,
             logo_color: opts.logo_color,
+            custom_logo_path: opts.custom_logo_path,
             mini_logo_mode: opts.mini_logo_mode,
         }
     }

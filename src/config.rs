@@ -1,7 +1,7 @@
 //! Configuration file handling (`config.toml`).
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
 const CONFIG_DIR_NAME: &str = "sysprint";
 const FILE_NAME: &str = "config.toml";
 
@@ -10,6 +10,7 @@ const FILE_NAME: &str = "config.toml";
 pub struct Config {
     pub logo: String,
     pub logo_color: String,
+    pub custom_logo_path: String,
     pub config_stronger: bool,
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
@@ -170,6 +171,7 @@ impl Default for Config {
         Self {
             logo: String::from("default"),
             logo_color: String::from("default"),
+            custom_logo_path: String::from("none"),
             config_stronger: false,
             mini_logo_mode: false,
             fast_mode: false,
