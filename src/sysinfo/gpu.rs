@@ -294,16 +294,23 @@ fn get_linux_sysfs_gpu(
             continue;
         }
 
-        let mut gpu_name = String::new();
-
         let vendor_hex = fs::read_to_string(device_path.join("vendor")).unwrap_or_default();
-        let device_hex = fs::read_to_string(device_path.join("device")).unwrap_or_default();
-
         let vendor_id =
             u16::from_str_radix(vendor_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
+
+        // --- ВОТ ЭТОТ БЛОК РЕШАЕТ ПРОБЛЕМУ ---
+        // Если это карточка NVIDIA, пропускаем её в sysfs,
+        // чтобы отдать наоткуп функциям get_nvidia_fast_info / get_nvidia_info
+        if vendor_id == 0x10de {
+            continue;
+        }
+        // -------------------------------------
+
+        let device_hex = fs::read_to_string(device_path.join("device")).unwrap_or_default();
         let device_id =
             u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
 
+        let mut gpu_name = String::new();
         if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id) {
             if let Some(device) = vendor.devices().find(|d| d.id() == device_id) {
                 gpu_name = device.name().to_string();
