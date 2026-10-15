@@ -71,9 +71,16 @@ pub fn get_logo(
         }
     }
 
-    if let Ok(content) = std::fs::read_to_string(std::path::Path::new(&final_path)) {
-        file_content = content;
-        is_custom = true;
+    if !custom_logo_path.is_empty() && custom_logo_path != "none" {
+        match std::fs::read_to_string(std::path::Path::new(&final_path)) {
+            Ok(content) => {
+                file_content = content;
+                is_custom = true;
+            }
+            Err(e) => {
+                eprintln!("Error read custom logo '{}': {}", final_path, e);
+            }
+        }
     }
 
 
