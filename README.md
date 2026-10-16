@@ -16,7 +16,7 @@ Check out [LOGOS.md](./LOGOS.md) to see all supported OS logos, mini-modes, and 
 * **Linux / BSD:** `~/.config/sysprint/config.toml`
 * **Windows:** `%APPDATA%\sysprint\config.toml` *(usually `C:\Users\Имя\AppData\Roaming\sysprint\config.toml`)*
 
-### Example `.sysprint.toml`
+### Example `~/.config/sysprint/config.toml`
 
 ```toml
 # SysPrint configuration
