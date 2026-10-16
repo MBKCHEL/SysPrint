@@ -3,12 +3,6 @@
 A fast, lightweight, and customizable system information fetch tool written in Rust. Inspired by `neofetch` and `fastfetch`.
 
 ---
-## Contributors
-
-* [@dev-er1](https://github.com/dev-er1) - my first contributors, respect 
-* [@MBKCHEL](https://github.com/MBKCHEL) - it`s me (owner)
-* [@BALBES](https://github.com/BALB3S) - QA, and my best friend)))
----
 ## 🎨 Logo Gallery & Customization
 
 Check out [LOGOS.md](./LOGOS.md) to see all supported OS logos, mini-modes, and custom ASCII examples.
