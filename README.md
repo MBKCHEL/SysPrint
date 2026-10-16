@@ -32,13 +32,63 @@ NixOS  <img width="1201" height="766" alt="изображение" src="https://
 
 ```toml
 # SysPrint configuration
-show-system-info = true
-show-cpu-info = true
-show-memory-info = true
-show-disks-info = true
-show-other-info = true
-show-gpu-info = true
-mini-mode = false
+# When a CLI flag contradicts the config, `config-stronger = true` makes the config win.
+# Fast-mode disable GPU Vram and Temp info.
+
+logo = "default"
+logo-color = "purple"
+custom-logo-path = "~/FemboyLogo.txt"
+config-stronger = false
+mini-logo-mode = false
+fast-mode = false
+compact-mode = false
+hide-fetch-info = false
+show-sysprint-start-time = true
+
+[system]
+enabled = true
+os-name = true
+kernel = true
+os-version = true
+init = true
+host = true
+user = true
+uptime = true
+
+[cpu]
+enabled = true
+name = true
+ghz = true
+usage = true
+temp = true
+cores = true
+threads = true
+architecture = true
+
+[gpu]
+enabled = true
+name = true
+vram = true
+temp = true
+
+[memory]
+enabled = true
+ram = true
+
+[other]
+enabled = true
+de = true
+wm = true
+terminal = true
+shell = true
+battery = true
+locale-time = true
+
+[disks]
+enabled = true
+list = true
+
+
 ```
 ## When a CLI flag contradicts the config, `config-stronger = true` makes the config win
 config-stronger = false
