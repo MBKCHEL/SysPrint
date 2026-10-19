@@ -111,6 +111,7 @@ impl Default for GpuConfig {
 pub struct MemoryConfig {
     pub enabled: bool,
     pub ram: bool,
+    pub swap: bool,
 }
 
 impl Default for MemoryConfig {
@@ -118,6 +119,7 @@ impl Default for MemoryConfig {
         Self {
             enabled: true,
             ram: true,
+            swap: true,
         }
     }
 }

@@ -4,9 +4,6 @@ mod parser;
 mod print;
 mod sysinfo;
 
-use std::path::Path;
-use std::path::PathBuf;
-
 use crate::config::Config;
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;

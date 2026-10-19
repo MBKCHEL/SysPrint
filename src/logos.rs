@@ -65,14 +65,14 @@ pub fn get_logo(
     }
 
     if final_path.starts_with('~') {
-        if let Some(home_dir) = std::env::var_os("HOME") {
+        if let Some(home_dir) = env::var_os("HOME") {
             let home_str = home_dir.to_string_lossy();
             final_path = final_path.replacen('~', &home_str, 1);
         }
     }
 
     if !custom_logo_path.is_empty() && custom_logo_path != "none" {
-        match std::fs::read_to_string(std::path::Path::new(&final_path)) {
+        match std::fs::read_to_string(Path::new(&final_path)) {
             Ok(content) => {
                 file_content = content;
                 is_custom = true;

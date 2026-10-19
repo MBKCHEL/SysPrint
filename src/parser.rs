@@ -1,6 +1,4 @@
 //! Argument parsing.
-use std::path::PathBuf;
-
 use clap::Parser;
 
 #[derive(Parser)]
