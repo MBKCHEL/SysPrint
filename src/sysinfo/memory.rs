@@ -33,5 +33,9 @@ pub fn swap_info(sys: &System, buf: &mut String, c: &str) {
     let total_swap = sys.total_swap() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_swap = sys.used_swap() as f64 / 1024.0 / 1024.0 / 1024.0;
 
+    if total_swap <= 0.001 {
+        return;
+    }
+
     let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("Swap", c), used_swap, total_swap);
 }
