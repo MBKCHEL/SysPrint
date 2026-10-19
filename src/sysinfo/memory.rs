@@ -4,7 +4,6 @@ use std::fmt::Write;
 use sysinfo::System;
 use crate::logos::parse_color;
 
-// --- MEMORY INFO ---
 pub fn memory_info(
     opts: &DisplayOptions,
     buf: &mut String,
@@ -19,17 +18,28 @@ pub fn memory_info(
         let _ = writeln!(buf, "{}", "--- Memory INFO ---".bold().cyan());
     }
 
-    if opts.memory.swap {
-        swap_info(sys, buf, c)
-    }
+    ram_info(opts, sys, buf, c);
 
+    if opts.memory.swap {
+        swap_info(opts, sys, buf, c);
+    }
+}
+
+pub fn ram_info(opts: &DisplayOptions, sys: &System, buf: &mut String, c: &str) {
     let total_ram = sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_ram = sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
 
-    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("RAM", c), used_ram, total_ram);
+    let (label, val_str) = match (opts.memory.ram_used, opts.memory.ram_total) {
+        (true, true)   => ("RAM", format!("{:.2} GB / {:.2} GB", used_ram, total_ram)),
+        (true, false)  => ("Used RAM", format!("{:.2} GB", used_ram)),
+        (false, true)  => ("Total RAM", format!("{:.2} GB", total_ram)),
+        (false, false) => return,
+    };
+
+    let _ = writeln!(buf, "{}: {}", parse_color(label, c), val_str);
 }
 
-pub fn swap_info(sys: &System, buf: &mut String, c: &str) {
+pub fn swap_info(opts: &DisplayOptions, sys: &System, buf: &mut String, c: &str) {
     let total_swap = sys.total_swap() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_swap = sys.used_swap() as f64 / 1024.0 / 1024.0 / 1024.0;
 
@@ -37,5 +47,12 @@ pub fn swap_info(sys: &System, buf: &mut String, c: &str) {
         return;
     }
 
-    let _ = writeln!(buf, "{}: {:.2} GB / {:.2} GB", parse_color("Swap", c), used_swap, total_swap);
+    let (label, val_str) = match (opts.memory.swap_used, opts.memory.swap_total) {
+        (true, true)   => ("Swap", format!("{:.2} GB / {:.2} GB", used_swap, total_swap)),
+        (true, false)  => ("Used Swap", format!("{:.2} GB", used_swap)),
+        (false, true)  => ("Total Swap", format!("{:.2} GB", total_swap)),
+        (false, false) => return,
+    };
+
+    let _ = writeln!(buf, "{}: {}", parse_color(label, c), val_str);
 }
