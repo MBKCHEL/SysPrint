@@ -1,5 +1,5 @@
-use crate::sysinfo::combine::DisplayOptions;
 use crate::logos::parse_color;
+use crate::sysinfo::combine::DisplayOptions;
 use chrono::Local;
 use colored::Colorize;
 use std::env;
@@ -7,12 +7,7 @@ use std::fmt::Write;
 use std::fs;
 use std::time::Instant;
 
-pub fn other_info(
-    opts: &DisplayOptions,
-    buf: &mut String,
-    c: &str,
-    start_time: Instant,
-) {
+pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: &str, start_time: Instant) {
     if !opts.other.enabled {
         return;
     }
@@ -81,6 +76,8 @@ fn wm_check(buf: &mut String, c: &str) {
             "Niri".to_string()
         } else if env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
             "Hyprland".to_string()
+        } else if env::var("UMBRIEL_SOCKET").is_ok() {
+            "Umbriel".to_string()
         } else if env::var("SWAYSOCK").is_ok() {
             "Sway".to_string()
         } else if env::var("I3SOCK").is_ok() {
@@ -228,15 +225,15 @@ fn battery_info(buf: &mut String, c: &str) {
 
 fn system_time(buf: &mut String, c: &str) {
     let now = Local::now();
-    let _ = writeln!(buf, "{}: {}", parse_color("Locale Time", c), now.format("%H:%M"));
+    let _ = writeln!(
+        buf,
+        "{}: {}",
+        parse_color("Locale Time", c),
+        now.format("%H:%M")
+    );
 }
 
-fn sysprint_info(
-    buf: &mut String,
-    c: &str,
-    start_time: Instant,
-    opts: &DisplayOptions,
-) {
+fn sysprint_info(buf: &mut String, c: &str, start_time: Instant, opts: &DisplayOptions) {
     let time_str = if opts.show_sysprint_start_time {
         let ms = start_time.elapsed().as_secs_f64() * 1000.0;
         format!(" ({:.2} ms)", ms)
