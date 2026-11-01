@@ -4,7 +4,7 @@
 
 ## 🎨 Галерея логотипов и кастомизация
 
-Посмотрите файл [LOGOS.md], чтобы увидеть все поддерживаемые логотипы операционных систем, мини-режимы и примеры пользовательского ASCII-арта.
+Посмотрите файл [LOGOS.md](./LOGOS.md), чтобы увидеть все поддерживаемые логотипы операционных систем, мини-режимы и примеры пользовательского ASCII-арта.
 
 > 🐧 **Поддерживаемые логотипы:** Alpine, Android, MacOS, Arch, Artix, Astra Linux, EndeavourOS, CachyOS, Debian, Fedora, FreeBSD, NetBSD, OpenBSD, OpenSUSE, Gentoo, Kali Linux, Manjaro, Linux Mint, NixOS, Pop!OS, Ubuntu, Void Linux, Zorin OS, Lubuntu, Xubuntu, Kubuntu и Windows. Скоро появится еще больше!
 > _Если ваш дистрибутив пока не поддерживается явно, SysPrint переключится на стандартный логотип пингвина Такса (GNU/Linux)._
