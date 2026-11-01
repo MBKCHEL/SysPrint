@@ -1,5 +1,7 @@
 # SysPrint
 
+*Read in Russian language:* **[READMEru.md](./READMEru.md)**
+
 A fast, lightweight, and customizable system information fetch tool written in Rust. Inspired by `neofetch` and `fastfetch`.
 
 ---
