@@ -77,9 +77,9 @@ locale-time = true
 [disks]
 enabled = true
 list = true
-
-
 ```
+Example configuration via Nix - [NixConfig](nix/example_configuration.nix)
+
 ## When a CLI flag contradicts the config, `config-stronger = true` makes the config win
 config-stronger = false
 
