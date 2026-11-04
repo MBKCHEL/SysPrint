@@ -28,7 +28,7 @@ let
             description = "Show the ${name} block";
           };
         }
-        // lib.getAttrs fields (
+        // lib.genAttrs fields (
           f:
           mkOption {
             type = types.bool;
