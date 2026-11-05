@@ -1,5 +1,5 @@
-use crate::sysinfo::combine::DisplayOptions;
 use crate::logos::parse_color;
+use crate::sysinfo::combine::DisplayOptions;
 use colored::Colorize;
 use std::fmt::Write;
 use sysinfo::{Components, System};
@@ -33,15 +33,17 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &str) 
     if opts.cpu.cores || opts.cpu.threads {
         cpu_cores_and_threads(buf, sys, c, opts.cpu.cores, opts.cpu.threads);
     }
-    if opts.cpu.architecture {
-        cpu_arch(buf, c);
-    }
 }
 
 fn cpu_name(buf: &mut String, sys: &System, c: &str) {
     let cpus = sys.cpus();
     if let Some(cpu) = cpus.first() {
-        let _ = writeln!(buf, "{}: {}", parse_color("CPU name", c), cpu.brand().trim());
+        let _ = writeln!(
+            buf,
+            "{}: {}",
+            parse_color("CPU name", c),
+            cpu.brand().trim()
+        );
     } else {
         let _ = writeln!(buf, "CPU: Unknown");
     }
@@ -93,14 +95,15 @@ fn cpu_cores_and_threads(
     show_threads: bool,
 ) {
     if show_cores {
-        let _ = writeln!(buf, "{}: {}", parse_color("Cores", c), System::physical_core_count().unwrap_or(0));
+        let _ = writeln!(
+            buf,
+            "{}: {}",
+            parse_color("Cores", c),
+            System::physical_core_count().unwrap_or(0)
+        );
     }
     if show_threads {
         let cpus = sys.cpus();
         let _ = writeln!(buf, "{}: {}", parse_color("Threads", c), cpus.len());
     }
-}
-
-fn cpu_arch(buf: &mut String, c: &str) {
-    let _ = writeln!(buf, "{}: {}", parse_color("Architecture", c), std::env::consts::ARCH);
 }

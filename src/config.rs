@@ -33,6 +33,7 @@ pub struct SystemConfig {
     pub enabled: bool,
     pub os_name: bool,
     pub kernel: bool,
+    pub arch: bool,
     pub os_version: bool,
     pub init: bool,
     pub host: bool,
@@ -46,6 +47,7 @@ impl Default for SystemConfig {
             enabled: true,
             os_name: true,
             kernel: true,
+            arch: true,
             os_version: true,
             init: true,
             host: true,
@@ -66,7 +68,6 @@ pub struct CpuConfig {
     pub temp: bool,
     pub cores: bool,
     pub threads: bool,
-    pub architecture: bool,
 }
 
 impl Default for CpuConfig {
@@ -79,7 +80,6 @@ impl Default for CpuConfig {
             temp: true,
             cores: true,
             threads: true,
-            architecture: true,
         }
     }
 }
@@ -127,7 +127,7 @@ impl Default for MemoryConfig {
             ram_used: true,
             ram_total: true,
             swap_used: true,
-            swap_total: true
+            swap_total: true,
         }
     }
 }

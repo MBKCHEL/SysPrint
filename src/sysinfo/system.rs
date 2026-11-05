@@ -35,7 +35,7 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
         os_name(buf, c);
     }
     if opts.system.kernel {
-        check_kernel(buf, c);
+        check_kernel_and_arch(buf, c, opts);
     }
     if opts.compact_mode {
         return;
@@ -53,13 +53,31 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
         user_info(buf, c);
     }
     if opts.system.uptime {
-        let _ = writeln!(buf, "{}: {}", parse_color("Uptime", c), format_uptime(System::uptime()));
+        let _ = writeln!(
+            buf,
+            "{}: {}",
+            parse_color("Uptime", c),
+            format_uptime(System::uptime())
+        );
+    }
+    if !opts.system.kernel && opts.system.arch {
+        let _ = writeln!(
+            buf,
+            "{}: {}",
+            parse_color("Architecture", c),
+            std::env::consts::ARCH
+        );
     }
 }
 
 // OS_name
 fn os_name(buf: &mut String, c: &str) {
-    let _ = writeln!(buf, "{}: {}", parse_color("OS", c), System::name().unwrap_or_default());
+    let _ = writeln!(
+        buf,
+        "{}: {}",
+        parse_color("OS", c),
+        System::name().unwrap_or_default()
+    );
 }
 
 // OS_version
@@ -82,9 +100,15 @@ fn host(buf: &mut String, c: &str) {
     );
 }
 
-fn check_kernel(buf: &mut String, c: &str) {
+fn check_kernel_and_arch(buf: &mut String, c: &str, opts: &DisplayOptions) {
     let kernel = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
-    let _ = writeln!(buf, "{}: {}", parse_color("Kernel", c), kernel);
+    if !opts.system.arch {
+        let _ = writeln!(buf, "{}: {}", parse_color("Kernel", c), kernel);
+        return;
+    }
+    let arch = std::env::consts::ARCH;
+    let format_kernel = format!("{} ({})", kernel, arch);
+    let _ = writeln!(buf, "{}: {}", parse_color("Kernel", c), format_kernel);
 }
 
 pub fn get_init_system() -> String {
@@ -142,3 +166,4 @@ pub fn user_info(buf: &mut String, c: &str) {
 
     let _ = writeln!(buf, "{}: {}", parse_color("User", c), username);
 }
+
