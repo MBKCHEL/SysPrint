@@ -34,14 +34,14 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
     if opts.system.os_name {
         os_name(buf, c);
     }
-    if opts.system.kernel {
-        check_kernel_and_arch(buf, c, opts);
-    }
     if opts.compact_mode {
         return;
     }
     if opts.system.os_version {
         os_version(buf, c);
+    }
+    if opts.system.kernel {
+        check_kernel_and_arch(buf, c, opts);
     }
     if opts.system.init {
         init_info(buf, c);
@@ -166,4 +166,3 @@ pub fn user_info(buf: &mut String, c: &str) {
 
     let _ = writeln!(buf, "{}: {}", parse_color("User", c), username);
 }
-
