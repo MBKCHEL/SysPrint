@@ -76,6 +76,7 @@ locale-time = true
 enabled = true
 list = true
 ```
+Пример конфигурации через Nix - [NixConfig](nix/example_configuration.nix)
 
 ## Если флаг командной строки противоречит конфигу, параметр `config-stronger = true` делает приоритетным конфиг
 ```bash
