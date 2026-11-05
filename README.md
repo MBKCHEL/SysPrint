@@ -39,6 +39,7 @@ show-sysprint-start-time = true
 enabled = true
 os-name = true
 kernel = true
+architecture = true
 os-version = true
 init = true
 host = true
@@ -53,7 +54,6 @@ usage = true
 temp = true
 cores = true
 threads = true
-architecture = true
 
 [gpu]
 enabled = true
