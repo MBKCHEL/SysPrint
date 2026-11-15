@@ -117,9 +117,10 @@ sudo mv ~/Загрузки/sysprint-linux /usr/local/bin/sysprint
 ```bash
 git clone https://github.com/MBKCHEL/SysPrint.git
 cd SysPrint
-cargo build --release
-sudo cp target/release/sysprint /usr/local/bin/
+make install
 ```
+Dependencies: cargo, gnumake. Check [Makefile](Makefile)
+
 
 ##### Nix / NixOS
 For Nix or NixOS, you can install the program as follows:
