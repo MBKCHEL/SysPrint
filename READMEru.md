@@ -122,9 +122,9 @@ sudo mv ~/Загрузки/sysprint-linux /usr/local/bin/sysprint
 ```Bash
 git clone https://github.com/MBKCHEL/SysPrint.git
 cd SysPrint
-cargo build --release
-sudo cp target/release/sysprint /usr/local/bin/
+make install
 ```
+Зависимости: cargo, gnumake. См. [Makefile](Makefile)
 
 ##### Nix / NixOS
 
