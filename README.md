@@ -37,45 +37,56 @@ show-sysprint-start-time = true
 
 [system]
 enabled = true
+header-color-system = "cyan"
 os-name = true
 kernel = true
-architecture = true
-os-version = true
-init = true
-host = true
-user = true
+arch = true
+os-version = false
+init = false
+host = false
+user = false
 uptime = true
 
 [cpu]
 enabled = true
+header-color-cpu = "cyan"
 name = true
-ghz = true
+ghz = false
 usage = true
 temp = true
-cores = true
-threads = true
+cores = false
+threads = false
 
 [gpu]
 enabled = true
+header-color-gpu = "cyan"
 name = true
 vram = true
 temp = true
 
 [memory]
 enabled = true
+header-color-memory = "cyan"
 ram = true
+ram-used = true
+ram-total = true
+swap-used = true
+swap-total = true
+swap = false
 
 [other]
 enabled = true
+header-color-other = "cyan"
 de = true
-wm = true
+wm = false
 terminal = true
 shell = true
 battery = true
-locale-time = true
+locale-time = false
 
 [disks]
 enabled = true
+header-color-disk = "cyan"
 list = true
 ```
 Example configuration via Nix - [NixConfig](nix/example_configuration.nix)
