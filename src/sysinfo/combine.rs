@@ -64,7 +64,7 @@ impl SystemInfo {
             RefreshKind::nothing()
                 .with_cpu(CpuRefreshKind::everything())
                 .with_memory(MemoryRefreshKind::everything()),
-        );
+        ).unwrap();
 
         let (_, _, c) = logos::get_logo(opts.mini_logo_mode, &opts.logo, &opts.logo_color, &opts.custom_logo_path);
 

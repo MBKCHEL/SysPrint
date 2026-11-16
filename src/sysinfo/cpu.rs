@@ -70,7 +70,7 @@ fn cpu_usage(buf: &mut String, sys: &System, c: &str) {
 }
 
 fn cpu_temperature(buf: &mut String, c: &str) {
-    let components = Components::new_with_refreshed_list();
+    let components = Components::new_with_refreshed_list().unwrap();
     let cpu_temp = components.iter().find_map(|comp| {
         let label = comp.label().to_lowercase();
         if label.contains("cpu")

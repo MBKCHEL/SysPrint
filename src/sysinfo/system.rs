@@ -60,7 +60,7 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
             buf,
             "{}: {}",
             parse_color("Uptime", c),
-            format_uptime(System::uptime())
+            format_uptime(System::uptime().expect("Error getting uptime!"))
         );
     }
     if !opts.system.kernel && opts.system.arch {
@@ -104,7 +104,7 @@ fn host(buf: &mut String, c: &str) {
 }
 
 fn check_kernel_and_arch(buf: &mut String, c: &str, opts: &DisplayOptions) {
-    let kernel = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
+    let kernel = System::kernel_version().unwrap_or_else(|_| "Unknown".to_string());
     if !opts.system.arch {
         let _ = writeln!(buf, "{}: {}", parse_color("Kernel", c), kernel);
         return;
