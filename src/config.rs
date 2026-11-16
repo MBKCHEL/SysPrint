@@ -228,7 +228,18 @@ pub fn load() -> Result<Option<Config>, String> {
     };
 
     match toml::from_str::<Config>(&contents) {
-        Ok(cfg) => Ok(Some(cfg)),
+        Ok(cfg) => {
+            let updated_contents = format!(
+                "# SysPrint configuration\n\
+                 # When a CLI flag contradicts the config, `config-stronger = true` makes the config win.\n\
+                 # Fast-mode disable GPU Vram and Temp info.\n\n\
+                 {}\n",
+                toml::to_string_pretty(&cfg).map_err(|e| e.to_string())?
+            );
+            let _ = fs::write(&path, updated_contents);
+
+            Ok(Some(cfg))
+        }
         Err(e) => Err(format!("cannot parse {}: {e}", path.display())),
     }
 }
