@@ -1,6 +1,5 @@
 use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
-use colored::Colorize;
 use std::fmt::Write;
 use sysinfo::{Components, System};
 
@@ -10,7 +9,11 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &str) 
     }
 
     if !opts.compact_mode {
-        let _ = writeln!(buf, "{}", "--- CPU INFO ---".bold().cyan());
+        let _ = writeln!(
+            buf,
+            "{}",
+            parse_color("--- CPU INFO ---", &opts.cpu.header_color_cpu)
+        );
     }
 
     if opts.cpu.name || opts.compact_mode {

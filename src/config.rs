@@ -31,6 +31,7 @@ pub struct Config {
 #[serde(rename_all = "kebab-case", default)]
 pub struct SystemConfig {
     pub enabled: bool,
+    pub header_color_system: String,
     pub os_name: bool,
     pub kernel: bool,
     pub arch: bool,
@@ -45,6 +46,7 @@ impl Default for SystemConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_system: String::from("cyan"),
             os_name: true,
             kernel: true,
             arch: true,
@@ -62,6 +64,7 @@ impl Default for SystemConfig {
 #[serde(rename_all = "kebab-case", default)]
 pub struct CpuConfig {
     pub enabled: bool,
+    pub header_color_cpu: String,
     pub name: bool,
     pub ghz: bool,
     pub usage: bool,
@@ -74,6 +77,7 @@ impl Default for CpuConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_cpu: String::from("cyan"),
             name: true,
             ghz: true,
             usage: true,
@@ -89,6 +93,7 @@ impl Default for CpuConfig {
 #[serde(rename_all = "kebab-case", default)]
 pub struct GpuConfig {
     pub enabled: bool,
+    pub header_color_gpu: String,
     pub name: bool,
     pub vram: bool,
     pub temp: bool,
@@ -98,6 +103,7 @@ impl Default for GpuConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_gpu: String::from("cyan"),
             name: true,
             vram: true,
             temp: true,
@@ -110,6 +116,7 @@ impl Default for GpuConfig {
 #[serde(rename_all = "kebab-case", default)]
 pub struct MemoryConfig {
     pub enabled: bool,
+    pub header_color_memory: String,
     pub ram: bool,
     pub ram_used: bool,
     pub ram_total: bool,
@@ -122,6 +129,7 @@ impl Default for MemoryConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_memory: String::from("cyan"),
             ram: true,
             swap: true,
             ram_used: true,
@@ -137,6 +145,7 @@ impl Default for MemoryConfig {
 #[serde(rename_all = "kebab-case", default)]
 pub struct OtherConfig {
     pub enabled: bool,
+    pub header_color_other: String,
     pub de: bool,
     pub wm: bool,
     pub terminal: bool,
@@ -149,6 +158,7 @@ impl Default for OtherConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_other: String::from("cyan"),
             de: true,
             wm: true,
             terminal: true,
@@ -164,6 +174,7 @@ impl Default for OtherConfig {
 #[serde(rename_all = "kebab-case", default)]
 pub struct DisksConfig {
     pub enabled: bool,
+    pub header_color_disk: String,
     pub list: bool,
 }
 
@@ -171,6 +182,7 @@ impl Default for DisksConfig {
     fn default() -> Self {
         Self {
             enabled: true,
+            header_color_disk: String::from("cyan"),
             list: true,
         }
     }

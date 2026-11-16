@@ -1,6 +1,5 @@
 use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
-use colored::Colorize;
 use std::env;
 use std::fmt::Write;
 use std::fs;
@@ -29,7 +28,11 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
     }
 
     if !opts.compact_mode {
-        let _ = writeln!(buf, "{}", "--- System INFO ---".bold().cyan());
+        let _ = writeln!(
+            buf,
+            "{}",
+            parse_color("--- System INFO ---", &opts.system.header_color_system)
+        );
     }
     if opts.system.os_name {
         os_name(buf, c);

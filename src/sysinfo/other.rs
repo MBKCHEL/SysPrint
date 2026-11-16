@@ -1,7 +1,6 @@
 use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
 use chrono::Local;
-use colored::Colorize;
 use std::env;
 use std::fmt::Write;
 use std::fs;
@@ -13,7 +12,11 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: &str, start_time: 
     }
 
     if !opts.compact_mode {
-        let _ = writeln!(buf, "{}", "--- Other INFO ---".bold().cyan());
+        let _ = writeln!(
+            buf,
+            "{}",
+            parse_color("--- Other INFO ---", &opts.other.header_color_other)
+        );
     }
 
     if opts.other.de {
