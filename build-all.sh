@@ -42,6 +42,7 @@
 # Build support:
 #   Linux:
 #     - x86_64-unknown-linux-gnu (native)
+#     - x86_64-unknown-linux-musl
 #     - x86_64-pc-windows-gnu (cross-compilation via Zig)
 #
 #   macOS:
@@ -103,6 +104,7 @@ set -uo pipefail
 TARGETS=(
     # Linux
     "x86_64-unknown-linux-gnu"
+    "x86_64-unknown-linux-musl"
 
     # Windows
     "x86_64-pc-windows-gnu"
@@ -190,7 +192,7 @@ build_strategy() {
     local target_arch
 
     case "$target" in
-        x86_64-unknown-linux-gnu)
+        x86_64-unknown-linux-gnu|x86_64-unknown-linux-musl)
             target_os="linux"
             ;;
         x86_64-pc-windows-gnu)
@@ -215,16 +217,18 @@ build_strategy() {
 
     target_arch="${target%%-*}"
 
-    # Native compilation requires an exact OS and architecture match.
-    if [[ "$target_os" == "$HOST_OS" &&
-          "$target_arch" == "$HOST_ARCH" ]]; then
+    # Native compilation requires an exact OS and architecture match (only for glibc on standard Linux).
+    if [[ "$target" == "x86_64-unknown-linux-gnu" &&
+          "$HOST_OS" == "linux" &&
+          "$HOST_ARCH" == "x86_64" ]]; then
         echo "native"
         return 0
     fi
 
-    # Zig provides the configured Linux-to-Windows GNU cross-compilation path.
+    # Zig provides cross-compilation for Windows GNU and Linux musl.
     if [[ "$HOST_OS" == "linux" &&
-          "$target" == "x86_64-pc-windows-gnu" ]]; then
+          ( "$target" == "x86_64-pc-windows-gnu" ||
+            "$target" == "x86_64-unknown-linux-musl" ) ]]; then
         echo "zig"
         return 0
     fi

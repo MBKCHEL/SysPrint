@@ -1,6 +1,7 @@
 /result
 /target
 /logs
+/idea
 sysprint-bin/
 *.SRCINFO
 PKGBUILD
