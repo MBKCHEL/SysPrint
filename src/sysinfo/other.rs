@@ -11,7 +11,7 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: &str, start_time: 
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.other.header_enabled_other {
         let _ = writeln!(
             buf,
             "{}",

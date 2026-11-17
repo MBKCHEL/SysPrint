@@ -8,7 +8,7 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &str) 
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.cpu.header_enabled_cpu {
         let _ = writeln!(
             buf,
             "{}",

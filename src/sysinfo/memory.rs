@@ -8,7 +8,7 @@ pub fn memory_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &st
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.memory.header_enabled_memory {
         let _ = writeln!(
             buf,
             "{}",

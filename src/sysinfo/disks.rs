@@ -9,7 +9,7 @@ pub fn disk_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.disks.header_enabled_disk {
         let _ = writeln!(
             buf,
             "{}",

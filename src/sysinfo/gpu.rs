@@ -8,7 +8,7 @@ pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c:
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.gpu.header_enabled_gpu {
         let _ = writeln!(
             buf,
             "{}",

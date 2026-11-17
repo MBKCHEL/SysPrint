@@ -27,7 +27,7 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
         return;
     }
 
-    if !opts.compact_mode {
+    if !opts.compact_mode && opts.system.header_enabled_system {
         let _ = writeln!(
             buf,
             "{}",

@@ -19,9 +19,6 @@ chrono = "0.4.45"
 [target.'cfg(windows)'.dependencies]
 winreg = "0.56.0"
 
-[target.x86_64-pc-windows-msvc]
-rustflags = ["-C", "target-feature=+crt-static"]
-
 [profile.release]
 opt-level = "z"
 lto = true

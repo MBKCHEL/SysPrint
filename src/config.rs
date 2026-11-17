@@ -32,6 +32,7 @@ pub struct Config {
 pub struct SystemConfig {
     pub enabled: bool,
     pub header_color_system: String,
+    pub header_enabled_system: bool,
     pub os_name: bool,
     pub kernel: bool,
     pub arch: bool,
@@ -47,6 +48,7 @@ impl Default for SystemConfig {
         Self {
             enabled: true,
             header_color_system: String::from("cyan"),
+            header_enabled_system: true,
             os_name: true,
             kernel: true,
             arch: true,
@@ -65,6 +67,7 @@ impl Default for SystemConfig {
 pub struct CpuConfig {
     pub enabled: bool,
     pub header_color_cpu: String,
+    pub header_enabled_cpu: bool,
     pub name: bool,
     pub ghz: bool,
     pub usage: bool,
@@ -78,6 +81,7 @@ impl Default for CpuConfig {
         Self {
             enabled: true,
             header_color_cpu: String::from("cyan"),
+            header_enabled_cpu: true,
             name: true,
             ghz: true,
             usage: true,
@@ -94,6 +98,7 @@ impl Default for CpuConfig {
 pub struct GpuConfig {
     pub enabled: bool,
     pub header_color_gpu: String,
+    pub header_enabled_gpu: bool,
     pub name: bool,
     pub vram: bool,
     pub temp: bool,
@@ -104,6 +109,7 @@ impl Default for GpuConfig {
         Self {
             enabled: true,
             header_color_gpu: String::from("cyan"),
+            header_enabled_gpu: true,
             name: true,
             vram: true,
             temp: true,
@@ -117,6 +123,7 @@ impl Default for GpuConfig {
 pub struct MemoryConfig {
     pub enabled: bool,
     pub header_color_memory: String,
+    pub header_enabled_memory: bool,
     pub ram: bool,
     pub ram_used: bool,
     pub ram_total: bool,
@@ -130,6 +137,7 @@ impl Default for MemoryConfig {
         Self {
             enabled: true,
             header_color_memory: String::from("cyan"),
+            header_enabled_memory: true,
             ram: true,
             swap: true,
             ram_used: true,
@@ -146,6 +154,7 @@ impl Default for MemoryConfig {
 pub struct OtherConfig {
     pub enabled: bool,
     pub header_color_other: String,
+    pub header_enabled_other: bool,
     pub de: bool,
     pub wm: bool,
     pub terminal: bool,
@@ -159,6 +168,7 @@ impl Default for OtherConfig {
         Self {
             enabled: true,
             header_color_other: String::from("cyan"),
+            header_enabled_other: true,
             de: true,
             wm: true,
             terminal: true,
@@ -175,6 +185,7 @@ impl Default for OtherConfig {
 pub struct DisksConfig {
     pub enabled: bool,
     pub header_color_disk: String,
+    pub header_enabled_disk: bool,
     pub list: bool,
 }
 
@@ -183,6 +194,7 @@ impl Default for DisksConfig {
         Self {
             enabled: true,
             header_color_disk: String::from("cyan"),
+            header_enabled_disk: true,
             list: true,
         }
     }
