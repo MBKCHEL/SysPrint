@@ -1,0 +1,36 @@
+# ==============================================================================
+# Universal Cargo Config for Cross-Compilation (Linux, Windows, macOS, BSD)
+# ==============================================================================
+
+# Linux
+[target.x86_64-unknown-linux-gnu]
+linker = "cc"
+
+# Windows (GNU тулчейн через MinGW)
+[target.x86_64-pc-windows-gnu]
+linker = "x86_64-w64-mingw32-gcc"
+ar = "x86_64-w64-mingw32-ar"
+
+# FreeBSD
+[target.x86_64-unknown-freebsd]
+linker = "rust-lld"
+
+# OpenBSD
+[target.x86_64-unknown-openbsd]
+linker = "rust-lld"
+
+# NetBSD
+[target.x86_64-unknown-netbsd]
+linker = "rust-lld"
+
+# DragonFly BSD
+[target.x86_64-unknown-dragonfly]
+linker = "rust-lld"
+
+# macOS (Intel)
+[target.x86_64-apple-darwin]
+linker = "rust-lld"
+
+# macOS (Apple Silicon / ARM64)
+[target.aarch64-apple-darwin]
+linker = "rust-lld"

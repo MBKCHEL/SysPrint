@@ -1,5 +1,6 @@
 /result
 /target
+/logs
 sysprint-bin/
 *.SRCINFO
 PKGBUILD
