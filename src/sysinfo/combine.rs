@@ -1,4 +1,4 @@
-use crate::config::{CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OtherConfig, SystemConfig};
+use crate::config::{CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OrderConfig, OtherConfig, SystemConfig};
 use crate::logos;
 use crate::sysinfo::cpu::cpu_info;
 use crate::sysinfo::disks::disk_info;
@@ -11,6 +11,7 @@ use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
 #[derive(Clone)]
 pub struct DisplayOptions {
     pub system: SystemConfig,
+    pub order: OrderConfig,
     pub cpu: CpuConfig,
     pub gpu: GpuConfig,
     pub memory: MemoryConfig,
@@ -29,6 +30,7 @@ pub struct DisplayOptions {
 impl Default for DisplayOptions {
     fn default() -> Self {
         Self {
+            order: OrderConfig::default(),
             system: SystemConfig::default(),
             cpu: CpuConfig::default(),
             gpu: GpuConfig::default(),
@@ -56,9 +58,16 @@ pub struct SystemInfo {
 }
 
 impl SystemInfo {
-    pub fn collect(opts: DisplayOptions) -> Self {
+    pub fn collect(mut opts: DisplayOptions) -> Self {
         let start_time = std::time::Instant::now();
         let mut buffer = String::with_capacity(2048);
+
+        if opts.order.order.is_empty() {
+            opts.order.order = vec![
+                "system".into(), "cpu".into(), "gpu".into(),
+                "memory".into(), "other".into(), "disks".into()
+            ];
+        }
 
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
@@ -84,25 +93,31 @@ impl SystemInfo {
             };
         }
 
-        // --- STANDARD / FULL MODE BRANCH ---
-        if opts.system.enabled {
-            system_info(&opts, &mut buffer, &c);
+
+        for item in &opts.order.order {
+            match item.as_str() {
+                "system" => if opts.system.enabled {
+                    system_info(&opts, &mut buffer, &c);
+                },
+                "cpu" => if opts.cpu.enabled {
+                    cpu_info(&opts, &mut buffer, &_sys, &c);
+                },
+                "gpu" => if opts.gpu.enabled {
+                    get_gpu_info(&opts, &mut buffer, opts.fast_mode, &c);
+                },
+                "memory" => if opts.memory.enabled {
+                        memory_info(&opts, &mut buffer, &_sys, &c);
+                },
+                "other" => if opts.other.enabled {
+                    other_info(&opts, &mut buffer, &c, start_time);
+                },
+                "disks" => if opts.disks.enabled {
+                    disk_info(&opts, &mut buffer, &c);
+                },
+                _ => {}
+            }
         }
-        if opts.cpu.enabled {
-            cpu_info(&opts, &mut buffer, &_sys, &c);
-        }
-        if opts.gpu.enabled {
-            get_gpu_info(&opts, &mut buffer, opts.fast_mode, &c);
-        }
-        if opts.memory.enabled {
-            memory_info(&opts, &mut buffer, &_sys, &c);
-        }
-        if opts.other.enabled {
-            other_info(&opts, &mut buffer, &c, start_time);
-        }
-        if opts.disks.enabled {
-            disk_info(&opts, &mut buffer, &c);
-        }
+
 
         Self {
             buffer,

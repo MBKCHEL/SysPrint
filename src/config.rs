@@ -18,12 +18,36 @@ pub struct Config {
     pub hide_fetch_info: bool,
     pub show_sysprint_start_time: bool,
 
+    pub order: OrderConfig,
     pub system: SystemConfig,
     pub cpu: CpuConfig,
     pub gpu: GpuConfig,
     pub memory: MemoryConfig,
     pub other: OtherConfig,
     pub disks: DisksConfig,
+}
+
+
+// Order
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case", default)]
+pub struct OrderConfig {
+    pub order: Vec<String>,
+}
+
+impl Default for OrderConfig {
+    fn default() -> Self {
+        Self {
+            order: vec![
+                "system".to_string(),
+                "cpu".to_string(),
+                "gpu".to_string(),
+                "memory".to_string(),
+                "other".to_string(),
+                "disks".to_string(),
+            ],
+        }
+    }
 }
 
 // --- SYSTEM ---
@@ -212,6 +236,7 @@ impl Default for Config {
             compact_mode: false,
             hide_fetch_info: false,
             show_sysprint_start_time: true,
+            order: OrderConfig::default(),
             system: SystemConfig::default(),
             cpu: CpuConfig::default(),
             gpu: GpuConfig::default(),
@@ -244,7 +269,8 @@ pub fn load() -> Result<Option<Config>, String> {
             let updated_contents = format!(
                 "# SysPrint configuration\n\
                  # When a CLI flag contradicts the config, `config-stronger = true` makes the config win.\n\
-                 # Fast-mode disable GPU Vram and Temp info.\n\n\
+                 # Fast-mode disable GPU Vram and Temp info.\n\
+                 # [order] it`s vec with order info point. If order full empty (even quotes prints default).\n\
                  {}\n",
                 toml::to_string_pretty(&cfg).map_err(|e| e.to_string())?
             );

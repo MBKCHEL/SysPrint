@@ -4,7 +4,7 @@ mod parser;
 mod print;
 mod sysinfo;
 
-use crate::config::Config;
+use crate::config::{Config};
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;
 use clap::Parser;
@@ -39,6 +39,8 @@ fn main() {
     let custom_logo_path_cfg =
         decide_string(args.custom_logo_path, cfg.custom_logo_path, config_stronger);
 
+    let order_cfg = cfg.order;
+
     let mut system_cfg = cfg.system;
     system_cfg.enabled = decide(args.hide_system, system_cfg.enabled, config_stronger);
 
@@ -58,6 +60,7 @@ fn main() {
     disks_cfg.enabled = decide(args.hide_disks, disks_cfg.enabled, config_stronger);
 
     let opts = DisplayOptions {
+        order: order_cfg,
         system: system_cfg,
         cpu: cpu_cfg,
         gpu: gpu_cfg,
