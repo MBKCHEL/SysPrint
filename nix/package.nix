@@ -1,6 +1,9 @@
 {
   lib,
+  stdenv,
   rustPlatform,
+  makeWrapper,
+  hwdata,
   ...
 }:
 
@@ -18,6 +21,13 @@ rustPlatform.buildRustPackage {
     ];
   };
   cargoLock.lockFile = ../Cargo.lock;
+
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ makeWrapper ];
+
+  postInstall = lib.optionalString stdenv.hostPlatform.isLinux ''
+    wrapProgram $out/bin/sysprint \
+      --prefix XDG_DATA_DIRS : ${hwdata}/share
+  '';
 
   meta = {
     description = "Fast and lightweight ASCII system information fetch tool";

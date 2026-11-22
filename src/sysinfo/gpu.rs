@@ -287,8 +287,74 @@ fn get_macos_gpu_info(opts: &DisplayOptions, buf: &mut String, c: &str) -> bool 
 }
 
 #[cfg(target_os = "linux")]
+fn vendor_fallback(vendor_id: u16) -> Option<&'static str> {
+    match vendor_id {
+        0x1002 => Some("AMD Graphics"),
+        0x8086 => Some("Intel Graphics"),
+        0x10de => Some("NVIDIA Graphics"),
+        _ => None,
+    }
+}
+
+#[cfg(target_os = "linux")]
+fn find_pci_ids() -> Option<String> {
+    let mut dirs: Vec<String> = Vec::new();
+
+    if let Ok(xdg) = std::env::var("XDG_DATA_DIRS") {
+        dirs.extend(xdg.split(':').filter(|s| !s.is_empty()).map(String::from));
+    }
+
+    dirs.push("/usr/share".into());
+    dirs.push("/usr/local/share".into());
+    dirs.push("/run/current-system/sw/share".into());
+
+    for dir in dirs {
+        for sub in ["hwdata/pci.ids", "misc/pci.ids", "pci.ids"] {
+            if let Ok(text) = std::fs::read_to_string(format!("{dir}/{sub}")) {
+                return Some(text);
+            }
+        }
+    }
+
+    None
+}
+
+#[cfg(target_os = "linux")]
+fn lookup_pci_name(vendor_id: u16, device_id: u16) -> Option<String> {
+    let Some(text) = find_pci_ids() else {
+        return vendor_fallback(vendor_id).map(String::from);
+    };
+
+    let mut vendor_name: Option<&str> = None;
+
+    for line in text.lines() {
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+
+        if !line.starts_with('\t') {
+            if vendor_name.is_some() {
+                break;
+            }
+            if let Some((id, name)) = line.split_once("  ") {
+                if u16::from_str_radix(id, 16) == Ok(vendor_id) {
+                    vendor_name = Some(name.trim());
+                }
+            }
+        } else if vendor_name.is_some() && !line.starts_with("\t\t") {
+            if let Some((id, name)) = line.trim_start().split_once("  ") {
+                if u16::from_str_radix(id, 16) == Ok(device_id) {
+                    return Some(name.trim().to_string());
+                }
+            }
+        }
+    }
+
+    vendor_name.map(|v| format!("{v} Graphics"))
+}
+
+#[cfg(target_os = "linux")]
 fn get_linux_sysfs_gpu(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c: &str) -> bool {
-    use pci_ids::FromId;
     use std::fs;
     use std::path::Path;
 
@@ -325,14 +391,7 @@ fn get_linux_sysfs_gpu(opts: &DisplayOptions, buf: &mut String, fast_mode: bool,
         let device_id =
             u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16).unwrap_or(0);
 
-        let mut gpu_name = String::new();
-        if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id) {
-            if let Some(device) = vendor.devices().find(|d| d.id() == device_id) {
-                gpu_name = device.name().to_string();
-            } else {
-                gpu_name = format!("{} Graphics", vendor.name());
-            }
-        }
+        let mut gpu_name = lookup_pci_name(vendor_id, device_id).unwrap_or_default();
 
         gpu_name = clean_gpu_name(&gpu_name);
 
@@ -608,7 +667,6 @@ fn get_generic_gpu_name() -> String {
 
     #[cfg(target_os = "linux")]
     {
-        use pci_ids::FromId;
         use std::fs;
         use std::path::Path;
 
@@ -631,10 +689,8 @@ fn get_generic_gpu_name() -> String {
                             u16::from_str_radix(device_hex.trim().trim_start_matches("0x"), 16)
                                 .unwrap_or(0);
 
-                        if let Some(vendor) = pci_ids::Vendor::from_id(vendor_id) {
-                            if let Some(device) = vendor.devices().find(|d| d.id() == device_id) {
-                                return device.name().to_string();
-                            }
+                        if let Some(name) = lookup_pci_name(vendor_id, device_id) {
+                            return name;
                         }
                     }
                 }
@@ -668,4 +724,3 @@ fn get_generic_gpu_name() -> String {
 
     "Unknown GPU".to_string()
 }
-
