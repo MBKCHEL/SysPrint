@@ -1,6 +1,6 @@
 [package]
 name = "sysprint"
-version = "4.6.2"
+version = "4.6.3"
 edition = "2024"
 license = "GPL-3.0-only"
 authors = ["MBKCHEL"]
