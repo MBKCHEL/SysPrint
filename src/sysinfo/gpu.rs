@@ -3,6 +3,7 @@ use crate::sysinfo::combine::DisplayOptions;
 use std::fmt::Write;
 use std::process::Command;
 
+#[cfg_attr(not(target_os = "linux"), allow(unused_variables))]
 pub fn get_gpu_info(opts: &DisplayOptions, buf: &mut String, fast_mode: bool, c: &str) {
     if !opts.gpu.enabled {
         return;

@@ -3,7 +3,9 @@ use crate::sysinfo::combine::DisplayOptions;
 use chrono::Local;
 use std::env;
 use std::fmt::Write;
+#[cfg(target_os = "linux")]
 use std::fs;
+
 use std::time::Instant;
 
 pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: &str, start_time: Instant) {
@@ -163,6 +165,7 @@ fn terminal_info(buf: &mut String, c: &str) {
 }
 
 fn battery_info(buf: &mut String, c: &str) {
+    #[allow(unused_mut)]
     let mut battery_str = String::new();
 
     #[cfg(target_os = "linux")]
