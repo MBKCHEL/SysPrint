@@ -24,7 +24,7 @@ Check out [LOGOS.md](./LOGOS.md) to see all supported OS logos, mini-modes, and 
 # SysPrint configuration
 # When a CLI flag contradicts the config, `config-stronger = true` makes the config win.
 # Fast-mode disable GPU Vram and Temp info.
-
+# [order] it`s vec with order info point. If order full empty (even quotes prints default).
 logo = "default"
 logo-color = "purple"
 custom-logo-path = "~/FemboyLogo.txt"
@@ -35,9 +35,20 @@ compact-mode = false
 hide-fetch-info = false
 show-sysprint-start-time = true
 
+[order]
+order = [
+    "system",
+    "cpu",
+    "gpu",
+    "memory",
+    "other",
+    "disks",
+]
+
 [system]
 enabled = true
 header-color-system = "cyan"
+header-enabled-system = true
 os-name = true
 kernel = true
 arch = true
@@ -50,6 +61,7 @@ uptime = true
 [cpu]
 enabled = true
 header-color-cpu = "cyan"
+header-enabled-cpu = true
 name = true
 ghz = false
 usage = true
@@ -60,6 +72,7 @@ threads = false
 [gpu]
 enabled = true
 header-color-gpu = "cyan"
+header-enabled-gpu = true
 name = true
 vram = true
 temp = true
@@ -67,6 +80,7 @@ temp = true
 [memory]
 enabled = true
 header-color-memory = "cyan"
+header-enabled-memory = true
 ram = true
 ram-used = true
 ram-total = true
@@ -77,6 +91,7 @@ swap = false
 [other]
 enabled = true
 header-color-other = "cyan"
+header-enabled-other = true
 de = true
 wm = false
 terminal = true
@@ -87,7 +102,10 @@ locale-time = false
 [disks]
 enabled = true
 header-color-disk = "cyan"
+header-enabled-disk = true
 list = true
+
+
 ```
 Example configuration via Nix - [NixConfig](nix/example_configuration.nix)
 
