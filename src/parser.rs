@@ -1,64 +1,65 @@
 //! Argument parsing.
-use clap::Parser;
-
-#[derive(Parser)]
+use argh::FromArgs;
+/// Struct with 'Arguments'
+#[derive(FromArgs)]
 pub struct Arguments {
-    /// Write a default configuration file to the user config directory and exit
-    #[arg(long)]
+    /// write a default configuration file to the user config directory and exit
+    #[argh(switch)]
     pub generate_config: bool,
 
-    /// Print logos
-    #[arg(long)]
+    /// print logos
+    #[argh(option)]
     pub logo: Option<String>,
 
-    /// Logo Color
-    #[arg(long)]
+    /// logo color
+    #[argh(option)]
     pub logo_color: Option<String>,
 
-    /// Path to custom logo
-    #[arg(long)]
+    /// path to custom logo
+    #[argh(option)]
     pub custom_logo_path: Option<String>,
 
-    /// Hide System section
-    #[arg(long = "hide-system")]
+    /// hide system section
+    #[argh(switch)]
     pub hide_system: bool,
 
-    /// Hide CPU section
-    #[arg(long = "hide-cpu")]
+    /// hide cpu section
+    #[argh(switch)]
     pub hide_cpu: bool,
 
-    /// Hide GPU section
-    #[arg(long = "hide-gpu")]
+    /// hide gpu section
+    #[argh(switch)]
     pub hide_gpu: bool,
 
-    /// Hide Memory section
-    #[arg(long = "hide-memory")]
+    /// hide memory section
+    #[argh(switch)]
     pub hide_memory: bool,
 
-    /// Hide Other section
-    #[arg(long = "hide-other")]
+    /// hide other section
+    #[argh(switch)]
     pub hide_other: bool,
 
-    /// Hide Disks section
-    #[arg(long = "hide-disks")]
+    /// hide disks section
+    #[argh(switch)]
     pub hide_disks: bool,
 
-    /// Mini mode
-    #[arg(short = 'm', long = "mini")]
+    /// mini mode
+    #[argh(switch)]
     pub mini: bool,
 
-    /// Fast mode
-    #[arg(short = 'f', long = "fast-mode")]
+    /// fast mode
+    #[argh(switch)]
     pub fast_mode: bool,
 
-    /// Compact mode
-    #[arg(short = 'c', long = "compact-mode")]
+    /// compact mode
+    #[argh(switch)]
     pub compact_mode: bool,
 
-    /// Hide "Fetch: SysPrint"
-    #[arg(long = "hide-fetch-info")]
+    /// hide "Fetch: SysPrint"
+    #[argh(switch)]
     pub hide_fetch_info: bool,
 
-    #[arg(long = "show-sysprint-start-time")]
+    /// show speed 'SysPrint'
+    #[argh(switch)]
     pub show_sysprint_start_time: bool,
 }

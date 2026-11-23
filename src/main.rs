@@ -7,14 +7,13 @@ mod sysinfo;
 use crate::config::{Config};
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;
-use clap::Parser;
 use parser::Arguments;
 
 fn main() {
     #[cfg(windows)]
     let _ = colored::control::set_virtual_terminal(true);
 
-    let args = Arguments::parse();
+    let args = argh::from_env::<Arguments>();
 
     if args.generate_config {
         match config::generate() {
