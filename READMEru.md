@@ -19,10 +19,10 @@
 ### Пример `~/.config/sysprint/config.toml`
 
 ```TOML
-# Конфигурация SysPrint
-# Когда флаг командной строки противоречит конфигу, параметр `config-stronger = true` делает приоритетным конфиг.
-# Fast-mode отключает информацию о VRAM графического процессора и температуре.
-
+# SysPrint configuration
+# When a CLI flag contradicts the config, `config-stronger = true` makes the config win.
+# Fast-mode disable GPU Vram and Temp info.
+# [order] it`s vec with order info point. If order full empty (even quotes prints default).
 logo = "default"
 logo-color = "purple"
 custom-logo-path = "~/FemboyLogo.txt"
@@ -33,48 +33,77 @@ compact-mode = false
 hide-fetch-info = false
 show-sysprint-start-time = true
 
+[order]
+order = [
+    "system",
+    "cpu",
+    "gpu",
+    "memory",
+    "other",
+    "disks",
+]
+
 [system]
 enabled = true
+header-color-system = "cyan"
+header-enabled-system = true
 os-name = true
 kernel = true
-os-version = true
-init = true
-host = true
-user = true
+arch = true
+os-version = false
+init = false
+host = false
+user = false
 uptime = true
 
 [cpu]
 enabled = true
+header-color-cpu = "cyan"
+header-enabled-cpu = true
 name = true
-ghz = true
+ghz = false
 usage = true
 temp = true
-cores = true
-threads = true
-architecture = true
+cores = false
+threads = false
 
 [gpu]
 enabled = true
+header-color-gpu = "cyan"
+header-enabled-gpu = true
 name = true
 vram = true
 temp = true
 
 [memory]
 enabled = true
+header-color-memory = "cyan"
+header-enabled-memory = true
 ram = true
+ram-used = true
+ram-total = true
+swap-used = true
+swap-total = true
+swap = false
 
 [other]
 enabled = true
+header-color-other = "cyan"
+header-enabled-other = true
 de = true
-wm = true
+wm = false
 terminal = true
 shell = true
 battery = true
-locale-time = true
+locale-time = false
 
 [disks]
 enabled = true
+header-color-disk = "cyan"
+header-enabled-disk = true
 list = true
+
+
 ```
 Пример конфигурации через Nix - [NixConfig](nix/example_configuration.nix)
 
