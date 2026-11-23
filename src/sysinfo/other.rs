@@ -1,6 +1,6 @@
 use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
-use chrono::Local;
+use std::ffi::{c_char, c_long};
 use std::env;
 use std::fmt::Write;
 #[cfg(target_os = "linux")]
@@ -229,13 +229,75 @@ fn battery_info(buf: &mut String, c: &str) {
     }
 }
 
+
+#[cfg(unix)]
+fn local_hm() -> (i32, i32) {
+    use std::mem::MaybeUninit;
+    #[repr(C)]
+    struct Tm {
+        tm_sec: i32,
+        tm_min: i32,
+        tm_hour: i32,
+        tm_mday: i32,
+        tm_mon: i32,
+        tm_year: i32,
+        tm_wday: i32,
+        tm_yday: i32,
+        tm_isdst: i32,
+        tm_gmtoff: c_long,
+        tm_zone: *const c_char,
+    }
+
+    unsafe extern "C" {
+        fn time(t: *mut isize) -> isize;
+        fn localtime_r(timep: *const isize, result: *mut Tm) -> *mut Tm;
+    }
+
+    unsafe {
+        let now = time(std::ptr::null_mut());
+        let mut tm = MaybeUninit::<Tm>::uninit();
+        if !localtime_r(&now, tm.as_mut_ptr()).is_null() {
+            let tm = tm.assume_init();
+            (tm.tm_hour, tm.tm_min)
+        } else {
+            (0, 0)
+        }
+    }
+}
+
+#[cfg(windows)]
+fn local_hm() -> (i32, i32) {
+    #[repr(C)]
+    #[derive(Default)]
+    struct SystemTime {
+        year: u16,
+        month: u16,
+        day_of_week: u16,
+        day: u16,
+        hour: u16,
+        minute: u16,
+        second: u16,
+        milliseconds: u16,
+    }
+
+    #[link(name = "kernel32")]
+    unsafe extern "system" {
+        fn GetLocalTime(lpSystemTime: *mut SystemTime);
+    }
+
+    let mut st = SystemTime::default();
+    unsafe { GetLocalTime(&mut st) };
+    (st.hour as i32, st.minute as i32)
+}
+
 fn system_time(buf: &mut String, c: &str) {
-    let now = Local::now();
+    let (hour, min) = local_hm();
     let _ = writeln!(
         buf,
-        "{}: {}",
+        "{}: {:02}:{:02}",
         parse_color("Locale Time", c),
-        now.format("%H:%M")
+        hour,
+        min
     );
 }
 
