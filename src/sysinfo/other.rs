@@ -1,6 +1,5 @@
 use crate::logos::parse_color;
 use crate::sysinfo::combine::DisplayOptions;
-use std::ffi::{c_char, c_long};
 use std::env;
 use std::fmt::Write;
 #[cfg(target_os = "linux")]
@@ -233,6 +232,7 @@ fn battery_info(buf: &mut String, c: &str) {
 #[cfg(unix)]
 fn local_hm() -> (i32, i32) {
     use std::mem::MaybeUninit;
+    use std::ffi::{c_char, c_long};
     #[repr(C)]
     struct Tm {
         tm_sec: i32,

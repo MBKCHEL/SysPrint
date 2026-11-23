@@ -4,10 +4,10 @@ use crate::sysinfo::combine::SystemInfo;
 
 pub fn render(info: &SystemInfo) {
     let (logo, logo_padding, _) = logos::get_logo(info.mini_logo_mode, &info.logo, &info.logo_color, &info.custom_logo_path);
-    
+
     let raw_lens: Vec<usize> = logo
         .iter()
-        .map(|line| strip_ansi_escapes::strip_str(&line.to_string()).chars().count())
+        .map(|line| line.chars().count())
         .collect();
 
     let stdout = io::stdout();

@@ -1,6 +1,7 @@
 //! Configuration file handling (`config.toml`).
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::env;
 use std::path::PathBuf;
 const CONFIG_DIR_NAME: &str = "sysprint";
 const FILE_NAME: &str = "config.toml";
@@ -248,7 +249,36 @@ impl Default for Config {
 }
 
 pub fn config_path() -> PathBuf {
-    dirs::config_dir()
+    let base_dir = {
+        #[cfg(target_os = "windows")]
+        {
+            // %APPDATA% -> C:\Users\<User>\AppData\Roaming
+            env::var_os("APPDATA")
+                .filter(|s| !s.is_empty())
+                .map(PathBuf::from)
+        }
+        #[cfg(target_os = "macos")]
+        {
+            // ~/Library/Application Support
+            env::var_os("HOME")
+                .filter(|s| !s.is_empty())
+                .map(|h| PathBuf::from(h).join("Library/Application Support"))
+        }
+        #[cfg(not(any(target_os = "windows", target_os = "macos")))]
+        {
+            // Linux, BSD tree
+            env::var_os("XDG_CONFIG_HOME")
+                .filter(|s| !s.is_empty())
+                .map(PathBuf::from)
+                .or_else(|| {
+                    env::var_os("HOME")
+                        .filter(|s| !s.is_empty())
+                        .map(|h| PathBuf::from(h).join(".config"))
+                })
+        }
+    };
+
+    base_dir
         .map(|dir| dir.join(CONFIG_DIR_NAME).join(FILE_NAME))
         .unwrap_or_else(|| PathBuf::from(FILE_NAME))
 }
