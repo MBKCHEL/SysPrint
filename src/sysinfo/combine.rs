@@ -1,4 +1,6 @@
-use crate::config::{CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OrderConfig, OtherConfig, SystemConfig};
+use crate::config::{
+    CpuConfig, DisksConfig, GpuConfig, MemoryConfig, OrderConfig, OtherConfig, SystemConfig,
+};
 use crate::logos;
 use crate::sysinfo::cpu::cpu_info;
 use crate::sysinfo::disks::disk_info;
@@ -23,7 +25,6 @@ pub struct DisplayOptions {
     pub mini_logo_mode: bool,
     pub compact_mode: bool,
     pub fast_mode: bool,
-    pub hide_fetch_info: bool,
     pub show_sysprint_start_time: bool,
 }
 
@@ -43,7 +44,6 @@ impl Default for DisplayOptions {
             mini_logo_mode: false,
             compact_mode: false,
             fast_mode: false,
-            hide_fetch_info: false,
             show_sysprint_start_time: true,
         }
     }
@@ -64,34 +64,66 @@ impl SystemInfo {
 
         if opts.order.order.is_empty() {
             opts.order.order = vec![
-                "system".into(), "cpu".into(), "gpu".into(),
-                "memory".into(), "other".into(), "disks".into()
+                "system".into(),
+                "cpu".into(),
+                "gpu".into(),
+                "memory".into(),
+                "other".into(),
+                "disks".into(),
             ];
         }
 
         if opts.system.order_system.is_empty() {
             opts.system.order_system = vec![
-                "os-name".into(), "os-version".into(),
-                "kernel".into(), "init".into(),
-                "user".into(), "uptime".into(),
+                "os-name".into(),
+                "os-version".into(),
+                "kernel".into(),
+                "init".into(),
+                "user".into(),
+                "uptime".into(),
             ];
         }
 
         if opts.cpu.order_cpu.is_empty() {
             opts.cpu.order_cpu = vec![
-                "cpu-name".into(), "cpu-ghz".into(),
-                "cpu-usage".into(), "cpu-temp".into(),
-                "cpu-cores".into(), "cpu-threads".into(),
+                "cpu-name".into(),
+                "cpu-ghz".into(),
+                "cpu-usage".into(),
+                "cpu-temp".into(),
+                "cpu-cores".into(),
+                "cpu-threads".into(),
             ];
+        }
+
+        if opts.memory.order_memory.is_empty() {
+            opts.memory.order_memory = vec!["ram".into(), "swap".into()];
+        }
+
+        if opts.other.order_other.is_empty() {
+            opts.other.order_other = vec![
+                "de".into(),
+                "fetch-info".into(),
+                "wm".into(),
+                "terminal".into(),
+                "shell".into(),
+                "battery".into(),
+                "locale-time".into(),
+            ]
         }
 
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
                 .with_cpu(CpuRefreshKind::everything())
                 .with_memory(MemoryRefreshKind::everything()),
-        ).unwrap();
+        )
+        .unwrap();
 
-        let (_, _, c) = logos::get_logo(opts.mini_logo_mode, &opts.logo, &opts.logo_color, &opts.custom_logo_path);
+        let (_, _, c) = logos::get_logo(
+            opts.mini_logo_mode,
+            &opts.logo,
+            &opts.logo_color,
+            &opts.custom_logo_path,
+        );
 
         if opts.compact_mode {
             system_info(&opts, &mut buffer, &c);
@@ -109,7 +141,6 @@ impl SystemInfo {
             };
         }
 
-
         let mut parts: Vec<String> = vec![String::new(); opts.order.order.len()];
 
         std::thread::scope(|s| {
@@ -119,24 +150,36 @@ impl SystemInfo {
                 let c = &c;
 
                 s.spawn(move || match item.as_str() {
-                    "system" => if opts.system.enabled {
-                        system_info(opts, out, c);
-                    },
-                    "cpu" => if opts.cpu.enabled {
-                        cpu_info(opts, out, sys, c);
-                    },
-                    "gpu" => if opts.gpu.enabled {
-                        get_gpu_info(opts, out, opts.fast_mode, c);
-                    },
-                    "memory" => if opts.memory.enabled {
-                        memory_info(opts, out, sys, c);
-                    },
-                    "other" => if opts.other.enabled {
-                        other_info(opts, out, c, start_time);
-                    },
-                    "disks" => if opts.disks.enabled {
-                        disk_info(opts, out, c);
-                    },
+                    "system" => {
+                        if opts.system.enabled {
+                            system_info(opts, out, c);
+                        }
+                    }
+                    "cpu" => {
+                        if opts.cpu.enabled {
+                            cpu_info(opts, out, sys, c);
+                        }
+                    }
+                    "gpu" => {
+                        if opts.gpu.enabled {
+                            get_gpu_info(opts, out, opts.fast_mode, c);
+                        }
+                    }
+                    "memory" => {
+                        if opts.memory.enabled {
+                            memory_info(opts, out, sys, c);
+                        }
+                    }
+                    "other" => {
+                        if opts.other.enabled {
+                            other_info(opts, out, c, start_time);
+                        }
+                    }
+                    "disks" => {
+                        if opts.disks.enabled {
+                            disk_info(opts, out, c);
+                        }
+                    }
                     _ => {}
                 });
             }
@@ -145,7 +188,6 @@ impl SystemInfo {
         for part in parts {
             buffer.push_str(&part);
         }
-
 
         Self {
             buffer,

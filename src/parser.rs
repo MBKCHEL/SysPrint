@@ -55,10 +55,6 @@ pub struct Arguments {
     #[argh(switch)]
     pub compact_mode: bool,
 
-    /// hide "Fetch: SysPrint"
-    #[argh(switch)]
-    pub hide_fetch_info: bool,
-
     /// show speed 'SysPrint'
     #[argh(switch)]
     pub show_sysprint_start_time: bool,

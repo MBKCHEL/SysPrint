@@ -20,29 +20,47 @@ pub fn other_info(opts: &DisplayOptions, buf: &mut String, c: &str, start_time: 
         );
     }
 
-    if opts.other.de {
-        de_check(buf, c);
-    }
-    if !opts.hide_fetch_info {
-        sysprint_info(buf, c, start_time, opts);
-    }
-    if opts.compact_mode {
-        return;
-    }
-    if opts.other.wm {
-        wm_check(buf, c);
-    }
-    if opts.other.terminal {
-        terminal_info(buf, c);
-    }
-    if opts.other.shell {
-        get_shell(buf, c);
-    }
-    if opts.other.battery {
-        battery_info(buf, c);
-    }
-    if opts.other.locale_time {
-        system_time(buf, c);
+    for item in &opts.other.order_other {
+        match item.as_str() {
+            "de" => {
+                if opts.other.de {
+                    de_check(buf, c);
+                }
+            }
+            "fetch-info" => {
+                if opts.other.fetch_info {
+                    sysprint_info(buf, c, start_time, opts);
+                }
+            }
+            "wm" => {
+                if opts.other.wm {
+                    wm_check(buf, c);
+                }
+            }
+            "terminal" => {
+                if opts.other.terminal {
+                    terminal_info(buf, c);
+                }
+            }
+            "shell" => {
+                if opts.other.shell {
+                    get_shell(buf, c);
+                }
+            }
+
+            "battery" => {
+                if opts.other.battery {
+                    battery_info(buf, c);
+                }
+            }
+
+            "localetime" => {
+                if opts.other.locale_time {
+                    system_time(buf, c);
+                }
+            }
+            _ => {}
+        }
     }
 }
 
@@ -228,11 +246,10 @@ fn battery_info(buf: &mut String, c: &str) {
     }
 }
 
-
 #[cfg(unix)]
 fn local_hm() -> (i32, i32) {
-    use std::mem::MaybeUninit;
     use std::ffi::{c_char, c_long};
+    use std::mem::MaybeUninit;
     #[repr(C)]
     struct Tm {
         tm_sec: i32,

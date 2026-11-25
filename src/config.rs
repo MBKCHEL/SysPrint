@@ -1,7 +1,7 @@
 //! Configuration file handling (`config.toml`).
 use serde::{Deserialize, Serialize};
-use std::fs;
 use std::env;
+use std::fs;
 use std::path::PathBuf;
 const CONFIG_DIR_NAME: &str = "sysprint";
 const FILE_NAME: &str = "config.toml";
@@ -16,7 +16,6 @@ pub struct Config {
     pub mini_logo_mode: bool,
     pub fast_mode: bool,
     pub compact_mode: bool,
-    pub hide_fetch_info: bool,
     pub show_sysprint_start_time: bool,
 
     pub order: OrderConfig,
@@ -27,7 +26,6 @@ pub struct Config {
     pub other: OtherConfig,
     pub disks: DisksConfig,
 }
-
 
 // Order
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -91,7 +89,7 @@ impl Default for SystemConfig {
                 "host".to_string(),
                 "user".to_string(),
                 "uptime".to_string(),
-            ]
+            ],
         }
     }
 }
@@ -174,6 +172,7 @@ pub struct MemoryConfig {
     pub swap_used: bool,
     pub swap_total: bool,
     pub swap: bool,
+    pub order_memory: Vec<String>,
 }
 
 impl Default for MemoryConfig {
@@ -188,6 +187,7 @@ impl Default for MemoryConfig {
             ram_total: true,
             swap_used: true,
             swap_total: true,
+            order_memory: vec!["ram".to_string(), "swap".to_string()],
         }
     }
 }
@@ -200,11 +200,13 @@ pub struct OtherConfig {
     pub header_color_other: String,
     pub header_enabled_other: bool,
     pub de: bool,
+    pub fetch_info: bool,
     pub wm: bool,
     pub terminal: bool,
     pub shell: bool,
     pub battery: bool,
     pub locale_time: bool,
+    pub order_other: Vec<String>,
 }
 
 impl Default for OtherConfig {
@@ -214,11 +216,21 @@ impl Default for OtherConfig {
             header_color_other: String::from("cyan"),
             header_enabled_other: true,
             de: true,
+            fetch_info: true,
             wm: true,
             terminal: true,
             shell: true,
             battery: true,
             locale_time: true,
+            order_other: vec![
+                "de".to_string(),
+                "fetch-info".to_string(),
+                "wm".to_string(),
+                "terminal".to_string(),
+                "shell".to_string(),
+                "battery".to_string(),
+                "locale-time".to_string(),
+            ],
         }
     }
 }
@@ -254,7 +266,6 @@ impl Default for Config {
             mini_logo_mode: false,
             fast_mode: false,
             compact_mode: false,
-            hide_fetch_info: false,
             show_sysprint_start_time: true,
             order: OrderConfig::default(),
             system: SystemConfig::default(),

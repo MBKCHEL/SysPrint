@@ -4,7 +4,7 @@ mod parser;
 mod print;
 mod sysinfo;
 
-use crate::config::{Config};
+use crate::config::Config;
 use crate::sysinfo::combine::DisplayOptions;
 use crate::sysinfo::combine::SystemInfo;
 use parser::Arguments;
@@ -72,7 +72,6 @@ fn main() {
         mini_logo_mode: decide_bool(args.mini, cfg.mini_logo_mode, config_stronger),
         fast_mode: decide_bool(args.fast_mode, cfg.fast_mode, config_stronger),
         compact_mode: decide_bool(args.compact_mode, cfg.compact_mode, config_stronger),
-        hide_fetch_info: decide_bool(args.hide_fetch_info, cfg.hide_fetch_info, config_stronger),
         show_sysprint_start_time: decide_bool(
             args.show_sysprint_start_time,
             cfg.show_sysprint_start_time,

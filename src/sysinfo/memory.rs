@@ -16,10 +16,21 @@ pub fn memory_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &st
         );
     }
 
-    ram_info(opts, sys, buf, c);
+    for item in &opts.memory.order_memory {
+        match item.as_str() {
+            "ram" => {
+                if opts.memory.ram {
+                    ram_info(opts, sys, buf, c);
+                }
+            }
+            "swap" => {
+                if opts.memory.swap {
+                    swap_info(opts, sys, buf, c);
+                }
+            }
 
-    if opts.memory.swap {
-        swap_info(opts, sys, buf, c);
+            _ => {}
+        }
     }
 }
 
@@ -57,4 +68,3 @@ pub fn swap_info(opts: &DisplayOptions, sys: &System, buf: &mut String, c: &str)
 
     let _ = writeln!(buf, "{}: {}", parse_color(label, c), val_str);
 }
-
