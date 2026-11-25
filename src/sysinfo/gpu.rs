@@ -146,7 +146,7 @@ pub fn get_nvidia_fast_info(
         return false;
     }
 
-    if fast_mode || opts.compact_mode {
+    if fast_mode || opts.compact_mode || (!opts.gpu.vram && !opts.gpu.temp) {
         return true;
     }
 

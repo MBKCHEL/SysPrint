@@ -94,28 +94,40 @@ impl SystemInfo {
         }
 
 
-        for item in &opts.order.order {
-            match item.as_str() {
-                "system" => if opts.system.enabled {
-                    system_info(&opts, &mut buffer, &c);
-                },
-                "cpu" => if opts.cpu.enabled {
-                    cpu_info(&opts, &mut buffer, &_sys, &c);
-                },
-                "gpu" => if opts.gpu.enabled {
-                    get_gpu_info(&opts, &mut buffer, opts.fast_mode, &c);
-                },
-                "memory" => if opts.memory.enabled {
-                        memory_info(&opts, &mut buffer, &_sys, &c);
-                },
-                "other" => if opts.other.enabled {
-                    other_info(&opts, &mut buffer, &c, start_time);
-                },
-                "disks" => if opts.disks.enabled {
-                    disk_info(&opts, &mut buffer, &c);
-                },
-                _ => {}
+        let mut parts: Vec<String> = vec![String::new(); opts.order.order.len()];
+
+        std::thread::scope(|s| {
+            for (item, out) in opts.order.order.iter().zip(parts.iter_mut()) {
+                let opts = &opts;
+                let sys = &_sys;
+                let c = &c;
+
+                s.spawn(move || match item.as_str() {
+                    "system" => if opts.system.enabled {
+                        system_info(opts, out, c);
+                    },
+                    "cpu" => if opts.cpu.enabled {
+                        cpu_info(opts, out, sys, c);
+                    },
+                    "gpu" => if opts.gpu.enabled {
+                        get_gpu_info(opts, out, opts.fast_mode, c);
+                    },
+                    "memory" => if opts.memory.enabled {
+                        memory_info(opts, out, sys, c);
+                    },
+                    "other" => if opts.other.enabled {
+                        other_info(opts, out, c, start_time);
+                    },
+                    "disks" => if opts.disks.enabled {
+                        disk_info(opts, out, c);
+                    },
+                    _ => {}
+                });
             }
+        });
+
+        for part in parts {
+            buffer.push_str(&part);
         }
 
 
