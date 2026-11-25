@@ -69,6 +69,22 @@ impl SystemInfo {
             ];
         }
 
+        if opts.system.order_system.is_empty() {
+            opts.system.order_system = vec![
+                "os-name".into(), "os-version".into(),
+                "kernel".into(), "init".into(),
+                "user".into(), "uptime".into(),
+            ];
+        }
+
+        if opts.cpu.order_cpu.is_empty() {
+            opts.cpu.order_cpu = vec![
+                "cpu-name".into(), "cpu-ghz".into(),
+                "cpu-usage".into(), "cpu-temp".into(),
+                "cpu-cores".into(), "cpu-threads".into(),
+            ];
+        }
+
         let _sys = System::new_with_specifics(
             RefreshKind::nothing()
                 .with_cpu(CpuRefreshKind::everything())

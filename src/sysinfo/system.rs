@@ -34,41 +34,45 @@ pub fn system_info(opts: &DisplayOptions, buf: &mut String, c: &str) {
             parse_color("--- System INFO ---", &opts.system.header_color_system)
         );
     }
-    if opts.system.os_name {
-        os_name(buf, c);
+
+    for item in &opts.system.order_system {
+        match item.as_str() {
+            "os-name" => if opts.system.os_name {
+                os_name(buf, c);
+            }
+            "os-version" => if opts.system.os_version {
+                os_version(buf, c);
+            }
+            "kernel" => if opts.system.kernel {
+                check_kernel_and_arch(buf, c, opts);
+            }
+            "init" => if opts.system.init {
+                init_info(buf, c);
+            }
+            "host" =>  if opts.system.host {
+                host(buf, c);
+            }
+            "user" => if opts.system.user {
+                user_info(buf, c);
+            }
+            "uptime" =>  if opts.system.uptime {
+                let _ = writeln!(
+                    buf,
+                    "{}: {}",
+                    parse_color("Uptime", c),
+                    format_uptime(System::uptime().expect("Error getting uptime!"))
+                );
+            }
+            _ => {}
+        }
     }
-    if opts.compact_mode {
-        return;
-    }
-    if opts.system.os_version {
-        os_version(buf, c);
-    }
-    if opts.system.kernel {
-        check_kernel_and_arch(buf, c, opts);
-    }
-    if opts.system.init {
-        init_info(buf, c);
-    }
-    if opts.system.host {
-        host(buf, c);
-    }
-    if opts.system.user {
-        user_info(buf, c);
-    }
-    if opts.system.uptime {
-        let _ = writeln!(
-            buf,
-            "{}: {}",
-            parse_color("Uptime", c),
-            format_uptime(System::uptime().expect("Error getting uptime!"))
-        );
-    }
+
     if !opts.system.kernel && opts.system.arch {
         let _ = writeln!(
             buf,
             "{}: {}",
             parse_color("Architecture", c),
-            std::env::consts::ARCH
+            env::consts::ARCH
         );
     }
 }

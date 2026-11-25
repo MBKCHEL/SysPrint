@@ -16,26 +16,34 @@ pub fn cpu_info(opts: &DisplayOptions, buf: &mut String, sys: &System, c: &str) 
         );
     }
 
-    if opts.cpu.name || opts.compact_mode {
-        cpu_name(buf, sys, c);
+    for item in &opts.cpu.order_cpu {
+        match item.as_str() {
+            "cpu-name" => if opts.cpu.name || opts.compact_mode {
+                cpu_name(buf, sys, c);
+            }
+            "cpu-ghz" => if opts.cpu.ghz {
+                ggz_cpu(buf, sys, c);
+            }
+            "cpu-usage" => if opts.cpu.usage {
+                cpu_usage(buf, sys, c);
+            }
+            "cpu-temp" => if opts.cpu.temp {
+                cpu_temperature(buf, c);
+            }
+            "cpu-cores" => if opts.cpu.cores {
+                cpu_cores(buf, c);
+            }
+            "cpu-threads" => if opts.cpu.threads {
+                cpu_threads(buf, sys, c);
+            }
+            _ => {}
+        }
     }
 
-    if opts.compact_mode {
-        return;
-    }
 
-    if opts.cpu.ghz {
-        ggz_cpu(buf, sys, c);
-    }
-    if opts.cpu.usage {
-        cpu_usage(buf, sys, c);
-    }
-    if opts.cpu.temp {
-        cpu_temperature(buf, c);
-    }
-    if opts.cpu.cores || opts.cpu.threads {
-        cpu_cores_and_threads(buf, sys, c, opts.cpu.cores, opts.cpu.threads);
-    }
+
+
+
 }
 
 fn cpu_name(buf: &mut String, sys: &System, c: &str) {
@@ -90,23 +98,21 @@ fn cpu_temperature(buf: &mut String, c: &str) {
     }
 }
 
-fn cpu_cores_and_threads(
+fn cpu_threads(
     buf: &mut String,
     sys: &System,
     c: &str,
-    show_cores: bool,
-    show_threads: bool,
 ) {
-    if show_cores {
-        let _ = writeln!(
-            buf,
-            "{}: {}",
-            parse_color("Cores", c),
-            System::physical_core_count().unwrap_or(0)
-        );
-    }
-    if show_threads {
-        let cpus = sys.cpus();
-        let _ = writeln!(buf, "{}: {}", parse_color("Threads", c), cpus.len());
-    }
+    let cpus = sys.cpus();
+    let _ = writeln!(buf, "{}: {}", parse_color("Threads", c), cpus.len());
+}
+
+fn cpu_cores(buf: &mut String, c: &str)  {
+    let _ = writeln!(
+        buf,
+        "{}: {}",
+        parse_color("Cores", c),
+        System::physical_core_count().unwrap_or(0)
+    );
+
 }

@@ -66,6 +66,7 @@ pub struct SystemConfig {
     pub host: bool,
     pub user: bool,
     pub uptime: bool,
+    pub order_system: Vec<String>,
 }
 
 impl Default for SystemConfig {
@@ -82,6 +83,15 @@ impl Default for SystemConfig {
             host: true,
             user: true,
             uptime: true,
+            order_system: vec![
+                "os-name".to_string(),
+                "kernel".to_string(),
+                "os-version".to_string(),
+                "init".to_string(),
+                "host".to_string(),
+                "user".to_string(),
+                "uptime".to_string(),
+            ]
         }
     }
 }
@@ -99,6 +109,7 @@ pub struct CpuConfig {
     pub temp: bool,
     pub cores: bool,
     pub threads: bool,
+    pub order_cpu: Vec<String>,
 }
 
 impl Default for CpuConfig {
@@ -113,6 +124,14 @@ impl Default for CpuConfig {
             temp: true,
             cores: true,
             threads: true,
+            order_cpu: vec![
+                "cpu-name".to_string(),
+                "cpu-ghz".to_string(),
+                "cpu-usage".to_string(),
+                "cpu-temp".to_string(),
+                "cpu-cores".to_string(),
+                "cpu-threads".to_string(),
+            ],
         }
     }
 }
