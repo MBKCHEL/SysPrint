@@ -98,6 +98,8 @@ fn wm_check(buf: &mut String, c: &str) {
             "Niri".to_string()
         } else if env::var("HYPRLAND_INSTANCE_SIGNATURE").is_ok() {
             "Hyprland".to_string()
+        } else if env::var("MANGO_INSTANCE_SIGNATURE").is_ok() {
+            "MangoWC".to_string()
         } else if env::var("UMBRIEL_SOCKET").is_ok() {
             "Umbriel".to_string()
         } else if env::var("SWAYSOCK").is_ok() {
