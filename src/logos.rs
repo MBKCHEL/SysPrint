@@ -202,11 +202,9 @@ pub fn get_logo(
     } else {
         default_color
     };
-    let force_color = (custom_color != "default").then_some(active_color);
-
     let logo_lines: Vec<LogoLine> = raw_logo
         .lines()
-        .map(|line| parse_logo_line(line, active_color, force_color))
+        .map(|line| parse_logo_line(line, active_color, None))
         .collect();
 
     let max_width = logo_lines.iter().map(|line| line.width).max().unwrap_or(0);

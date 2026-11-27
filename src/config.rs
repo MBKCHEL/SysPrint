@@ -329,6 +329,9 @@ pub fn load() -> Result<Option<Config>, String> {
                  # When a CLI flag contradicts the config, `config-stronger = true` makes the config win.\n\
                  # Fast-mode disable GPU Vram and Temp info.\n\
                  # [order] it`s vec with order info point. If order full empty (even quotes prints default).\n\
+                 # logo-color sets the color of the info labels (OS:, CPU name:, ...).\n\
+                 # Logos that contain color flags keep their own colors, so changing logo-color will not repaint them.\n\
+                 # Use the {{d}} flag in a logo file to make that part follow logo-color.\n\
                  {}\n",
                 toml::to_string_pretty(&cfg).map_err(|e| e.to_string())?
             );
