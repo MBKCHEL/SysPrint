@@ -3,12 +3,7 @@ use crate::logos;
 use crate::sysinfo::combine::SystemInfo;
 
 pub fn render(info: &SystemInfo) {
-    let (logo, logo_padding, _) = logos::get_logo(info.mini_logo_mode, &info.logo, &info.logo_color, &info.custom_logo_path);
-
-    let raw_lens: Vec<usize> = logo
-        .iter()
-        .map(|line| line.chars().count())
-        .collect();
+    let (logo, logo_padding, _) = logos::get_logo( &info.logo, &info.logo_color, &info.custom_logo_path);
 
     let stdout = io::stdout();
 
@@ -25,14 +20,13 @@ pub fn render(info: &SystemInfo) {
             break;
         }
 
-        if let Some(logo_str) = logo_line {
-            let raw_len = raw_lens[i];
-            let pad = if logo_padding > raw_len {
-                logo_padding - raw_len + 3
+        if let Some(logo_line) = logo_line {
+            let pad = if logo_padding > logo_line.width {
+                logo_padding - logo_line.width + 3
             } else {
                 3
             };
-            let _ = write!(handle, "{}{}", logo_str, " ".repeat(pad));
+            let _ = write!(handle, "{}{}", logo_line.text, " ".repeat(pad));
         } else {
             let _ = write!(handle, "{}", " ".repeat(logo_padding + 3));
         }

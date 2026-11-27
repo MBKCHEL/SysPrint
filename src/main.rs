@@ -69,7 +69,6 @@ fn main() {
         logo: logo_cfg,
         logo_color: logo_color_cfg,
         custom_logo_path: custom_logo_path_cfg,
-        mini_logo_mode: decide_bool(args.mini, cfg.mini_logo_mode, config_stronger),
         fast_mode: decide_bool(args.fast_mode, cfg.fast_mode, config_stronger),
         compact_mode: decide_bool(args.compact_mode, cfg.compact_mode, config_stronger),
         show_sysprint_start_time: decide_bool(

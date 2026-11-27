@@ -43,10 +43,6 @@ pub struct Arguments {
     #[argh(switch)]
     pub hide_disks: bool,
 
-    /// mini mode
-    #[argh(switch)]
-    pub mini: bool,
-
     /// fast mode
     #[argh(switch)]
     pub fast_mode: bool,

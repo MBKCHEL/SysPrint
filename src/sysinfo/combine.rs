@@ -22,7 +22,6 @@ pub struct DisplayOptions {
     pub logo: String,
     pub logo_color: String,
     pub custom_logo_path: String,
-    pub mini_logo_mode: bool,
     pub compact_mode: bool,
     pub fast_mode: bool,
     pub show_sysprint_start_time: bool,
@@ -41,7 +40,6 @@ impl Default for DisplayOptions {
             logo: String::from("default"),
             logo_color: String::from("default"),
             custom_logo_path: String::from("default"),
-            mini_logo_mode: false,
             compact_mode: false,
             fast_mode: false,
             show_sysprint_start_time: true,
@@ -54,7 +52,6 @@ pub struct SystemInfo {
     pub logo: String,
     pub logo_color: String,
     pub custom_logo_path: String,
-    pub mini_logo_mode: bool,
 }
 
 impl SystemInfo {
@@ -119,7 +116,6 @@ impl SystemInfo {
         .unwrap();
 
         let (_, _, c) = logos::get_logo(
-            opts.mini_logo_mode,
             &opts.logo,
             &opts.logo_color,
             &opts.custom_logo_path,
@@ -137,7 +133,6 @@ impl SystemInfo {
                 logo: opts.logo,
                 logo_color: opts.logo_color,
                 custom_logo_path: opts.custom_logo_path,
-                mini_logo_mode: opts.mini_logo_mode,
             };
         }
 
@@ -194,7 +189,6 @@ impl SystemInfo {
             logo: opts.logo,
             logo_color: opts.logo_color,
             custom_logo_path: opts.custom_logo_path,
-            mini_logo_mode: opts.mini_logo_mode,
         }
     }
 }
